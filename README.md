@@ -10,7 +10,7 @@ Fitness tracking data analysis and sharing app for CITS5505 Agile Web Dev projec
 | -------------- | ------------ | --------------- |
 | 23917077       | Vincent Wang | VincentWang2961 |
 | 24201328       | Ethika Biswas| ethika-biswas   |
-|                |              |                 |
+| 24201328       | Yidan Xu     | EdenXu886       |
 |                |              |                 |
 
 ## How to Install
