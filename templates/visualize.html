@@ -1,0 +1,80 @@
+<!-- templates/visualize.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6 text-center">Your Fitness Dashboard</h1>
+<p class="text-center text-gray-600 dark:text-gray-400 mb-8">
+    View your activity statistics and compare with friends.
+</p>
+
+<!-- Section: Personal Analytics -->
+<section class="mb-12">
+    <h2 class="text-2xl font-semibold mb-4 border-b pb-2 dark:border-gray-600">My Analytics</h2>
+    <!-- Responsive Grid for Stat Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- Placeholder Card 1: Activity Overview -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="text-xl font-semibold mb-3 text-primary dark:text-blue-400">Activity This Week</h3>
+            <!-- Placeholder: Simple stats -->
+            <p class="text-gray-700 dark:text-gray-300"><i class="fas fa-running mr-2 text-orange-500"></i>Workouts: <span class="font-bold">5</span></p>
+            <p class="text-gray-700 dark:text-gray-300"><i class="fas fa-clock mr-2 text-purple-500"></i>Total Time: <span class="font-bold">3h 45m</span></p>
+            <p class="text-gray-700 dark:text-gray-300"><i class="fas fa-fire mr-2 text-red-500"></i>Calories Burned (est.): <span class="font-bold">1500</span></p>
+             <!-- Button: View Details -->
+             <!-- Description: Links to a more detailed view of this week's activities (non-functional link). -->
+            <a href="#" class="text-sm text-primary dark:text-blue-400 hover:underline mt-4 inline-block">View Details &rarr;</a>
+        </div>
+
+        <!-- Placeholder Card 2: Workout Duration Trend (Chart Placeholder) -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="text-xl font-semibold mb-3 text-green-500">Workout Duration Trend</h3>
+            <!-- Placeholder: Area where a chart would be rendered -->
+            <div class="h-40 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
+                <p class="text-gray-500 dark:text-gray-400 italic">Chart Placeholder</p>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Average duration is increasing!</p>
+        </div>
+
+         <!-- Placeholder Card 3: Exercise Type Breakdown (Pie Chart Placeholder) -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+            <h3 class="text-xl font-semibold mb-3 text-yellow-500">Exercise Types</h3>
+            <!-- Placeholder: Area where a pie chart would be rendered -->
+             <div class="h-40 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
+                <p class="text-gray-500 dark:text-gray-400 italic">Pie Chart Placeholder</p>
+            </div>
+             <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Running: 40%, Cycling: 30%, Weights: 20%, Other: 10%</p>
+        </div>
+
+    </div>
+</section>
+
+<!-- Section: Friend Comparison -->
+<section>
+    <h2 class="text-2xl font-semibold mb-4 border-b pb-2 dark:border-gray-600">Friend Comparison</h2>
+    <p class="text-gray-600 dark:text-gray-400 mb-4">
+        See how your stats compare to friends who have shared their data with you. (Requires friend connection and sharing enabled).
+    </p>
+     <!-- Placeholder Card: Friend Comparison Example -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+        <h3 class="text-xl font-semibold mb-3">Weekly Steps Challenge</h3>
+        <!-- Placeholder: List or table comparing friends -->
+        <ul class="space-y-2">
+            <li class="flex justify-between items-center">
+                <span><i class="fas fa-user-circle mr-2 text-gray-400"></i>You</span>
+                <span class="font-bold text-green-500">55,000 steps</span>
+            </li>
+             <li class="flex justify-between items-center border-t pt-2 dark:border-gray-700">
+                <span><i class="fas fa-user-circle mr-2 text-blue-400"></i>Friend_Alice</span>
+                <span class="font-bold">62,000 steps</span>
+            </li>
+             <li class="flex justify-between items-center border-t pt-2 dark:border-gray-700">
+                <span><i class="fas fa-user-circle mr-2 text-purple-400"></i>Friend_Bob</span>
+                <span class="font-bold">48,000 steps</span>
+            </li>
+        </ul>
+        <!-- Button: View More Comparisons -->
+        <!-- Description: Links to a dedicated friend comparison page (non-functional link). -->
+        <a href="#" class="text-sm text-primary dark:text-blue-400 hover:underline mt-4 inline-block">More Comparisons &rarr;</a>
+    </div>
+</section>
+{% endblock %}
