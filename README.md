@@ -15,4 +15,12 @@ Fitness tracking data analysis and sharing app for CITS5505 Agile Web Dev projec
 
 ## How to Install
 
+1. Create a virtual environment `python -m venv venv`
+2. Active the virtual environment on macOS or Linux  `source venv/bin/activate`
+3. Install Flask `pip install Flask`
+
 ## how to Run
+
+1. Run the Flask app `flask run`
+2. Open the browser and go to the URL `http://127.0.0.1:5000`
+
