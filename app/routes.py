@@ -1,11 +1,7 @@
-# app.py
-# Imports
-from flask import Flask, render_template
+# routes.py
 
-# Initialize Flask app
-app = Flask(__name__)
-
-# --- Routes ---
+from app import app
+from flask import render_template
 
 # Route for the Introduction/Home page
 @app.route('/')
@@ -50,10 +46,3 @@ def register():
     # We will create register.html later if needed
     # Let's create a simple placeholder register.html
     return render_template('register.html', title='Register')
-
-
-# --- Run the App ---
-if __name__ == '__main__':
-    # Runs the Flask development server
-    # Debug=True allows auto-reloading on code changes
-    app.run(debug=True)
