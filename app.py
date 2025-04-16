@@ -20,12 +20,12 @@ def upload():
     # We will create upload.html in the next iteration
     return render_template('upload.html', title='Upload Data')
 
-# Route for Data Visualization page (placeholder)
-@app.route('/visualize')
-def visualize():
-    """Renders the data visualization page."""
-    # We will create visualize.html in the next iteration
-    return render_template('visualize.html', title='Visualize Data')
+# Route for Data Visualisation page (placeholder)
+@app.route('/visualise')
+def visualise():
+    """Renders the data visualisation page."""
+    # We will create visualise.html in the next iteration
+    return render_template('visualise.html', title='Visualise Data')
 
 # Route for Data Sharing page (placeholder)
 @app.route('/share')

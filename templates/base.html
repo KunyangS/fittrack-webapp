@@ -9,18 +9,17 @@
     <title>{{ title }} - Fitness Tracker</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Link to your custom CSS (optional) -->
+    <!-- Link to custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Font Awesome for Icons (Optional, but useful) -->
+    <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Configuration for Tailwind Dark Mode (applied via JS) -->
+    <!-- Configuration for Tailwind Dark Mode -->
     <script>
         tailwind.config = {
             darkMode: 'class', // Enable class-based dark mode
             theme: {
                 extend: {
                     colors: {
-                        // You can define custom colors here if needed
                         primary: '#3490dc', // Example primary color
                     }
                 }
@@ -49,7 +48,7 @@
             <ul class="flex space-x-4 items-center">
                 <li><a href="{{ url_for('index') }}" class="hover:text-primary dark:hover:text-blue-400">Home</a></li>
                 <li><a href="{{ url_for('upload') }}" class="hover:text-primary dark:hover:text-blue-400">Upload</a></li>
-                <li><a href="{{ url_for('visualize') }}" class="hover:text-primary dark:hover:text-blue-400">Visualize</a></li>
+                <li><a href="{{ url_for('visualise') }}" class="hover:text-primary dark:hover:text-blue-400">Visualise</a></li>
                 <li><a href="{{ url_for('share') }}" class="hover:text-primary dark:hover:text-blue-400">Share</a></li>
                 <!-- Dark Mode Toggle Button -->
                 <li>
@@ -59,7 +58,6 @@
                     </button>
                 </li>
                  <!-- Login/Register Buttons (visible if not logged in) -->
-                 <!-- In a real app, these would be conditionally shown -->
                 <li><a href="{{ url_for('login') }}" class="bg-primary text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Login</a></li>
                 <li><a href="{{ url_for('register') }}" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm">Register</a></li>
             </ul>
@@ -87,9 +85,9 @@
         </div>
     </footer>
 
-    <!-- Include jQuery (Optional, but allowed and can be useful) -->
+    <!-- Include jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Include your main JavaScript file -->
+    <!-- Include main JavaScript file -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
 </body>
