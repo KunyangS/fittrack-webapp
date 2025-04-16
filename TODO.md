@@ -4,8 +4,11 @@
 fittrack-webapp/
 ├── README.md  #README file for the project
 ├── TODO.md  #This file, lists all the TODOs
-├── app.py  #The core Flask application file
+├── run.py  #The core Flask application file
 ├── requirements.txt  #Dependency list
+├── app
+│   ├── __init__.py  #Init of the website application
+│   ├── routes.py  #Router of the templates
 ├── static  #Static files and resources
 │   ├── css
 │   ├── img
