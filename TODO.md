@@ -30,3 +30,4 @@ fittrack-webapp/
 - [ ] Decide the source of the data set
 - [ ] Decide what kind of visualisation of the data and what visualisation lib we need
 - [ ] Extent some new interesting features
+- [ ] Add a secure key to protect data from cross site request forgery(CSRF)
