@@ -14,7 +14,7 @@ def index():
 def upload():
     """Renders the data upload page."""
     # We will create upload.html in the next iteration
-    return render_template('upload.html', title='Upload Data')
+    return render_template('upload.html', title='Data Upload')
 
 # Route for Data Visualisation page (placeholder)
 @app.route('/visualise')
@@ -46,3 +46,5 @@ def register():
     # We will create register.html later if needed
     # Let's create a simple placeholder register.html
     return render_template('register.html', title='Register')
+
+
