@@ -3,6 +3,8 @@
 from flask import Flask
 import os
 from flask_sqlalchemy import SQLAlchemy
+from app import routes
+from app.upload import upload_bp 
 
 # Initialize Flask app, redirect the tamplate folder outside the app folder
 template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'templates')
@@ -18,10 +20,4 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
-
-# --- Routes ---
-from app import routes
-
-# Register Blueprints
-from app.upload import upload_bp   
 app.register_blueprint(upload_bp) 
