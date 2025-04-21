@@ -3,7 +3,7 @@
 
 <h2 class="text-2xl font-bold mb-6 text-primary">Upload Your Daily Fitness Data</h2>
 
-<form action="/upload" method="post" class="space-y-8">
+<form id="uploadForm" class="space-y-8">
 
   <!-- Basic Information -->
   <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
@@ -60,4 +60,5 @@
   </div>
 
 </form>
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 {% endblock %}
