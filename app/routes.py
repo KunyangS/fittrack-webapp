@@ -9,12 +9,6 @@ def index():
     """Renders the introduction page."""
     return render_template('index.html', title='Welcome') # Pass title variable
 
-# Route for Data Upload page (placeholder)
-@app.route('/upload')
-def upload():
-    """Renders the data upload page."""
-    # We will create upload.html in the next iteration
-    return render_template('upload.html', title='Data Upload')
 
 # Route for Data Visualisation page (placeholder)
 @app.route('/visualise')
