@@ -1,41 +1,138 @@
-<!-- templates/register.html -->
-{% extends 'base.html' %}
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<!-- Add 'dark' class here via JS for dark mode -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Use the title variable passed from Flask -->
+    <title>{{ title }} - Fitness Tracker</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Link to custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Configuration for Tailwind Dark Mode -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Enable class-based dark mode
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3490dc', // Example primary color
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Simple smooth transition for color changes */
+        body, html {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+    </style>
+</head>
+<!-- Apply base background and text colors for light/dark modes -->
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans flex flex-col min-h-screen">
+
+    <!-- Floating Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <!-- Logo/Brand Name -->
+            <a href="{{ url_for('index') }}" class="text-xl font-bold text-primary dark:text-blue-400">
+                <i class="fas fa-heartbeat mr-2"></i>FitTrack
+            </a>
+
+            <!-- Navigation Links -->
+            <ul class="flex space-x-4 items-center">
+                <li><a href="{{ url_for('index') }}" class="hover:text-primary dark:hover:text-blue-400">Home</a></li>
+                <li><a href="{{ url_for('upload') }}" class="hover:text-primary dark:hover:text-blue-400">Upload</a></li>
+                <li><a href="{{ url_for('visualise') }}" class="hover:text-primary dark:hover:text-blue-400">Visualise</a></li>
+                <li><a href="{{ url_for('share') }}" class="hover:text-primary dark:hover:text-blue-400">Share</a></li>
+                <!-- Dark Mode Toggle Button -->
+                <li>
+                    <button id="darkModeToggle" class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <i class="fas fa-moon text-yellow-500"></i> <!-- Moon icon for dark mode -->
+                        <i class="fas fa-sun text-yellow-500" style="display: none;"></i> <!-- Sun icon for light mode -->
+                    </button>
+                </li>
+                 <!-- Login/Register Buttons (visible if not logged in) -->
+                <li><a href="{{ url_for('login') }}" class="bg-primary text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Login</a></li>
+                <li><a href="{{ url_for('register') }}" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm">Register</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <!-- 'flex-grow' makes this section fill available space -->
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        <!-- Content from child templates will be injected here -->
+        
 {% block content %}
-<div class="max-w-md mx-auto mt-10 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-    <h2 class="text-2xl font-bold text-center mb-6 text-green-500">Create Account</h2>
-     <p class="text-center text-gray-600 dark:text-gray-400 mb-6">
+<div class="flex flex-col items-center justify-center py-16 px-4 sm:px-6 lg:px-8">
+  <div class="w-full max-w-md space-y-8">
+    <div>
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+        Create Account
+      </h2>
+      <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
         This is a placeholder registration form. Functionality is not implemented.
-    </p>
-    <form action="#" method="post"> <!-- Action points nowhere for now -->
-        <div class="mb-4">
-            <label for="reg-username" class="block text-gray-700 dark:text-gray-300 mb-2">Username</label>
-            <input type="text" id="reg-username" name="username" placeholder="Choose a username"
-                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+      </p>
+    </div>
+    <form class="mt-8 space-y-6" method="POST">
+      <div class="rounded-md shadow-sm space-y-4">
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
+          <input id="username" name="username" type="text" required class="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white">
         </div>
-        <div class="mb-4">
-            <label for="reg-email" class="block text-gray-700 dark:text-gray-300 mb-2">Email</label>
-            <input type="email" id="reg-email" name="email" placeholder="Enter your email"
-                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+          <input id="email" name="email" type="email" required class="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white">
         </div>
-        <div class="mb-4">
-            <label for="reg-password" class="block text-gray-700 dark:text-gray-300 mb-2">Password</label>
-            <input type="password" id="reg-password" name="password" placeholder="Create a password"
-                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+          <input id="password" name="password" type="password" required class="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white">
         </div>
-         <div class="mb-6">
-            <label for="reg-confirm-password" class="block text-gray-700 dark:text-gray-300 mb-2">Confirm Password</label>
-            <input type="password" id="reg-confirm-password" name="confirm_password" placeholder="Confirm your password"
-                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        <div>
+          <label for="confirm-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
+          <input id="confirm-password" name="confirm-password" type="password" required class="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white">
         </div>
-        <!-- Button: Register Submit -->
-        <!-- Description: Submits the registration details (non-functional). -->
-        <button type="submit"
-                class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
-            Register
+      </div>
+
+      <div>
+        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 font-semibold">
+          Register
         </button>
-         <p class="text-center mt-4 text-sm text-gray-600 dark:text-gray-400">
-            Already have an account? <a href="{{ url_for('login') }}" class="text-primary hover:underline dark:text-blue-400">Login here</a>
-        </p>
+      </div>
     </form>
+    <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
+      Already have an account?
+      <a href="{{ url_for('login') }}" class="font-medium text-blue-600 hover:text-blue-500">
+        Login here
+      </a>
+    </p>
+  </div>
 </div>
 {% endblock %}
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-center py-4 mt-auto">
+        <div class="container mx-auto px-4">
+            <p>&copy; 2025 Fitness Tracker. All rights reserved.</p>
+            <p class="text-sm">
+                <a href="#" class="hover:text-primary dark:hover:text-blue-400">Privacy Policy</a> |
+                <a href="#" class="hover:text-primary dark:hover:text-blue-400">Terms of Service</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include main JavaScript file -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>

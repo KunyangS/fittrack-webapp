@@ -25,3 +25,5 @@ from app import routes
 # Register Blueprints
 from app.upload import upload_bp   
 app.register_blueprint(upload_bp) 
+
+app.secret_key = "fittrack@2025_secret_reset_feature"

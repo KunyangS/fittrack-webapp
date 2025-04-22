@@ -1,59 +1,125 @@
-<!-- templates/index.html -->
-{% extends 'base.html' %} <!-- Inherit from base.html -->
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<!-- Add 'dark' class here via JS for dark mode -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Use the title variable passed from Flask -->
+    <title>{{ title }} - Fitness Tracker</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Link to custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Configuration for Tailwind Dark Mode -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Enable class-based dark mode
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3490dc', // Example primary color
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Simple smooth transition for color changes */
+        body, html {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+    </style>
+</head>
+<!-- Apply base background and text colors for light/dark modes -->
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans flex flex-col min-h-screen">
 
-{% block content %} <!-- Content for the main area -->
-<div class="text-center pt-10 pb-16">
-    <h1 class="text-4xl md:text-5xl font-bold mb-4 text-primary dark:text-blue-400">Welcome to FitTrack!</h1>
-    <p class="text-lg md:text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-        Your personal companion to track exercise habits, visualise your progress, and share your achievements with friends. Stay motivated and reach your fitness goals.
+    <!-- Floating Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <!-- Logo/Brand Name -->
+            <a href="{{ url_for('index') }}" class="text-xl font-bold text-primary dark:text-blue-400">
+                <i class="fas fa-heartbeat mr-2"></i>FitTrack
+            </a>
+
+            <!-- Navigation Links -->
+            <ul class="flex space-x-4 items-center">
+                <li><a href="{{ url_for('index') }}" class="hover:text-primary dark:hover:text-blue-400">Home</a></li>
+                <li><a href="{{ url_for('upload') }}" class="hover:text-primary dark:hover:text-blue-400">Upload</a></li>
+                <li><a href="{{ url_for('visualise') }}" class="hover:text-primary dark:hover:text-blue-400">Visualise</a></li>
+                <li><a href="{{ url_for('share') }}" class="hover:text-primary dark:hover:text-blue-400">Share</a></li>
+                <!-- Dark Mode Toggle Button -->
+                <li>
+                    <button id="darkModeToggle" class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <i class="fas fa-moon text-yellow-500"></i> <!-- Moon icon for dark mode -->
+                        <i class="fas fa-sun text-yellow-500" style="display: none;"></i> <!-- Sun icon for light mode -->
+                    </button>
+                </li>
+                 <!-- Login/Register Buttons (visible if not logged in) -->
+                <li><a href="{{ url_for('login') }}" class="bg-primary text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Login</a></li>
+                <li><a href="{{ url_for('register') }}" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm">Register</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <!-- 'flex-grow' makes this section fill available space -->
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        <!-- Content from child templates will be injected here -->
+        
+{% block content %}
+<section class="bg-white dark:bg-gray-900 py-16">
+  <div class="container mx-auto px-6 text-center">
+    <h1 class="text-4xl font-bold text-gray-800 dark:text-white mb-4">Welcome to FitTrack!</h1>
+    <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-8">
+      Your personal companion to track exercise habits, visualise your progress, and share your achievements with friends. 
+      Stay motivated and reach your fitness goals.
     </p>
-    <div class="space-x-4">
-        <!-- Button: Register -->
-        <!-- Description: Directs users to the registration page/modal. -->
-        <a href="{{ url_for('register') }}"
-           class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
-           Get Started (Register)
-        </a>
-        <!-- Button: Login -->
-        <!-- Description: Directs users to the login page/modal. -->
-        <a href="{{ url_for('login') }}"
-           class="bg-primary hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
-           Login
-        </a>
+    <div class="flex justify-center gap-4 mb-12">
+      <a href="{{ url_for('register') }}" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow">
+        Get Started (Register)
+      </a>
+      <a href="{{ url_for('login') }}" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg shadow">
+        Login
+      </a>
     </div>
-</div>
-
-<!-- Example Feature Section using Cards (Responsive Grid) -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-    <!-- Card 1: Record Habits -->
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-        <div class="text-center">
-             <i class="fas fa-pencil-alt text-3xl text-primary dark:text-blue-400 mb-4"></i>
-             <h3 class="text-xl font-semibold mb-2">Record Habits Easily</h3>
-             <p class="text-gray-600 dark:text-gray-400">
-                 Quickly add your workouts manually or upload data files. Keep track of duration, type, and intensity.
-             </p>
-        </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-left max-w-6xl mx-auto">
+      <div>
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">📋 Record Habits Easily</h3>
+        <p class="text-gray-600 dark:text-gray-300">Quickly add your workouts manually or upload data files. Keep track of duration, type, and intensity.</p>
+      </div>
+      <div>
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">📊 Visualise Your Progress</h3>
+        <p class="text-gray-600 dark:text-gray-300">See insightful statistics and charts about your activity trends. Understand your patterns and stay motivated.</p>
+      </div>
+      <div>
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">🤝 Share Achievements</h3>
+        <p class="text-gray-600 dark:text-gray-300">Connect with friends, compare progress (if they allow!), and celebrate milestones together.</p>
+      </div>
     </div>
-    <!-- Card 2: Visualise Progress -->
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-        <div class="text-center">
-             <i class="fas fa-chart-line text-3xl text-green-500 mb-4"></i>
-             <h3 class="text-xl font-semibold mb-2">Visualise Your Progress</h3>
-             <p class="text-gray-600 dark:text-gray-400">
-                 See insightful statistics and charts about your activity trends. Understand your patterns and stay motivated.
-             </p>
-        </div>
-    </div>
-    <!-- Card 3: Share with Friends -->
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-         <div class="text-center">
-             <i class="fas fa-share-alt text-3xl text-red-500 mb-4"></i>
-             <h3 class="text-xl font-semibold mb-2">Share Achievements</h3>
-             <p class="text-gray-600 dark:text-gray-400">
-                 Connect with friends, compare progress (if they allow!), and celebrate milestones together.
-             </p>
-        </div>
-    </div>
-</div>
+  </div>
+</section>
 {% endblock %}
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-center py-4 mt-auto">
+        <div class="container mx-auto px-4">
+            <p>&copy; 2025 Fitness Tracker. All rights reserved.</p>
+            <p class="text-sm">
+                <a href="#" class="hover:text-primary dark:hover:text-blue-400">Privacy Policy</a> |
+                <a href="#" class="hover:text-primary dark:hover:text-blue-400">Terms of Service</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include main JavaScript file -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>
