@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify, render_template
 from app import db
 from app.models import UserInfo, FitnessEntry, FoodEntry
-from datetime import datetime
+from datetime import datetime, date, time
+
 
 upload_bp = Blueprint('upload', __name__)
 
@@ -18,6 +19,7 @@ def api_upload():
 
         date_obj = datetime.strptime(data['date'], '%Y-%m-%d').date()
         time_obj = datetime.strptime(data['time'], '%H:%M').time()
+
 
         user_info = UserInfo(
             date=date_obj,
@@ -53,3 +55,25 @@ def api_upload():
         print("❌ Error:", e)
         db.session.rollback()
         return jsonify({'success': False, 'message': 'Upload failed!'}), 500
+
+@upload_bp.route('/api/data', methods=['GET'])
+def get_all_data():
+    all_userinfo = UserInfo.query.all()
+    all_fitness = FitnessEntry.query.all()
+    all_food = FoodEntry.query.all()
+
+    def serialize(model):
+        result = {}
+        for column in model.__table__.columns:
+            value = getattr(model, column.name)
+            if isinstance(value, (date, time)):
+                value = value.isoformat()
+            result[column.name] = value
+        return result
+
+    return jsonify({
+        "user_info": [serialize(u) for u in all_userinfo],
+        "fitness_entries": [serialize(f) for f in all_fitness],
+        "food_entries": [serialize(food) for food in all_food]
+    })
+
