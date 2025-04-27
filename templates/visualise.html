@@ -1,4 +1,5 @@
 <!-- templates/visualise.html -->
+
 {% extends 'base.html' %}
 
 {% block content %}
@@ -77,7 +78,39 @@
         <a href="#" class="text-sm text-primary dark:text-blue-400 hover:underline mt-4 inline-block">More Comparisons &rarr;</a>
     </div>
 </section>
+
+
+<h2 class="text-3xl font-bold text-center my-8 text-primary dark:text-blue-400">
+  Fitness Data Visualization
+</h2>
+
+<!-- terminal choose -->
+<div class="flex justify-center mb-6">
+  <select id="timePeriod" class="input">
+    <option value="day">Daily</option>
+    <option value="week" selected>Weekly</option>
+    <option value="month">Monthly</option>
+  </select>
+</div>
+
+<!-- Analytics -->
+<div id="analytics" class="grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
+  <div id="summary-card" class="bg-white dark:bg-gray-800 p-6 rounded shadow-md"></div>
+  <div id="duration-chart-card" class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
+    <canvas id="durationChart"></canvas>
+  </div>
+  <div id="activity-chart-card" class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
+    <canvas id="activityPieChart"></canvas>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/visualise.js') }}"></script>
+
+
 {% endblock %}
+
+
 
 
 
