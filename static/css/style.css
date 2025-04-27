@@ -94,3 +94,53 @@ img:hover {
 .animate-fadeIn {
   animation: fadeIn 0.4s ease-out forwards;
 }
+
+/* Sidebar Menu */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  height: 100%;
+  width: 250px;
+  background-color: #1f2937;
+  color: white;
+  transition: left 0.3s ease-in-out;
+  z-index: 1000;
+  padding: 2rem 1rem;
+  padding-top: 6rem; /* ✅ add this to push links below the menu icon */
+}
+
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar a {
+  display: block;
+  margin: 1.5rem 0;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.sidebar .close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Hamburger Button */
+.hamburger-btn {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1050;
+  background-color: #1f2937;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  font-size: 1.5rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
