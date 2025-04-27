@@ -77,3 +77,16 @@ def get_all_data():
         "food_entries": [serialize(food) for food in all_food]
     })
 
+@upload_bp.route('/api/visualisation/fitness', methods=['GET'])
+def visualisation_fitness_data():
+    fitness = FitnessEntry.query.all()
+    return jsonify([
+        {
+            "date": entry.date.isoformat(),
+            "activity_type": entry.activity_type,
+            "duration": entry.duration,
+            "calories_burned": entry.calories_burned,
+            "emotion": entry.emotion
+        }
+        for entry in fitness
+    ])
