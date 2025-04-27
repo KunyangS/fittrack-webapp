@@ -1,24 +1,49 @@
+// static/js/visualise.js
+
 document.addEventListener('DOMContentLoaded', async () => {
+  const startDateInput = document.getElementById('startDate');
+  const endDateInput = document.getElementById('endDate');
   const periodSelect = document.getElementById('timePeriod');
+  const applyButton = document.getElementById('applyFilter');
+
   const summaryCard = document.getElementById('summary-card');
   const ctxDuration = document.getElementById('durationChart').getContext('2d');
-  const ctxActivity = document.getElementById('activityPieChart').getContext('2d');
+  const ctxCalories = document.getElementById('caloriesChart').getContext('2d');
+  const ctxStacked = document.getElementById('stackedChart').getContext('2d');
+  const ctxPie = document.getElementById('activityPieChart').getContext('2d');
 
   let rawData = [];
-  let durationChart, activityPieChart;
+  let durationChart, caloriesChart, stackedChart, pieChart;
 
+  // Fetch data from backend
   async function fetchData() {
     const response = await fetch('/api/data');
     const fullData = await response.json();
-    rawData = fullData.fitness_entries; 
+    rawData = fullData.fitness_entries;
     updateDashboard();
   }
 
-  function groupData(period) {
-    const now = new Date();
-    const groups = {};
+  // Get today's date string (yyyy-mm-dd)
+  function getToday() {
+    return new Date().toISOString().slice(0, 10);
+  }
 
-    rawData.forEach(item => {
+  // Get date 6 days ago
+  function getSevenDaysAgo() {
+    const today = new Date();
+    today.setDate(today.getDate() - 6);
+    return today.toISOString().slice(0, 10);
+  }
+
+  // Format date into yyyy-mm-dd
+  function formatDate(date) {
+    return new Date(date).toISOString().slice(0, 10);
+  }
+
+  // Group data based on period
+  function groupData(data, period) {
+    const groups = {};
+    data.forEach(item => {
       const itemDate = new Date(item.date);
       const key = (period === 'day') ? itemDate.toISOString().slice(0, 10)
         : (period === 'week') ? `${itemDate.getFullYear()}-W${getWeek(itemDate)}`
@@ -33,23 +58,32 @@ document.addEventListener('DOMContentLoaded', async () => {
       groups[key].count += 1;
       groups[key].types[item.activity_type] = (groups[key].types[item.activity_type] || 0) + 1;
     });
-
     return groups;
   }
 
+  // Calculate week number
   function getWeek(date) {
     const firstJan = new Date(date.getFullYear(), 0, 1);
     return Math.ceil((((date - firstJan) / 86400000) + firstJan.getDay() + 1) / 7);
   }
 
+  // Update dashboard UI and charts
   function updateDashboard() {
+    const start = startDateInput.value || getSevenDaysAgo();
+    const end = endDateInput.value || getToday();
     const period = periodSelect.value;
-    const grouped = groupData(period);
 
+    const filtered = rawData.filter(item => {
+      return item.date >= start && item.date <= end;
+    });
+
+    const grouped = groupData(filtered, period);
     const labels = Object.keys(grouped).sort();
-    const durations = labels.map(k => grouped[k].duration);
-    const typesCount = {};
 
+    const durations = labels.map(k => grouped[k].duration);
+    const calories = labels.map(k => grouped[k].calories);
+
+    const typesCount = {};
     labels.forEach(k => {
       const types = grouped[k].types;
       for (let type in types) {
@@ -57,63 +91,85 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
-    // update Summary
+    // Update summary card
     const totalWorkouts = labels.reduce((sum, k) => sum + grouped[k].count, 0);
     const totalTime = durations.reduce((sum, d) => sum + d, 0);
-    const totalCalories = labels.reduce((sum, k) => sum + grouped[k].calories, 0);
+    const totalCalories = calories.reduce((sum, c) => sum + c, 0);
 
     summaryCard.innerHTML = `
-      <h3 class="text-xl font-semibold mb-4">Activity Summary (${capitalize(period)})</h3>
+      <h3 class="text-xl font-semibold mb-4">Summary (${capitalize(period)})</h3>
       <p>Workouts: <strong>${totalWorkouts}</strong></p>
       <p>Total Duration: <strong>${Math.round(totalTime)} min</strong></p>
       <p>Calories Burned: <strong>${Math.round(totalCalories)}</strong></p>
     `;
 
-    // update Duration 
+    // Destroy existing charts if any
     if (durationChart) durationChart.destroy();
+    if (caloriesChart) caloriesChart.destroy();
+    if (stackedChart) stackedChart.destroy();
+    if (pieChart) pieChart.destroy();
+
+    // Draw Duration Trend chart
     durationChart = new Chart(ctxDuration, {
       type: 'line',
       data: {
         labels,
         datasets: [{
-          label: 'Workout Duration (min)',
+          label: 'Workout Duration (minutes)',
           data: durations,
           fill: false,
           borderColor: 'blue',
           backgroundColor: 'blue',
-          tension: 0.2
+          tension: 0.3
         }]
+      },
+      options: commonOptions('Duration')
+    });
+
+    // Draw Calories Burned chart
+    caloriesChart = new Chart(ctxCalories, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Calories Burned',
+          data: calories,
+          fill: false,
+          borderColor: 'red',
+          backgroundColor: 'red',
+          tension: 0.3
+        }]
+      },
+      options: commonOptions('Calories')
+    });
+
+    // Draw Stacked Chart for workout types
+    const stackedDatasets = Object.keys(typesCount).map(type => {
+      return {
+        label: type,
+        data: labels.map(k => grouped[k].types[type] || 0),
+        stack: 'workout',
+      };
+    });
+
+    stackedChart = new Chart(ctxStacked, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: stackedDatasets
       },
       options: {
         responsive: true,
-        plugins: {
-          tooltip: {
-            mode: 'index',
-            intersect: false
-          },
-        },
         scales: {
-          x: {
-            display: true,
-            title: {
-              display: true,
-              text: 'Date'
-            }
-          },
-          y: {
-            display: true,
-            title: {
-              display: true,
-              text: 'Duration (minutes)'
-            }
-          }
-        }
+          x: { stacked: true },
+          y: { stacked: true }
+        },
+        animation: { duration: 1000 }
       }
     });
 
-    // update Activity 
-    if (activityPieChart) activityPieChart.destroy();
-    activityPieChart = new Chart(ctxActivity, {
+    // Draw Pie Chart for activity types
+    pieChart = new Chart(ctxPie, {
       type: 'pie',
       data: {
         labels: Object.keys(typesCount),
@@ -126,6 +182,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       },
       options: {
         responsive: true,
+        animation: {
+          animateRotate: true,
+          duration: 1500
+        },
         plugins: {
           tooltip: {
             callbacks: {
@@ -145,8 +205,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     return word.charAt(0).toUpperCase() + word.slice(1);
   }
 
-  periodSelect.addEventListener('change', updateDashboard);
+  function commonOptions(yLabel) {
+    return {
+      responsive: true,
+      plugins: {
+        tooltip: {
+          mode: 'index',
+          intersect: false
+        }
+      },
+      scales: {
+        x: { display: true },
+        y: {
+          display: true,
+          title: {
+            display: true,
+            text: yLabel
+          }
+        }
+      },
+      animation: {
+        duration: 1000,
+        easing: 'easeOutQuart'
+      }
+    };
+  }
+
+  applyButton.addEventListener('click', updateDashboard);
 
   fetchData();
 });
-
