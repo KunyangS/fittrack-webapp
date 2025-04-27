@@ -1,7 +1,9 @@
+from datetime import datetime, timedelta
 # routes.py
 
 from app import app
 from flask import render_template
+
 
 # Route for the Introduction/Home page
 @app.route('/')
@@ -40,6 +42,11 @@ def register():
     # We will create register.html later if needed
     # Let's create a simple placeholder register.html
     return render_template('register.html', title='Register')
+
+# ✅ ADDED: Route to handle "Verify via Email instead"
+@app.route('/verify-email')
+def verify_email():
+    return render_template('verify_email.html', title='Email Verification')
 
 # m.extra
 def forgot_password():
@@ -99,22 +106,40 @@ def forgot_password():
         email = request.form.get('email')
         if email:
             code = str(random.randint(100000, 999999))
-            verification_codes[email] = code
+            verification_codes[email] = {
+                'code': code,
+                'timestamp': datetime.now()
+            }
             session['reset_email'] = email
             print(f"🔐 Verification code for {email}: {code}")
             flash("Verification code sent to your email. (Check console)", "info")
             return redirect(url_for('verify_code'))
     return render_template('forgot_password.html', title='Forgot Password')
 
+# ✅ FIXED: verify_code route now includes 2-minute expiry check
 @app.route('/verify-code', methods=['GET', 'POST'])
 def verify_code():
     if 'reset_email' not in session:
         return redirect(url_for('forgot_password'))
 
+    email = session['reset_email']
+    record = verification_codes.get(email)
+
     if request.method == 'POST':
         code_input = request.form.get('code')
-        email = session['reset_email']
-        if code_input == verification_codes.get(email):
+
+        if not record:
+            flash("❌ Verification code not found. Please request again.", "danger")
+            return redirect(url_for('forgot_password'))
+
+        sent_time = record.get('timestamp')
+        if datetime.now() - sent_time > timedelta(minutes=2):
+            verification_codes.pop(email, None)
+            session.pop('code_sent_time', None)
+            flash("❌ Verification code expired. Please resend.", "danger")
+            return redirect(url_for('forgot_password'))
+
+        if code_input == record.get('code'):
             session['verified'] = True
             return redirect(url_for('reset_password'))
         else:
@@ -138,3 +163,20 @@ def reset_password():
             flash("❌ Passwords do not match.", "danger")
 
     return render_template('reset_password.html', title='Reset Password')
+
+
+@app.route('/resend_code', methods=['POST'])
+def resend_code():
+    import random
+
+    if 'email' not in session:
+        flash('Session expired. Please try again.', 'danger')
+        return redirect(url_for('forgot_password'))
+
+    # Generate new code
+    new_code = str(random.randint(100000, 999999))
+    session['verification_code'] = new_code
+    session['code_sent_time'] = datetime.now().timestamp()
+    print(f"[Resent] Verification code sent to {session['email']}: {new_code}")
+    flash('A new verification code has been sent to your email. (Check console)', 'info')
+    return redirect(url_for('verify_code'))
