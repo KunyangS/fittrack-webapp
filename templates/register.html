@@ -43,24 +43,37 @@
           </div>
           <div>
             <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-            
   <div class="password-wrapper">
-    <input id="password" name="password" type="password" required class="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white">
+    <input id="password" name="password" type="password" required 
+           class="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white"
+           title="Password must include at least one special character"
+           autocomplete="new-password"
+           oninput="checkPasswordStrength(this.value)">
     <span class="toggle-password" onclick="togglePassword(this)">👁️</span>
+    <div id="password-strength" class="text-sm mt-1 text-gray-500 dark:text-gray-400"></div>
   </div>
-          </div>
+  
           <div>
             <label for="confirm-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
-            
   <div class="password-wrapper">
-    <input id="confirm-password" name="confirm-password" type="password" required class="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white">
+    <input id="confirm-password" name="confirm-password" type="password" required 
+           class="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white"
+           autocomplete="new-password">
     <span class="toggle-password" onclick="togglePassword(this)">👁️</span>
   </div>
-          </div>
+  
         </div>
   
         <div>
-          <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 font-semibold">
+          
+  <div class="flex items-center">
+    <input id="terms" name="terms" type="checkbox" required class="mr-2">
+    <label for="terms" class="text-sm text-gray-300">
+      I agree to the <a href="#" data-modal-trigger class="text-blue-400 hover:underline">Terms and Conditions</a>.
+    </label>
+  </div>
+  
+  <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 font-semibold">
             Register
           </button>
         </div>
@@ -73,16 +86,134 @@
       </p>
     </div>
   </div>
+  
+  <!-- Terms Modal -->
+  <div id="termsModal" class="fixed inset-0 hidden justify-center items-center bg-black bg-opacity-50 z-50">
+    <div class="bg-white text-black dark:bg-gray-800 dark:text-white p-6 rounded-lg max-w-lg w-full shadow-lg">
+      <h2 class="text-xl font-bold mb-4">Terms and Conditions</h2>
+      <ul class="text-sm list-disc pl-5 space-y-2">
+        <li>Users must provide accurate information when registering.</li>
+        <li>Personal fitness data will be used only for analysis and visualization purposes.</li>
+        <li>Users are responsible for keeping their login credentials secure.</li>
+        <li>This site does not provide medical advice. Consult a health professional before making fitness decisions.</li>
+        <li>Do not share offensive or misleading content when using the sharing feature.</li>
+        <li>FitTrack reserves the right to modify or terminate services at any time.</li>
+      </ul>
+      <button id="closeModal" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-1 px-4 rounded">Close</button>
+    </div>
+  </div>
+  
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("termsModal");
+    const trigger = document.querySelector("[data-modal-trigger]");
+    const closeBtn = document.getElementById("closeModal");
+  
+    if (trigger && modal && closeBtn) {
+      trigger.addEventListener("click", function (e) {
+        e.preventDefault();
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      });
+  
+      closeBtn.addEventListener("click", function () {
+        modal.classList.remove("flex");
+        modal.classList.add("hidden");
+      });
+  
+      window.addEventListener("click", function (e) {
+        if (e.target === modal) {
+          modal.classList.remove("flex");
+          modal.classList.add("hidden");
+        }
+      });
+    }
+  });
+  </script>
+  
   {% endblock %}
   <script>
   function togglePassword(el) {
     const input = el.previousElementSibling;
     if (input.type === "password") {
       input.type = "text";
-      el.textContent = "🔒";
+      el.textContent = "🙈";
     } else {
       input.type = "password";
       el.textContent = "👁️";
     }
   }
+  </script>
+  <script>
+  function togglePassword(el) {
+    const input = el.previousElementSibling;
+    if (input.type === "password") {
+      input.type = "text";
+      el.textContent = "🙈";
+    } else {
+      input.type = "password";
+      el.textContent = "👁️";
+    }
+  }
+  
+  function checkPasswordStrength(password) {
+    const strengthDisplay = document.getElementById("password-strength");
+    const strongRegex = /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    if (password.length === 0) {
+      strengthDisplay.textContent = "";
+    } else if (strongRegex.test(password)) {
+      strengthDisplay.textContent = "Strong password";
+      strengthDisplay.style.color = "green";
+    } else {
+      strengthDisplay.textContent = "Weak password – add a special character";
+      strengthDisplay.style.color = "red";
+    }
+  }
+  </script>
+  
+  
+  
+  
+  <!-- Terms & Conditions Modal -->
+  <div id="termsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+    <div class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-6 rounded-lg max-w-lg w-full shadow-lg relative">
+      <h2 class="text-xl font-bold mb-4">Terms and Conditions</h2>
+      <ul class="text-sm list-disc pl-5 space-y-2">
+        <li>Users must provide accurate information when registering.</li>
+        <li>Personal fitness data will be used only for analysis and visualization purposes.</li>
+        <li>Users are responsible for keeping their login credentials secure.</li>
+        <li>This site does not provide medical advice. Consult a health professional before making fitness decisions.</li>
+        <li>Do not share offensive or misleading content when using the sharing feature.</li>
+        <li>FitTrack reserves the right to modify or terminate services at any time.</li>
+      </ul>
+      <button id="closeModal" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-1 px-4 rounded">Close</button>
+    </div>
+  </div>
+  
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("termsModal");
+    const openBtn = document.querySelector("[data-modal-trigger]");
+    const closeBtn = document.getElementById("closeModal");
+  
+    if (openBtn && modal && closeBtn) {
+      openBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      });
+  
+      closeBtn.addEventListener("click", function () {
+        modal.classList.remove("flex");
+        modal.classList.add("hidden");
+      });
+  
+      window.addEventListener("click", function (event) {
+        if (event.target === modal) {
+          modal.classList.remove("flex");
+          modal.classList.add("hidden");
+        }
+      });
+    }
+  });
   </script>
