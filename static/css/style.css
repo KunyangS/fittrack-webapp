@@ -1,0 +1,96 @@
+img:hover {
+    transform: scale(1.1);
+  }
+  .password-wrapper {
+    position: relative;
+  }
+  
+  .password-wrapper input[type="password"],
+  .password-wrapper input[type="text"] {
+    width: 100%;
+    padding-right: 2.5rem;
+  }
+  
+  .password-wrapper .toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #ccc;
+  }
+  
+  .checkmark {
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+  }
+  .checkmark__check {
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: draw 0.5s forwards;
+  }
+  .checkmark__circle {
+    stroke: currentColor;
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    animation: draw 0.6s ease-out forwards;
+  }
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* ✅ Animated Checkmark Styles */
+.checkmark {
+  stroke: #4CAF50;
+  stroke-width: 4;
+  stroke-miterlimit: 10;
+  fill: none;
+  animation: scale .3s ease-in-out .9s both;
+}
+
+.checkmark__circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 4;
+  stroke-miterlimit: 10;
+  stroke: #4CAF50;
+  fill: none;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark__check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+}
+
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes scale {
+  0%, 100% {
+    transform: none;
+  }
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+
+/* ✅ Modal Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
+}
