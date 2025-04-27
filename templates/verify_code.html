@@ -15,4 +15,51 @@
     </form>
   </div>
 </div>
+
+<div class="mt-6 text-center text-sm text-gray-600 dark:text-gray-300">
+  <div id="countdown">Code expires in <span id="timer">02:00</span></div>
+
+  <form method="POST" action="{{ url_for('resend_code') }}">
+    <button type="submit" id="resendBtn" class="mt-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-md disabled:opacity-50" disabled>
+      Resend Code (30)
+    </button>
+  </form>
+  
+
+ <div class="mt-6 text-center">
+  <a href="{{ url_for('verify_email') }}"
+     class="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+    Verify via Email
+  </a>
+  <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+  </p>
+</div>
+
+<script>
+  // Countdown Timer for Code Expiry
+  let countdownTime = 120; // 2 minutes in seconds
+  const timerDisplay = document.getElementById('timer');
+  setInterval(() => {
+    if (countdownTime > 0) {
+      countdownTime--;
+      const minutes = String(Math.floor(countdownTime / 60)).padStart(2, '0');
+      const seconds = String(countdownTime % 60).padStart(2, '0');
+      timerDisplay.textContent = minutes + ":" + seconds;
+    }
+  }, 1000);
+
+  // Resend Code Cooldown
+  let resendCooldown = 30;
+  const resendBtn = document.getElementById('resendBtn');
+  const resendInterval = setInterval(() => {
+    if (resendCooldown > 0) {
+      resendBtn.textContent = "Resend Code (" + resendCooldown + ")";
+      resendCooldown--;
+    } else {
+      resendBtn.disabled = false;
+      resendBtn.textContent = "Resend Code";
+      clearInterval(resendInterval);
+    }
+  }, 1000);
+</script>
 {% endblock %}

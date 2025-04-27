@@ -59,3 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("Fitness Tracker JS Initialized. Current theme:", preferredTheme);
 });
+function togglePassword(el) {
+    const input = el.previousElementSibling;
+    if (input.type === "password") {
+      input.type = "text";
+      el.textContent = "🔒";
+    } else {
+      input.type = "password";
+      el.textContent = "👁️";
+    }
+  }

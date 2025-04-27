@@ -53,10 +53,12 @@ def forgot_password():
     return render_template('forgot_password.html', title='Forgot Password')
 
 def reset_password():
-    return render_template('reset_password.html', title='Reset Password')
+    reset_success = session.pop('reset_success', False)
+    return render_template('reset_password.html', title='Reset Password', reset_success=reset_success)
 
 def reset_password():
-    return render_template('reset_password.html', title='Reset Password')
+    reset_success = session.pop('reset_success', False)
+    return render_template('reset_password.html', title='Reset Password', reset_success=reset_success)
 
 from flask import request, session, redirect, url_for, flash
 import random
@@ -157,12 +159,13 @@ def reset_password():
         confirm_pass = request.form.get('confirm_password')
         if new_pass == confirm_pass:
             flash("✅ Password successfully reset!", "success")
-            session.clear()
-            return redirect(url_for('login'))
+            session['reset_success'] = True
+            return redirect(url_for('reset_password'))
         else:
             flash("❌ Passwords do not match.", "danger")
 
-    return render_template('reset_password.html', title='Reset Password')
+    reset_success = session.pop('reset_success', False)
+    return render_template('reset_password.html', title='Reset Password', reset_success=reset_success)
 
 
 @app.route('/resend_code', methods=['POST'])

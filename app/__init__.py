@@ -27,3 +27,25 @@ from app.upload import upload_bp
 app.register_blueprint(upload_bp) 
 
 app.secret_key = "fittrack@2025_secret_reset_feature"
+
+# =============================
+# OAuth Setup using Flask-Dance
+# =============================
+
+# Google OAuth setup
+from flask_dance.contrib.google import make_google_blueprint
+google_bp = make_google_blueprint(
+    client_id="YOUR_GOOGLE_CLIENT_ID",
+    client_secret="YOUR_GOOGLE_CLIENT_SECRET",
+    redirect_to="google_login"  # Define this route in your app
+)
+app.register_blueprint(google_bp, url_prefix="/login")
+
+# Facebook OAuth setup
+from flask_dance.contrib.facebook import make_facebook_blueprint
+facebook_bp = make_facebook_blueprint(
+    client_id="YOUR_FACEBOOK_APP_ID",
+    client_secret="YOUR_FACEBOOK_APP_SECRET",
+    redirect_to="facebook_login"  # Define this route in your app
+)
+app.register_blueprint(facebook_bp, url_prefix="/login")
