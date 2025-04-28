@@ -48,13 +48,13 @@
                 value="{{ category.id }}"
                 class="hidden category-checkbox peer"
               />
-              {# --- Clickable pill-shaped tag style --- #}
+              {# --- Clickable pill-shaped tag style using Tailwind peer-checked --- #}
               <label
                 for="share-{{ category.id }}"
                 class="cursor-pointer border border-primary/60 dark:border-primary-light/60 text-primary-dark dark:text-primary-light text-xs font-medium px-3 py-1.5 rounded-full transition
                        hover:bg-primary/10 dark:hover:bg-primary-light/10
-                       peer-checked:bg-primary peer-checked:text-white dark:peer-checked:bg-primary-light dark:peer-checked:text-neutral-800
-                       category-tag"
+                       peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary dark:peer-checked:bg-primary-light dark:peer-checked:text-white dark:peer-checked:border-primary-light
+                       peer-checked:font-semibold peer-checked:shadow-md"
                 title="{{ category.details }}" {# Tooltip for details #}
               >
                 {{ category.label }}
@@ -64,39 +64,6 @@
           </div>
            <p class="text-xs text-warning dark:text-amber-400 mt-3">Note: Sharing 'Basic Profile' includes potentially sensitive information.</p>
         </div>
-
-        <style>
-          /* Updated styles for category tags */
-          .category-tag-container .category-checkbox:checked + .category-tag {
-            background-color: #0d9488; /* 强对比的teal-600背景色 */
-            color: #fff; /* 白色字体 */
-            border-color: #0d9488;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(13, 148, 136, 0.25);
-            transform: translateY(-1px);
-            font-weight: 600;
-            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-          }
-          
-          .dark .category-tag-container .category-checkbox:checked + .category-tag {
-            background-color: #2dd4bf; /* 强对比的teal-400背景色 */
-            color: #1e293b; /* slate-800深色字体 */
-            border-color: #2dd4bf;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 12px rgba(45, 212, 191, 0.5);
-          }
-          
-          .category-tag {
-            transition: all 0.2s ease-in-out;
-          }
-          
-          .category-tag:hover {
-            background-color: rgba(13, 148, 136, 0.15);
-            transform: translateY(-1px);
-          }
-          
-          .dark .category-tag:hover {
-            background-color: rgba(45, 212, 191, 0.2);
-          }
-        </style>
 
         <!-- Time Range Selection -->
         <div>
