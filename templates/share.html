@@ -40,18 +40,21 @@
             ] %}
 
             {% for category in share_categories %}
-            <div class="flex items-center">
+            <div class="category-tag-container">
               <input
                 type="checkbox"
                 id="share-{{ category.id }}"
                 name="share_options"
                 value="{{ category.id }}"
-                class="form-checkbox h-4 w-4 text-primary accent-primary focus:ring-primary focus:ring-offset-2 border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 rounded-sm transition"
+                class="hidden category-checkbox peer"
               />
-              {# --- Pill-shaped outline tag style for the label --- #}
+              {# --- Clickable pill-shaped tag style --- #}
               <label
                 for="share-{{ category.id }}"
-                class="ml-2 cursor-pointer border border-primary/60 dark:border-primary-light/60 text-primary-dark dark:text-primary-light text-xs font-medium px-3 py-1.5 rounded-full hover:bg-primary/10 dark:hover:bg-primary-light/10 transition"
+                class="cursor-pointer border border-primary/60 dark:border-primary-light/60 text-primary-dark dark:text-primary-light text-xs font-medium px-3 py-1.5 rounded-full transition
+                       hover:bg-primary/10 dark:hover:bg-primary-light/10
+                       peer-checked:bg-primary peer-checked:text-white dark:peer-checked:bg-primary-light dark:peer-checked:text-neutral-800
+                       category-tag"
                 title="{{ category.details }}" {# Tooltip for details #}
               >
                 {{ category.label }}
@@ -61,6 +64,39 @@
           </div>
            <p class="text-xs text-warning dark:text-amber-400 mt-3">Note: Sharing 'Basic Profile' includes potentially sensitive information.</p>
         </div>
+
+        <style>
+          /* Updated styles for category tags */
+          .category-tag-container .category-checkbox:checked + .category-tag {
+            background-color: #0d9488; /* 强对比的teal-600背景色 */
+            color: #fff; /* 白色字体 */
+            border-color: #0d9488;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(13, 148, 136, 0.25);
+            transform: translateY(-1px);
+            font-weight: 600;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+          }
+          
+          .dark .category-tag-container .category-checkbox:checked + .category-tag {
+            background-color: #2dd4bf; /* 强对比的teal-400背景色 */
+            color: #1e293b; /* slate-800深色字体 */
+            border-color: #2dd4bf;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 12px rgba(45, 212, 191, 0.5);
+          }
+          
+          .category-tag {
+            transition: all 0.2s ease-in-out;
+          }
+          
+          .category-tag:hover {
+            background-color: rgba(13, 148, 136, 0.15);
+            transform: translateY(-1px);
+          }
+          
+          .dark .category-tag:hover {
+            background-color: rgba(45, 212, 191, 0.2);
+          }
+        </style>
 
         <!-- Time Range Selection -->
         <div>

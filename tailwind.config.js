@@ -58,6 +58,24 @@ module.exports = {
         // Custom specific-use colors if needed
         'light-bg': colors.slate[50],   // Very light background
         'muted-text': colors.slate[500], // Softer text color
+        
+        // --- TAG SELECTION COLORS ---
+        'tag-selected': {
+          bg: colors.teal[600],
+          text: colors.white,
+          border: colors.teal[600],
+          glow: 'rgba(13, 148, 136, 0.4)'
+        },
+        'tag-selected-dark': {
+          bg: colors.teal[400],
+          text: colors.slate[800],
+          border: colors.teal[400],
+          glow: 'rgba(45, 212, 191, 0.5)'
+        },
+        'tag-hover': {
+          bg: 'rgba(13, 148, 136, 0.15)',
+          dark: 'rgba(45, 212, 191, 0.2)'
+        }
       },
 
       // --- BORDER RADIUS ---
@@ -81,6 +99,8 @@ module.exports = {
         'inner': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
         'interactive': `0 6px 12px -2px ${colors.teal[600]}30`, // Subtle colored shadow on interaction (adjust color/opacity)
         'none': 'none',
+        'tag-selected': '0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(13, 148, 136, 0.25)',
+        'tag-selected-dark': '0 2px 4px rgba(0, 0, 0, 0.3), 0 0 12px rgba(45, 212, 191, 0.5)',
       },
 
       // --- TYPOGRAPHY ---
@@ -143,6 +163,45 @@ module.exports = {
     }),
     require('@tailwindcss/typography'), // Provides `prose` classes for styling markdown/HTML content
     require('@tailwindcss/aspect-ratio'), // Useful for responsive media/visualizations
-    // Consider adding other plugins if needed, e.g., container-queries, animation plugins
+    
+    // Add plugin for CSS variables integration
+    function({ addBase, theme }) {
+      addBase({
+        ':root': {
+          '--primary-color': theme('colors.primary.DEFAULT'),
+          '--primary-color-rgb': '13, 148, 136', // RGB values for teal-600
+          '--primary-light': theme('colors.primary.light'),
+          '--primary-light-rgb': '45, 212, 191', // RGB values for teal-400
+          '--primary-dark': theme('colors.primary.dark'),
+          '--secondary-color': theme('colors.secondary.DEFAULT'),
+          '--secondary-light': theme('colors.secondary.light'),
+          '--accent-color': theme('colors.accent.DEFAULT'),
+          
+          // Tag selection specific variables
+          '--tag-selected-bg': theme('colors.tag-selected.bg'),
+          '--tag-selected-text': theme('colors.tag-selected.text'),
+          '--tag-selected-border': theme('colors.tag-selected.border'),
+          '--tag-selected-glow': theme('colors.tag-selected.glow'),
+          '--tag-hover-bg': theme('colors.tag-hover.bg'),
+        },
+        '.dark': {
+          '--primary-color': theme('colors.primary.light'),
+          '--primary-color-rgb': '45, 212, 191', // RGB values for teal-400
+          '--primary-light': theme('colors.primary.DEFAULT'),
+          '--primary-light-rgb': '13, 148, 136', // RGB values for teal-600
+          '--primary-dark': theme('colors.primary.light'),
+          '--secondary-color': theme('colors.secondary.light'),
+          '--secondary-light': theme('colors.secondary.DEFAULT'),
+          '--accent-color': theme('colors.accent.light'),
+          
+          // Tag selection specific variables for dark mode
+          '--tag-selected-bg': theme('colors.tag-selected-dark.bg'),
+          '--tag-selected-text': theme('colors.tag-selected-dark.text'),
+          '--tag-selected-border': theme('colors.tag-selected-dark.border'),
+          '--tag-selected-glow': theme('colors.tag-selected-dark.glow'),
+          '--tag-hover-bg': theme('colors.tag-hover.dark'),
+        }
+      });
+    }
   ],
 }
