@@ -30,13 +30,16 @@ def api_upload():
             weight=float(data['weight']),
         )
 
-        fitness_entry = FitnessEntry(
-            date=date_obj,
-            activity_type=data['activity_type'],
-            duration=float(data['duration']),
-            calories_burned=float(data['calories_burned']),
-            emotion=data['emotion'],
-        )
+        fitness_entry = []
+        for act in data['activities']:
+            fitness_entry.append(FitnessEntry(
+                date=date_obj,
+                activity_type=act['activity_type'],
+                duration=float(act['duration']),
+                calories_burned=float(act['calories_burned']),
+                emotion=act['emotion'],
+            ))
+
 
         food_entry = FoodEntry(
             date=date_obj,
