@@ -3,29 +3,6 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-<!-- Hamburger Menu Button -->
-<button onclick="toggleMenu()" class="hamburger-btn">☰</button>
-
-<!-- Sidebar Menu -->
-<div id="sidebar" class="sidebar">
-  <span class="close-btn" onclick="toggleMenu()">✖</span>
-  <a href="#about" onclick="toggleMenu()">About FitTrack</a>
-  <a href="#how-it-works" onclick="toggleMenu()">How It Works</a>
-  <a href="#live-stats" onclick="toggleMenu()">Live Stats</a>
-  <a href="#call-to-action" onclick="toggleMenu()">Call to Action</a>
-  <a href="#user-testimonials" onclick="toggleMenu()">User Testimonials</a>
-  <a href="#feature-highlights" onclick="toggleMenu()">Feature Highlights</a>
-  <a href="#demos" onclick="toggleMenu()">Demos</a>
-  <a href="#timeline" onclick="toggleMenu()">Timeline</a>
-  <a href="#contact" onclick="toggleMenu()">Contact</a>
-</div>
-
-<script>
-  function toggleMenu() {
-    document.getElementById('sidebar').classList.toggle('open');
-  }
-</script>
-
 <!-- Main Content Section -->
 <section class="bg-white dark:bg-gray-900 py-16">
   <div class="container mx-auto px-6 text-center">
