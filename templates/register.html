@@ -50,7 +50,7 @@
            autocomplete="new-password"
            oninput="checkPasswordStrength(this.value)">
     <span class="toggle-password" onclick="togglePassword(this)">👁️</span>
-    <div id="password-strength" class="text-sm mt-1 text-gray-500 dark:text-gray-400"></div>
+    <i class="fa-regular fa-eye toggle-password" onclick="togglePassword(this)"></i>
   </div>
   
           <div>
@@ -59,7 +59,7 @@
     <input id="confirm-password" name="confirm-password" type="password" required 
            class="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white"
            autocomplete="new-password">
-    <span class="toggle-password" onclick="togglePassword(this)">👁️</span>
+           <i class="fa-regular fa-eye toggle-password" onclick="togglePassword(this)"></i>
   </div>
   
         </div>
@@ -133,29 +133,33 @@
   
   {% endblock %}
   <script>
-  function togglePassword(el) {
-    const input = el.previousElementSibling;
-    if (input.type === "password") {
-      input.type = "text";
-      el.textContent = "🔓";
-    } else {
-      input.type = "password";
-      el.textContent = "👁️";
-    }
+ function togglePassword(el) {
+  const input = el.previousElementSibling;
+  if (input.type === "password") {
+    input.type = "text";
+    el.classList.remove("fa-eye");
+    el.classList.add("fa-eye-slash");
+  } else {
+    input.type = "password";
+    el.classList.remove("fa-eye-slash");
+    el.classList.add("fa-eye");
   }
+}
   </script>
   <script>
-  function togglePassword(el) {
-    const input = el.previousElementSibling;
-    if (input.type === "password") {
-      input.type = "text";
-      el.textContent = "🔓";
-    } else {
-      input.type = "password";
-      el.textContent = "👁️";
-    }
+ // Toggle Password Visibility
+function togglePassword(el) {
+  const input = el.previousElementSibling;
+  if (input.type === "password") {
+    input.type = "text";
+    el.classList.remove("fa-eye");
+    el.classList.add("fa-eye-slash");
+  } else {
+    input.type = "password";
+    el.classList.remove("fa-eye-slash");
+    el.classList.add("fa-eye");
   }
-  
+}
   function checkPasswordStrength(password) {
     const strengthDisplay = document.getElementById("password-strength");
     const strongRegex = /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;

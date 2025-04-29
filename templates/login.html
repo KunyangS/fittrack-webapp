@@ -42,7 +42,7 @@
             
   <div class="password-wrapper">
     <input id="password" name="password" type="password" required class="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white">
-    <span class="toggle-password" onclick="togglePassword(this)">👁️</span>
+    <i class="fa-regular fa-eye toggle-password" onclick="togglePassword(this)"></i>
   </div>
           </div>
         </div>
@@ -82,15 +82,18 @@
   </div>
   {% endblock %}
   <script>
-  function togglePassword(el) {
-    const input = el.previousElementSibling;
-    if (input.type === "password") {
-      input.type = "text";
-      el.textContent = "🔓";
-    } else {
-      input.type = "password";
-      el.textContent = "👁️";
-    }
+// Toggle Password Visibility
+function togglePassword(el) {
+  const input = el.previousElementSibling;
+  if (input.type === "password") {
+    input.type = "text";
+    el.classList.remove("fa-eye");
+    el.classList.add("fa-eye-slash");
+  } else {
+    input.type = "password";
+    el.classList.remove("fa-eye-slash");
+    el.classList.add("fa-eye");
   }
+}
   </script>
   
