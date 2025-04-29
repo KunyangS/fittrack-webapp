@@ -35,31 +35,6 @@
   </p>
 </div>
 
-<script>
-  // Countdown Timer for Code Expiry
-  let countdownTime = 120; // 2 minutes in seconds
-  const timerDisplay = document.getElementById('timer');
-  setInterval(() => {
-    if (countdownTime > 0) {
-      countdownTime--;
-      const minutes = String(Math.floor(countdownTime / 60)).padStart(2, '0');
-      const seconds = String(countdownTime % 60).padStart(2, '0');
-      timerDisplay.textContent = minutes + ":" + seconds;
-    }
-  }, 1000);
-
-  // Resend Code Cooldown
-  let resendCooldown = 30;
-  const resendBtn = document.getElementById('resendBtn');
-  const resendInterval = setInterval(() => {
-    if (resendCooldown > 0) {
-      resendBtn.textContent = "Resend Code (" + resendCooldown + ")";
-      resendCooldown--;
-    } else {
-      resendBtn.disabled = false;
-      resendBtn.textContent = "Resend Code";
-      clearInterval(resendInterval);
-    }
-  }, 1000);
-</script>
+<!-- ✅ Now Link auth.js here -->
+<script src="auth.js"></script>
 {% endblock %}

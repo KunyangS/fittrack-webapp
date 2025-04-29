@@ -1,23 +1,4 @@
 
-<style>
-  .password-wrapper {
-    position: relative;
-  }
-  .password-wrapper input[type="password"],
-  .password-wrapper input[type="text"] {
-    width: 100%;
-    padding-right: 2.5rem;
-  }
-  .password-wrapper .toggle-password {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    font-size: 1.2rem;
-    color: #ccc;
-  }
-  </style>
   <!-- templates/login.html -->
   {% extends 'base.html' %}
   {% block content %}
@@ -80,20 +61,8 @@
       </p>
     </div>
   </div>
+
+  <!-- Link auth.js for Login page -->
+<script src="auth.js"></script>
   {% endblock %}
-  <script>
-// Toggle Password Visibility
-function togglePassword(el) {
-  const input = el.previousElementSibling;
-  if (input.type === "password") {
-    input.type = "text";
-    el.classList.remove("fa-eye");
-    el.classList.add("fa-eye-slash");
-  } else {
-    input.type = "password";
-    el.classList.remove("fa-eye-slash");
-    el.classList.add("fa-eye");
-  }
-}
-  </script>
   

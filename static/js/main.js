@@ -59,16 +59,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("Fitness Tracker JS Initialized. Current theme:", preferredTheme);
 });
-// Toggle Password Visibility
-function togglePassword(el) {
-    const input = el.previousElementSibling;
-    if (input.type === "password") {
-      input.type = "text";
-      el.classList.remove("fa-eye");
-      el.classList.add("fa-eye-slash");
-    } else {
-      input.type = "password";
-      el.classList.remove("fa-eye-slash");
-      el.classList.add("fa-eye");
-    }
-  }
