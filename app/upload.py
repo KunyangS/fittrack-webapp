@@ -49,7 +49,7 @@ def api_upload():
             meal_type=data['meal_type'],
         )
 
-        db.session.add_all([user_info, fitness_entry, food_entry])
+        db.session.add_all([user_info, *fitness_entry, food_entry])
         db.session.commit()
 
         return jsonify({'success': True, 'message': 'Upload successful!'})
