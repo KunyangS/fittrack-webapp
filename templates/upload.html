@@ -19,24 +19,15 @@
   </div>
 
   <!-- Exercise Information -->
-  <!-- Exercise Information -->
 <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md">
   <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Exercise</h3>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div id="exerciseContainer" class="space-y-4">
+    
+  </div>
 
-    <!-- Activity Type: Select -->
-    <select name="activity_type" class="block w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
-      <option value="">Select Activity Type</option>
-      <option value="Running">Running</option>
-      <option value="Walking">Walking</option>
-      <option value="Cycling">Cycling</option>
-      <option value="Swimming">Swimming</option>
-      <option value="Yoga">Yoga</option>
-      <option value="Strength Training">Strength Training</option>
-      <option value="HIIT">HIIT</option>
-      <option value="Pilates">Pilates</option>
-      <option value="Hiking">Hiking</option>
-    </select>
+  <button type="button" id="addExerciseBtn" class="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+    ➕ Add Another Exercise
+  </button>
 
     <!-- Duration: Input -->
     <input type="number" name="duration" placeholder="Duration (minutes)" class="block w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" required>
