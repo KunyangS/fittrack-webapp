@@ -30,16 +30,13 @@ def api_upload():
             weight=float(data['weight']),
         )
 
-        fitness_entry = []
-        for act in data['activities']:
-            fitness_entry.append(FitnessEntry(
-                date=date_obj,
-                activity_type=act['activity_type'],
-                duration=float(act['duration']),
-                calories_burned=float(act['calories_burned']),
-                emotion=act['emotion'],
-            ))
-
+        fitness_entry = FitnessEntry(
+            date=date_obj,
+            activity_type=data['activity_type'],
+            duration=float(data['duration']),
+            calories_burned=float(data['calories_burned']),
+            emotion=data['emotion'],
+        )
 
         food_entry = FoodEntry(
             date=date_obj,
@@ -49,7 +46,7 @@ def api_upload():
             meal_type=data['meal_type'],
         )
 
-        db.session.add_all([user_info, *fitness_entry, food_entry])
+        db.session.add_all([user_info, fitness_entry, food_entry])
         db.session.commit()
 
         return jsonify({'success': True, 'message': 'Upload successful!'})
