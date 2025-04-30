@@ -90,15 +90,15 @@ document.querySelectorAll('#sidebar a[href^="#"]').forEach(anchor => {
   });
   
   // --- Back to Top Button ---
+  const backToTopButton = document.getElementById('backToTop');
+
   window.addEventListener('scroll', () => {
-    const backToTop = document.getElementById('backToTop');
     if (window.scrollY > 300) {
-      backToTop.classList.remove('hidden');
+      backToTopButton.classList.add('visible');
     } else {
-      backToTop.classList.add('hidden');
+      backToTopButton.classList.remove('visible');
     }
   });
   function scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  

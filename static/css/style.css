@@ -162,7 +162,47 @@ html {
   transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
 
-/* ✅ Back to Top Button */
+/* ===== BACK TO TOP BUTTON ===== */
+.back-to-top {
+    position: fixed;
+    bottom: -60px; /* Start hidden below the viewport */
+    right: 30px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    /* Use CSS variables or fallback colors */
+    background-color: var(--background-color, #ffffff); /* Light mode default */
+    color: var(--text-color, #333333); /* Light mode default */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px var(--shadow-color, rgba(0,0,0,0.2));
+    transition: all 0.3s ease; /* Adjusted transition speed */
+    opacity: 0;
+    z-index: 998;
+}
+
+/* Dark mode specific styles for the button */
+.dark .back-to-top {
+    background-color: var(--dark-background-color, #1f2937); /* Dark mode background */
+    color: var(--dark-text-color, #e5e7eb); /* Dark mode text */
+    box-shadow: 0 2px 5px var(--dark-shadow-color, rgba(255,255,255,0.1));
+}
+
+.back-to-top.visible {
+    bottom: 30px;
+    opacity: 1;
+}
+
+.back-to-top:hover {
+    transform: scale(1.15);
+    background-color: var(--primary-color, #3B82F6); /* Use primary color on hover */
+    color: white;
+}
+
+/* Remove or comment out old styles */
+/*
 #backToTop {
   background-color: #3B82F6;
   color: white;
@@ -174,3 +214,4 @@ html {
 #backToTop:hover {
   background-color: #2563EB;
 }
+*/
