@@ -7,58 +7,56 @@
 
 <!-- Date range and period selectors -->
 <div class="flex flex-col md:flex-row justify-center items-center mb-6 space-y-4 md:space-y-0 md:space-x-4">
-  <input type="date" id="startDate" class="input" placeholder="Start Date">
-  <input type="date" id="endDate" class="input" placeholder="End Date">
-  <select id="timePeriod" class="input">
+  <input type="date" id="startDate" class="input border rounded px-2 py-1">
+  <input type="date" id="endDate" class="input border rounded px-2 py-1">
+  <select id="timePeriod" class="input border rounded px-2 py-1">
     <option value="day">Daily</option>
     <option value="week" selected>Weekly</option>
     <option value="month">Monthly</option>
   </select>
-  <button id="applyFilter" class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-600">Apply</button>
+  <button id="applyFilter" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Apply</button>
 </div>
 
 <!-- Summary overview section -->
 <div id="analytics" class="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 mb-12">
-  <div id="summary-card" class="bg-white dark:bg-gray-800 p-6 rounded shadow-md"></div>
+  <div id="summary-card" class="bg-white dark:bg-gray-800 p-6 rounded shadow-md col-span-1"></div>
 </div>
 
 <!-- Chart visualization section -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
-  
-  <!-- Workout Duration Trend Line Chart -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 mb-12">
+  <!-- Duration Trend -->
   <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
     <h3 class="text-lg font-semibold mb-4 text-center">Workout Duration Trend</h3>
     <canvas id="durationChart"></canvas>
   </div>
 
-  <!-- Calories Burned Trend Line Chart -->
+  <!-- Calories Burned -->
   <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
     <h3 class="text-lg font-semibold mb-4 text-center">Calories Burned Trend</h3>
     <canvas id="caloriesChart"></canvas>
   </div>
 
-  <!-- Stacked Bar Chart for Exercise Types -->
+  <!-- Stacked Types -->
   <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
     <h3 class="text-lg font-semibold mb-4 text-center">Exercise Types (Stacked)</h3>
     <canvas id="stackedChart"></canvas>
   </div>
 
-  <!-- Pie Chart for Exercise Type Breakdown -->
+  <!-- Pie Breakdown -->
   <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
     <h3 class="text-lg font-semibold mb-4 text-center">Exercise Type Breakdown</h3>
     <canvas id="activityPieChart"></canvas>
   </div>
 
+  <!-- Calorie Gap Chart -->
+  <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md col-span-1 md:col-span-2">
+    <h3 class="text-lg font-semibold mb-4 text-center">Calorie Gap (Intake - Burned)</h3>
+    <canvas id="gapChart"></canvas>
+  </div>
 </div>
 
-<!-- Import Chart.js and custom JavaScript -->
+<!-- Chart.js and custom logic -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/visualise.js') }}"></script>
 
 {% endblock %}
-
-
-
-
-
-
