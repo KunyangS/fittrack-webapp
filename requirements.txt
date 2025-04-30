@@ -39,4 +39,7 @@ URLObject==2.4.3
 Werkzeug==3.1.3
 WTForms==3.2.1
 zipp==3.21.0
+<<<<<<< HEAD
 
+=======
+>>>>>>> main

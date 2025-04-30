@@ -8,7 +8,7 @@ from app import db
 # User basic information model 
 class UserInfo(db.Model):
     __tablename__ = 'user_info'
-
+    
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, default=date.today)
     time = db.Column(db.Time)

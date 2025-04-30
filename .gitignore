@@ -17,3 +17,11 @@ Thumbs.db
 
 # Environment variables file (if you use one later)
 # .env
+
+# Flask specific files
+instance/
+*.sqlite
+*.db
+*.log
+htmlcov/
+.pytest_cache/
