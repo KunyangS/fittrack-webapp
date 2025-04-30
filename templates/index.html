@@ -1,8 +1,17 @@
-<!-- templates/index.html -->
-{% extends 'base.html' %} <!-- Inherit from base.html -->
+{% extends 'base.html' %}
 
-{% block content %} <!-- Content for the main area -->
-<div class="text-center pt-10 pb-16">
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+<!-- Loading Spinner -->
+<div id="loading-spinner" class="fixed inset-0 bg-white dark:bg-gray-900 flex items-center justify-center z-50">
+  <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-solid"></div>
+</div>
+
+
+<!-- Main Content Section -->
+<section class="bg-white dark:bg-gray-900 py-16">
+  <div class="text-center pt-10 pb-16">
     <h1 class="text-4xl md:text-5xl font-bold mb-4 text-primary dark:text-blue-400">Welcome to FitTrack!</h1>
     <p class="text-lg md:text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
         Your personal companion to track exercise habits, visualise your progress, and share your achievements with friends. Stay motivated and reach your fitness goals.
@@ -56,4 +65,50 @@
         </div>
     </div>
 </div>
+</section>
+
+<section id="about">
+  <h2>About FitTrack</h2>
+  <p>Discover what FitTrack is all about — a smart way to build healthy habits and track your daily progress effortlessly.</p>
+</section>
+<section id="how-it-works">
+  <h2>How It Works</h2>
+  <p>Learn how to start using FitTrack in just a few simple steps. From logging your data to viewing your progress — it's all streamlined.</p>
+</section>
+<section id="live-stats">
+  <h2>Live Stats</h2>
+  <p>See real-time community stats — total workouts logged, calories tracked, and how many users are staying on track.</p>
+</section>
+<section id="call-to-action">
+  <h2>Call to Action</h2>
+  <p>Jump right in! Register, log in, or start tracking your activities now — your fitness journey begins here.</p>
+</section>
+<section id="user-testimonials">
+  <h2>User Testimonials</h2>
+  <p>Hear directly from our users — real stories about staying motivated, reaching goals, and building better routines.</p>
+</section>
+<section id="feature-highlights">
+  <h2>Feature Highlights</h2>
+  <p>Explore powerful features: track your workouts, visualize trends, and stay consistent with daily habit goals.</p>
+</section>
+<section id="demos">
+  <h2>Demos</h2>
+  <p>Get a sneak peek of FitTrack in action. Check out our clean interface and intuitive tools designed just for you.</p>
+</section>
+<section id="timeline">
+  <h2>Timeline</h2>
+  <p>Track the evolution of your habits — milestones, streaks, and key achievements all in one visual journey.</p>
+</section>
+<section id="contact">
+  <h2>Contact</h2>
+  <p>Need help or want to give feedback? Reach out to our team directly — we’re here to support your goals.</p>
+</section>
+<!-- Back to Top Button -->
+<button id="backToTop" onclick="scrollToTop()" class="hidden fixed bottom-6 right-6 bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full shadow-lg z-50">
+  ↑
+</button>
+
+<!-- Link external JS file -->
+<script src="auth.js"></script>
+
 {% endblock %}

@@ -59,3 +59,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("Fitness Tracker JS Initialized. Current theme:", preferredTheme);
 });
+// --- Smooth Scroll for Sidebar Menu ---
+document.querySelectorAll('#sidebar a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      document.querySelector(this.getAttribute('href')).scrollIntoView({
+        behavior: 'smooth'
+      });
+    });
+  });
+  
+  // --- Scroll Animations on Sections ---
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('fade-in-up');
+      }
+    });
+  });
+  document.querySelectorAll('section').forEach(section => {
+    observer.observe(section);
+  });
+  
+  // --- Loading Spinner ---
+  window.addEventListener('load', () => {
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) {
+      spinner.style.display = 'none';
+    }
+  });
+  
+  // --- Back to Top Button ---
+  window.addEventListener('scroll', () => {
+    const backToTop = document.getElementById('backToTop');
+    if (window.scrollY > 300) {
+      backToTop.classList.remove('hidden');
+    } else {
+      backToTop.classList.add('hidden');
+    }
+  });
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  
