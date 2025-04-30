@@ -1,62 +1,76 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="container mx-auto px-4 py-8 lg:py-12"> {# Added container and padding #}
 
-<h2 class="text-3xl font-bold text-center my-8 text-primary dark:text-blue-400">
-  Fitness Data Visualization
-</h2>
+  <!-- Page Header -->
+  <h2 class="text-3xl lg:text-4xl font-heading font-bold mb-10 text-center text-neutral-800 dark:text-neutral-100"> {# Applied header styles #}
+    Fitness Data Visualization
+  </h2>
 
-<!-- Date range and period selectors -->
-<div class="flex flex-col md:flex-row justify-center items-center mb-6 space-y-4 md:space-y-0 md:space-x-4">
-  <input type="date" id="startDate" class="input border rounded px-2 py-1">
-  <input type="date" id="endDate" class="input border rounded px-2 py-1">
-  <select id="timePeriod" class="input border rounded px-2 py-1">
-    <option value="day">Daily</option>
-    <option value="week" selected>Weekly</option>
-    <option value="month">Monthly</option>
-  </select>
-  <button id="applyFilter" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Apply</button>
-</div>
-
-<!-- Summary overview section -->
-<div id="analytics" class="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 mb-12">
-  <div id="summary-card" class="bg-white dark:bg-gray-800 p-6 rounded shadow-md col-span-1"></div>
-</div>
-
-<!-- Chart visualization section -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 mb-12">
-  <!-- Duration Trend -->
-  <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
-    <h3 class="text-lg font-semibold mb-4 text-center">Workout Duration Trend</h3>
-    <canvas id="durationChart"></canvas>
+  <!-- Date range and period selectors -->
+  {# Wrap in a grid container similar to summary/charts and make it full width #}
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 px-4 mb-10"> {# Added grid container #}
+    <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700 col-span-1 md:col-span-3"> {# Added col-span and removed mb-10 #}
+      <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-6 font-sans">
+        <input type="date" id="startDate" class="form-input px-4 py-2.5 border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 dark:text-white transition shadow-sm">
+        <input type="date" id="endDate" class="form-input px-4 py-2.5 border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 dark:text-white transition shadow-sm">
+        <select id="timePeriod" class="form-select px-4 py-2.5 border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 dark:text-white transition shadow-sm">
+          <option value="day">Daily</option>
+          <option value="week" selected>Weekly</option>
+          <option value="month">Monthly</option>
+        </select>
+        <button id="applyFilter" class="inline-block bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light text-white font-semibold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg transition duration-200 ease-in-out transform hover:scale-105">Apply</button>
+      </div>
+    </div>
   </div>
 
-  <!-- Calories Burned -->
-  <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
-    <h3 class="text-lg font-semibold mb-4 text-center">Calories Burned Trend</h3>
-    <canvas id="caloriesChart"></canvas>
+  <!-- Summary overview section -->
+  {# Applied card styles #}
+  <div id="analytics" class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 px-4 mb-12">
+    <div id="summary-card" class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700 col-span-1 md:col-span-3">
+        {# Summary content will be loaded here by JS #}
+        <h3 class="text-2xl font-heading font-semibold mb-6 text-primary-dark dark:text-primary-light text-center">Data Summary</h3>
+        <div id="summary-content" class="text-center text-neutral-600 dark:text-neutral-400">Loading summary...</div>
+    </div>
   </div>
 
-  <!-- Stacked Types -->
-  <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
-    <h3 class="text-lg font-semibold mb-4 text-center">Exercise Types (Stacked)</h3>
-    <canvas id="stackedChart"></canvas>
+  <!-- Chart visualization section -->
+  {# Applied card styles to chart containers #}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 px-4 mb-12">
+    <!-- Duration Trend -->
+    <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700">
+      <h3 class="text-xl font-heading font-semibold mb-4 text-center text-neutral-700 dark:text-neutral-200">Workout Duration Trend</h3>
+      <canvas id="durationChart"></canvas>
+    </div>
+
+    <!-- Calories Burned -->
+    <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700">
+      <h3 class="text-xl font-heading font-semibold mb-4 text-center text-neutral-700 dark:text-neutral-200">Calories Burned Trend</h3>
+      <canvas id="caloriesChart"></canvas>
+    </div>
+
+    <!-- Stacked Types -->
+    <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700">
+      <h3 class="text-xl font-heading font-semibold mb-4 text-center text-neutral-700 dark:text-neutral-200">Exercise Types (Stacked)</h3>
+      <canvas id="stackedChart"></canvas>
+    </div>
+
+    <!-- Pie Breakdown -->
+    <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700">
+      <h3 class="text-xl font-heading font-semibold mb-4 text-center text-neutral-700 dark:text-neutral-200">Exercise Type Breakdown</h3>
+      <canvas id="activityPieChart"></canvas>
+    </div>
+
+    <!-- Calorie Gap Chart -->
+    <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700 col-span-1 md:col-span-2">
+      <h3 class="text-xl font-heading font-semibold mb-4 text-center text-neutral-700 dark:text-neutral-200">Calorie Gap (Intake - Burned)</h3>
+      <canvas id="gapChart"></canvas>
+    </div>
   </div>
 
-  <!-- Pie Breakdown -->
-  <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
-    <h3 class="text-lg font-semibold mb-4 text-center">Exercise Type Breakdown</h3>
-    <canvas id="activityPieChart"></canvas>
-  </div>
+  <!-- Chart.js and custom logic -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='js/visualise.js') }}"></script>
 
-  <!-- Calorie Gap Chart -->
-  <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md col-span-1 md:col-span-2">
-    <h3 class="text-lg font-semibold mb-4 text-center">Calorie Gap (Intake - Burned)</h3>
-    <canvas id="gapChart"></canvas>
-  </div>
-</div>
-
-<!-- Chart.js and custom logic -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{{ url_for('static', filename='js/visualise.js') }}"></script>
-
+</div> {# Close container #}
 {% endblock %}
