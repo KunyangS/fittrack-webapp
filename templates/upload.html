@@ -1,54 +1,46 @@
 {% extends "base.html" %}
 {% block content %}
+
 <h2 class="text-2xl font-bold mb-6 text-primary">Upload Your Daily Fitness Data</h2>
+
 <form id="uploadForm" class="space-y-8">
-  <!-- Basic Info -->
+
+  <!-- Basic Information -->
   <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
     <h3 class="text-xl font-semibold mb-4">Basic Information</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <input type="date" name="date" class="input" required>
       <input type="time" name="time" class="input" required>
-      <input type="text" name="gender" placeholder="Gender" class="input" required>
+      <input type="text" name="gender" placeholder="Gender (e.g., Male, Female)" class="input" required>
       <input type="number" name="age" placeholder="Age" class="input" required>
       <input type="number" name="height" placeholder="Height (cm)" class="input" required>
-      <input type="number" name="weight" placeholder="Weight (kg)" class="input" required>
+      <input type="number" name="weight" placeholder="Current Weight (kg)" class="input" required>
     </div>
   </div>
 
-  <!-- Exercise -->
-  <!---test-->
+  <!-- Exercise Information -->
   <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
     <h3 class="text-xl font-semibold mb-4">Exercise</h3>
-    <div id="exerciseContainer">
-      <div class="exercise-block grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <select name="activity_type" class="input" required>
-          <option value="">Select Activity</option>
-          <option value="Running">Running</option>
-          <option value="Cycling">Cycling</option>
-          <option value="Swimming">Swimming</option>
-          <option value="Yoga">Yoga</option>
-          <option value="Walking">Walking</option>
-        </select>
-        <input type="number" name="duration" placeholder="Duration (min)" class="input" required>
-        <input type="number" name="calories_burned" placeholder="Calories Burned" class="input" required>
-        <select name="emotion" class="input">
-          <option value="">Emotion</option>
-          <option value="happy">Happy</option>
-          <option value="tired">Tired</option>
-          <option value="stressed">Stressed</option>
-          <option value="relaxed">Relaxed</option>
-        </select>
-      </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <input type="text" name="activity_type" placeholder="Activity Type (e.g., Running)" class="input" required>
+      <input type="number" name="duration" placeholder="Duration (minutes)" class="input" required>
+      <input type="number" name="calories_burned" placeholder="Calories Burned" class="input" required>
+      <select name="emotion" class="input">
+        <option value="">Emotion during exercise</option>
+        <option value="happy">Happy</option>
+        <option value="tired">Tired</option>
+        <option value="stressed">Stressed</option>
+        <option value="relaxed">Relaxed</option>
+      </select>
     </div>
-    <button type="button" id="addExerciseBtn" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">+ Add Exercise</button>
   </div>
 
-  <!-- Food -->
+  <!-- Food Intake -->
   <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
     <h3 class="text-xl font-semibold mb-4">Food Intake</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <input type="text" name="food_name" placeholder="Food Name" class="input" required>
-      <input type="number" name="food_quantity" placeholder="Quantity" class="input" required>
+      <input type="text" name="food_name" placeholder="Food Name (e.g., Apple)" class="input" required>
+      <input type="number" name="food_quantity" placeholder="Quantity (g or pieces)" class="input" required>
       <input type="number" name="food_calories" placeholder="Calories" class="input" required>
       <select name="meal_type" class="input">
         <option value="">Meal Type</option>
@@ -60,9 +52,14 @@
     </div>
   </div>
 
+  <!-- Submit -->
   <div class="text-right">
-    <button type="submit" class="bg-primary text-white px-6 py-2 rounded hover:bg-blue-600">Submit</button>
+    <button type="submit" class="bg-primary text-white px-6 py-2 rounded hover:bg-blue-600 transition">
+      Submit
+    </button>
   </div>
+
 </form>
 <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+
 {% endblock %}
