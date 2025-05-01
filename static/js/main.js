@@ -1,3 +1,4 @@
+// Commit fix by Ethika Biswas (24201328)
 // static/js/main.js
 
 document.addEventListener('DOMContentLoaded', () => {

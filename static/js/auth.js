@@ -1,3 +1,4 @@
+// Commit fix by Ethika Biswas (24201328)
 // Toggle Password Visibility
 function togglePassword(el) {
     const input = el.previousElementSibling;
