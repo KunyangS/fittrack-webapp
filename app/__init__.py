@@ -1,3 +1,7 @@
+
+# __init__.py
+# Imports
+
 from flask import Flask
 import os
 from flask_sqlalchemy import SQLAlchemy

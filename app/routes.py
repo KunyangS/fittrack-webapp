@@ -1,10 +1,14 @@
-# Contribution fix by Ethika Biswas (24201328)
 from datetime import datetime, timedelta
 # routes.py
 
 from app import app
 from flask import render_template
+import random
+from urllib.parse import urlencode
 
+# Temporary in-memory user storage
+users = {}
+temp_users = {}  # Temporary unverified users
 
 # Route for the Introduction/Home page
 @app.route('/')
@@ -12,43 +16,111 @@ def index():
     """Renders the introduction page."""
     return render_template('index.html', title='Welcome') # Pass title variable
 
-
 # Route for Data Visualisation page (placeholder)
 @app.route('/visualise')
 def visualise():
-    """Renders the data visualisation page."""
-    # We will create visualise.html in the next iteration
-    return render_template('visualise.html', title='Visualise Data')
+    if 'user' not in session:
+        return redirect('/login')
+    return render_template('visualise.html', username=session.get('user'))
 
 # Route for Data Sharing page (placeholder)
 @app.route('/share')
 def share():
-    """Renders the data sharing page."""
-    # We will create share.html in the next iteration
-    return render_template('share.html', title='Share Data')
+    if 'user' not in session:
+        return redirect('/login')
+    return render_template('share.html', username=session.get('user'))
 
-# Route for Login page (placeholder)
-@app.route('/login')
+# --- 🛠 UPDATED LOGIN route ---
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    """Renders the login page."""
-    # We will create login.html later if needed, or handle via modals
-    # For now, just show a basic template or redirect
-    # Let's create a simple placeholder login.html
+    if request.method == 'POST':
+        input_value = request.form.get('email')  # still using 'email' field name for both
+        password = request.form.get('password')
+
+        # First, try to match by email
+        user = users.get(input_value)
+
+        # If not found by email, try to match by username
+        if not user:
+            for u in users.values():
+                if u['username'] == input_value:
+                    user = u
+                    break
+
+        if user and user['password'] == password:
+            session['user'] = user['username']
+            return redirect('/upload')
+        else:
+            flash("❌ Invalid email/username or password.", "danger")
+            return redirect('/login')
+
     return render_template('login.html', title='Login')
 
-# Route for Registration page (placeholder)
-@app.route('/register')
-def register():
-    """Renders the registration page."""
-    # We will create register.html later if needed
-    # Let's create a simple placeholder register.html
-    return render_template('register.html', title='Register')
 
-# ✅ ADDED: Route to handle "Verify via Email instead"
+# Route for Registration page (placeholder)
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        code = str(random.randint(100000, 999999))  # Random 6 digit code
+
+        temp_users[email] = {
+            'username': username,
+            'password': password,
+            'code': code
+        }
+
+        # Generate Verification Link
+        query_params = urlencode({'email': email, 'code': code})
+        verification_link = f"http://127.0.0.1:5000/verify-email?{query_params}"
+
+        print(f"🔔 Verification Link for {email}: {verification_link}")
+
+        flash("A verification link has been sent to your email (Check Console).", "info")
+        return redirect('/login')
+    return render_template('register.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    flash('You have been logged out.', 'info')
+    return redirect('/login')
+
+# ✅ New UPLOAD Page after successful login
+@app.route('/upload')
+def upload():
+    if 'user' not in session:
+        return redirect('/login')
+    return render_template('upload.html', username=session.get('user'))
+
+# ✅ (ALL YOUR OTHER ROUTES REMAIN SAME AS YOU GAVE)
+# ✅ UPDATED /verify-email Route
 @app.route('/verify-email')
 def verify_email():
-    return render_template('verify_email.html', title='Email Verification')
+    email = request.args.get('email')
+    code = request.args.get('code')
 
+    if not email or not code:
+        flash('❌ Invalid verification link.', 'danger')
+        return redirect('/login')
+
+    user = temp_users.get(email)
+
+    if user and user['code'] == code:
+        users[email] = {
+            'username': user['username'],
+            'password': user['password']
+        }
+        temp_users.pop(email, None)
+        flash('✅ Email verified successfully! Please login.', 'success')
+        return redirect('/login')
+    else:
+        flash('❌ Verification failed. Invalid or expired link.', 'danger')
+        return redirect('/login')
+    
 # m.extra
 def forgot_password():
     return render_template('forgot_password.html', title='Forgot Password')
