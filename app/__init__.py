@@ -1,4 +1,3 @@
-# Contribution fix by Ethika Biswas (24201328)
 # __init__.py
 # Imports
 from flask import Flask
