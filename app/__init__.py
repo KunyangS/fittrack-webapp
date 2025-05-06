@@ -1,4 +1,3 @@
-
 # __init__.py
 # Imports
 
@@ -8,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from app.config import Config
 from flask_migrate import Migrate
+from flask_login import LoginManager
 
 # Load the environment variable
 load_dotenv()
@@ -24,8 +24,23 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 # migrate database
 migrate = Migrate(app,db)
+
+# Initialize Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login' # Changed from 'routes.login'
+
 # import models 
 from app import models
+
+# User loader function for Flask-Login
+@login_manager.user_loader
+def load_user(user_id):
+    print(f"--- load_user called with user_id: {user_id} ---")
+    user = models.UserInfo.query.get(int(user_id))
+    print(f"--- load_user returning: {user} ---")
+    return user
+
 #  Input routes
 from app import routes
 #  Register Bluprints

@@ -4,7 +4,8 @@ from flask import render_template, request, session, redirect, url_for, flash
 import random
 from urllib.parse import urlencode
 from app.models import UserInfo
-from app.database import login_user, register_user, find_user_by_email, reset_password as db_reset_password
+from app.database import login_user as db_login_user, register_user, find_user_by_email, reset_password as db_reset_password
+from flask_login import login_user, logout_user, login_required, current_user
 
 verification_codes = {}
 
@@ -16,36 +17,32 @@ def index():
 
 # Route for Data Visualisation page
 @app.route('/visualise')
+@login_required
 def visualise():
-    if 'user_id' not in session:
-        flash("Please login to access this page.", "warning")
-        return redirect(url_for('login'))
-    user = UserInfo.query.get(session['user_id'])
-    return render_template('visualise.html', username=user.username if user else "User")
+    return render_template('visualise.html', username=current_user.username if hasattr(current_user, 'username') else "User")
 
 # Route for Data Sharing page
 @app.route('/share')
+@login_required
 def share():
-    if 'user_id' not in session:
-        flash("Please login to access this page.", "warning")
-        return redirect(url_for('login'))
-    user = UserInfo.query.get(session['user_id'])
-    return render_template('share.html', username=user.username if user else "User")
+    return render_template('share.html', username=current_user.username if hasattr(current_user, 'username') else "User")
 
 # --- UPDATED LOGIN route ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('upload'))
     if request.method == 'POST':
         email_or_username = request.form.get('email')
         password = request.form.get('password')
 
-        user = login_user(email_or_username, password)
+        user = db_login_user(email_or_username, password)
 
         if user:
-            session['user_id'] = user.id
-            session['username'] = user.username
+            login_user(user)
             flash(f"Welcome back, {user.username}!", "success")
-            return redirect(url_for('upload'))
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('upload'))
         else:
             flash("Invalid email/username or password.", "danger")
             return redirect(url_for('login'))
@@ -81,20 +78,17 @@ def register():
     return render_template('register.html', title='Register')
 
 @app.route('/logout')
+@login_required
 def logout():
-    session.pop('user_id', None)
-    session.pop('username', None)
+    logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
 
 # UPLOAD Page after successful login
 @app.route('/upload')
+@login_required
 def upload():
-    if 'user_id' not in session:
-        flash("Please login to access this page.", "warning")
-        return redirect(url_for('login'))
-    user = UserInfo.query.get(session['user_id'])
-    return render_template('upload.html', username=user.username if user else "User")
+    return render_template('upload.html', username=current_user.username if hasattr(current_user, 'username') else "User")
 
 # Forgot Password Route
 @app.route('/forgot-password', methods=['GET', 'POST'])

@@ -69,35 +69,48 @@ def reset_password(user, new_password):
     user.set_password(new_password)
     db.session.commit()
 
-def upsert_daily_user_data(user_id, date_val: date, time_val: time, gender_val: str, age_val: int, height_val: float, weight_val: float):
+def update_user_profile_details(user_id_to_update: int, 
+                                date_val: date | None = None, 
+                                time_val: time | None = None, 
+                                gender_val: str | None = None, 
+                                age_val: int | None = None, 
+                                height_val: float | None = None, 
+                                weight_val: float | None = None):
     """
-    Creates or updates a daily user data snapshot.
-    Assumes UserInfo model can store these daily logs and has a user_id field.
-    An entry is identified by user_id and date_val for updates.
+    Updates specified profile details for a given user.
+    Only updates fields if a new value is provided.
+    'date_val' and 'time_val' update the UserInfo.date and UserInfo.time fields,
+    representing the date/time associated with this profile data snapshot.
     """
-    daily_log = UserInfo.query.filter_by(user_id=user_id, date=date_val).first()
+    user = UserInfo.query.get(user_id_to_update)
+    if not user:
+        # Consider logging this or raising an error
+        return None 
 
-    if daily_log:
-        # Update existing daily log
-        daily_log.time = time_val
-        daily_log.gender = gender_val
-        daily_log.age = age_val
-        daily_log.height = height_val
-        daily_log.weight = weight_val
-    else:
-        # Create new daily log
-        daily_log = UserInfo(
-            user_id=user_id,
-            date=date_val,
-            time=time_val,
-            gender=gender_val,
-            age=age_val,
-            height=height_val,
-            weight=weight_val
-        )
-        db.session.add(daily_log)
-    db.session.commit()
-    return daily_log
+    updated = False
+    # Update fields only if new values are provided and meaningful
+    if date_val is not None:
+        user.date = date_val
+        updated = True
+    if time_val is not None:
+        user.time = time_val
+        updated = True
+    if gender_val is not None and gender_val.strip(): # Check for non-empty string
+        user.gender = gender_val
+        updated = True
+    if age_val is not None:
+        user.age = age_val
+        updated = True
+    if height_val is not None:
+        user.height = height_val
+        updated = True
+    if weight_val is not None:
+        user.weight = weight_val
+        updated = True
+    
+    if updated:
+        db.session.commit()
+    return user
 
 def add_user_fitness_entry(user_id, date_val: date, activity_type_val: str, duration_val: float, calories_burned_val: float, emotion_val: str):
     """

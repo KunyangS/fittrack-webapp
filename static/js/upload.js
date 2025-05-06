@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     div.className = "exercise-block grid grid-cols-1 md:grid-cols-2 gap-4 mb-4";
 
     div.innerHTML = `
-      <select name="activity_type" class="input" required>
+      <select name="activity_type" class="input">
         <option value="">Select Activity Type</option>
         <option value="Running">Running</option>
         <option value="Walking">Walking</option>
@@ -22,8 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <option value="Hiking">Hiking</option>
       </select>
 
-      <input type="number" name="duration" placeholder="Duration (minutes)" class="input" required>
-      <input type="number" name="calories_burned" placeholder="Calories Burned" class="input" required>
+      <input type="number" name="duration" placeholder="Duration (minutes)" class="input">
+      <input type="number" name="calories_burned" placeholder="Calories Burned" class="input">
 
       <select name="emotion" class="input">
         <option value="">Emotion during exercise</option>

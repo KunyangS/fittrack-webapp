@@ -4,10 +4,10 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import date, time
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from flask_login import UserMixin  # Add this import
 
 # User basic information model
-class UserInfo(db.Model):
+class UserInfo(db.Model, UserMixin):  # Add UserMixin here
     __tablename__ = 'user_info'
 
     id = db.Column(db.Integer, primary_key=True)
