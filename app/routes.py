@@ -1,63 +1,58 @@
 from datetime import datetime, timedelta
-# routes.py
-
-from app import app
-from flask import render_template
+from app import app, db
+from flask import render_template, request, session, redirect, url_for, flash
 import random
 from urllib.parse import urlencode
+from app.models import UserInfo
+from app.database import login_user, register_user, find_user_by_email, reset_password as db_reset_password
 
-# Temporary in-memory user storage
-users = {}
-temp_users = {}  # Temporary unverified users
+verification_codes = {}
 
 # Route for the Introduction/Home page
 @app.route('/')
 def index():
     """Renders the introduction page."""
-    return render_template('index.html', title='Welcome') # Pass title variable
+    return render_template('index.html', title='Welcome')
 
-# Route for Data Visualisation page (placeholder)
+# Route for Data Visualisation page
 @app.route('/visualise')
 def visualise():
-    if 'user' not in session:
-        return redirect('/login')
-    return render_template('visualise.html', username=session.get('user'))
+    if 'user_id' not in session:
+        flash("Please login to access this page.", "warning")
+        return redirect(url_for('login'))
+    user = UserInfo.query.get(session['user_id'])
+    return render_template('visualise.html', username=user.username if user else "User")
 
-# Route for Data Sharing page (placeholder)
+# Route for Data Sharing page
 @app.route('/share')
 def share():
-    if 'user' not in session:
-        return redirect('/login')
-    return render_template('share.html', username=session.get('user'))
+    if 'user_id' not in session:
+        flash("Please login to access this page.", "warning")
+        return redirect(url_for('login'))
+    user = UserInfo.query.get(session['user_id'])
+    return render_template('share.html', username=user.username if user else "User")
 
-# --- 🛠 UPDATED LOGIN route ---
+# --- UPDATED LOGIN route ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        input_value = request.form.get('email')  # still using 'email' field name for both
+        email_or_username = request.form.get('email')
         password = request.form.get('password')
 
-        # First, try to match by email
-        user = users.get(input_value)
+        user = login_user(email_or_username, password)
 
-        # If not found by email, try to match by username
-        if not user:
-            for u in users.values():
-                if u['username'] == input_value:
-                    user = u
-                    break
-
-        if user and user['password'] == password:
-            session['user'] = user['username']
-            return redirect('/upload')
+        if user:
+            session['user_id'] = user.id
+            session['username'] = user.username
+            flash(f"Welcome back, {user.username}!", "success")
+            return redirect(url_for('upload'))
         else:
-            flash("❌ Invalid email/username or password.", "danger")
-            return redirect('/login')
+            flash("Invalid email/username or password.", "danger")
+            return redirect(url_for('login'))
 
     return render_template('login.html', title='Login')
 
-
-# Route for Registration page (placeholder)
+# Route for Registration page
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -65,194 +60,143 @@ def register():
         email = request.form.get('email')
         password = request.form.get('password')
 
-        code = str(random.randint(100000, 999999))  # Random 6 digit code
+        gender = "Not specified"
+        age = 0
+        height = 0.0
+        weight = 0.0
 
-        temp_users[email] = {
-            'username': username,
-            'password': password,
-            'code': code
-        }
+        if not username or not email or not password:
+            flash("All fields are required.", "danger")
+            return redirect(url_for('register'))
 
-        # Generate Verification Link
-        query_params = urlencode({'email': email, 'code': code})
-        verification_link = f"http://127.0.0.1:5000/verify-email?{query_params}"
+        new_user = register_user(username, email, password, gender, age, height, weight)
 
-        print(f"🔔 Verification Link for {email}: {verification_link}")
+        if new_user:
+            flash("Registration successful! Please login.", "success")
+            return redirect(url_for('login'))
+        else:
+            flash("Registration failed. Email or username may already exist.", "danger")
+            return redirect(url_for('register'))
 
-        flash("A verification link has been sent to your email (Check Console).", "info")
-        return redirect('/login')
-    return render_template('register.html')
+    return render_template('register.html', title='Register')
 
 @app.route('/logout')
 def logout():
-    session.pop('user', None)
+    session.pop('user_id', None)
+    session.pop('username', None)
     flash('You have been logged out.', 'info')
-    return redirect('/login')
+    return redirect(url_for('login'))
 
-# ✅ New UPLOAD Page after successful login
+# UPLOAD Page after successful login
 @app.route('/upload')
 def upload():
-    if 'user' not in session:
-        return redirect('/login')
-    return render_template('upload.html', username=session.get('user'))
+    if 'user_id' not in session:
+        flash("Please login to access this page.", "warning")
+        return redirect(url_for('login'))
+    user = UserInfo.query.get(session['user_id'])
+    return render_template('upload.html', username=user.username if user else "User")
 
-# ✅ (ALL YOUR OTHER ROUTES REMAIN SAME AS YOU GAVE)
-# ✅ UPDATED /verify-email Route
-@app.route('/verify-email')
-def verify_email():
-    email = request.args.get('email')
-    code = request.args.get('code')
-
-    if not email or not code:
-        flash('❌ Invalid verification link.', 'danger')
-        return redirect('/login')
-
-    user = temp_users.get(email)
-
-    if user and user['code'] == code:
-        users[email] = {
-            'username': user['username'],
-            'password': user['password']
-        }
-        temp_users.pop(email, None)
-        flash('✅ Email verified successfully! Please login.', 'success')
-        return redirect('/login')
-    else:
-        flash('❌ Verification failed. Invalid or expired link.', 'danger')
-        return redirect('/login')
-    
-# m.extra
-def forgot_password():
-    return render_template('forgot_password.html', title='Forgot Password')
-
-def reset_password():
-    reset_success = session.pop('reset_success', False)
-    return render_template('reset_password.html', title='Reset Password', reset_success=reset_success)
-
-def reset_password():
-    reset_success = session.pop('reset_success', False)
-    return render_template('reset_password.html', title='Reset Password', reset_success=reset_success)
-
-from flask import request, session, redirect, url_for, flash
-import random
-
-# Temporary in-memory store
-verification_codes = {}
-
-def reset_password():
-    step = session.get('reset_step', 'email')
-
-    if request.method == 'POST':
-        if step == 'email':
-            email = request.form.get('email')
-            if email:
-                code = str(random.randint(100000, 999999))
-                verification_codes[email] = code
-                session['reset_email'] = email
-                session['reset_step'] = 'verify'
-                print(f"🔐 Verification code for {email} is: {code}")
-                flash("Verification code sent to your email. (Check console for test)", "info")
-                return redirect(url_for('reset_password'))
-        elif step == 'verify':
-            email = session.get('reset_email')
-            code_input = request.form.get('code')
-            new_pass = request.form.get('new_password')
-            confirm_pass = request.form.get('confirm_password')
-            if code_input == verification_codes.get(email):
-                if new_pass == confirm_pass:
-                    flash("✅ Password successfully reset!", "success")
-                    session.pop('reset_email', None)
-                    session.pop('reset_step', None)
-                    verification_codes.pop(email, None)
-                    return redirect(url_for('login'))
-                else:
-                    flash("❌ Passwords do not match.", "danger")
-            else:
-                flash("❌ Invalid verification code.", "danger")
-
-    step = session.get('reset_step', 'email')
-    return render_template('reset_password.html', step=step, title='Reset Password')
-
-verification_codes = {}
-
+# Forgot Password Route
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
         email = request.form.get('email')
-        if email:
+        user = find_user_by_email(email)
+        if user:
             code = str(random.randint(100000, 999999))
             verification_codes[email] = {
                 'code': code,
-                'timestamp': datetime.now()
+                'timestamp': datetime.now(),
+                'user_id': user.id
             }
             session['reset_email'] = email
             print(f"🔐 Verification code for {email}: {code}")
-            flash("Verification code sent to your email. (Check console)", "info")
+            flash("A verification code has been sent to your email (check console).", "info")
             return redirect(url_for('verify_code'))
+        else:
+            flash("Email address not found.", "danger")
     return render_template('forgot_password.html', title='Forgot Password')
 
-# ✅ FIXED: verify_code route now includes 2-minute expiry check
+# Verify Code Route
 @app.route('/verify-code', methods=['GET', 'POST'])
 def verify_code():
     if 'reset_email' not in session:
+        flash("Session expired or invalid access.", "warning")
         return redirect(url_for('forgot_password'))
 
     email = session['reset_email']
     record = verification_codes.get(email)
 
+    if not record:
+        flash("Verification code not found or expired. Please request again.", "danger")
+        return redirect(url_for('forgot_password'))
+
     if request.method == 'POST':
         code_input = request.form.get('code')
-
-        if not record:
-            flash("❌ Verification code not found. Please request again.", "danger")
-            return redirect(url_for('forgot_password'))
-
-        sent_time = record.get('timestamp')
-        if datetime.now() - sent_time > timedelta(minutes=2):
+        
+        if datetime.now() - record['timestamp'] > timedelta(minutes=5):
             verification_codes.pop(email, None)
-            session.pop('code_sent_time', None)
-            flash("❌ Verification code expired. Please resend.", "danger")
+            flash("Verification code expired. Please request a new one.", "danger")
             return redirect(url_for('forgot_password'))
 
-        if code_input == record.get('code'):
-            session['verified'] = True
+        if code_input == record['code']:
+            session['verified_for_reset'] = True
+            session['user_id_for_reset'] = record['user_id']
+            verification_codes.pop(email, None)
             return redirect(url_for('reset_password'))
         else:
-            flash("❌ Invalid verification code.", "danger")
+            flash("Invalid verification code.", "danger")
+            
+    return render_template('verify_code.html', title='Verify Code', email=email)
 
-    return render_template('verify_code.html', title='Verify Code')
-
+# Reset Password Route
 @app.route('/reset-password', methods=['GET', 'POST'])
 def reset_password():
-    if not session.get('verified'):
+    if not session.get('verified_for_reset') or 'user_id_for_reset' not in session:
+        flash("Please verify your email first.", "warning")
         return redirect(url_for('forgot_password'))
 
     if request.method == 'POST':
-        new_pass = request.form.get('new_password')
-        confirm_pass = request.form.get('confirm_password')
-        if new_pass == confirm_pass:
-            flash("✅ Password successfully reset!", "success")
-            session['reset_success'] = True
-            return redirect(url_for('reset_password'))
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        if new_password == confirm_password:
+            user_id = session['user_id_for_reset']
+            user = UserInfo.query.get(user_id)
+            if user:
+                db_reset_password(user, new_password)
+                flash("Password successfully reset! Please login.", "success")
+                session.pop('verified_for_reset', None)
+                session.pop('user_id_for_reset', None)
+                session.pop('reset_email', None)
+                return redirect(url_for('login'))
+            else:
+                flash("User not found. Password reset failed.", "danger")
         else:
-            flash("❌ Passwords do not match.", "danger")
+            flash("Passwords do not match.", "danger")
+    
+    reset_success_flag = session.pop('reset_success', False)
+    return render_template('reset_password.html', title='Reset Password', reset_success=reset_success_flag)
 
-    reset_success = session.pop('reset_success', False)
-    return render_template('reset_password.html', title='Reset Password', reset_success=reset_success)
-
-
-@app.route('/resend_code', methods=['POST'])
+@app.route('/resend-code', methods=['POST'])
 def resend_code():
-    import random
-
-    if 'email' not in session:
-        flash('Session expired. Please try again.', 'danger')
+    email = session.get('reset_email')
+    if not email:
+        flash('Session expired or email not found. Please start over.', 'danger')
         return redirect(url_for('forgot_password'))
 
-    # Generate new code
-    new_code = str(random.randint(100000, 999999))
-    session['verification_code'] = new_code
-    session['code_sent_time'] = datetime.now().timestamp()
-    print(f"[Resent] Verification code sent to {session['email']}: {new_code}")
-    flash('A new verification code has been sent to your email. (Check console)', 'info')
+    user = find_user_by_email(email)
+    if user:
+        new_code = str(random.randint(100000, 999999))
+        verification_codes[email] = {
+            'code': new_code,
+            'timestamp': datetime.now(),
+            'user_id': user.id
+        }
+        print(f"🔐 [Resent] Verification code for {email}: {new_code}")
+        flash('A new verification code has been sent to your email (check console).', 'info')
+    else:
+        flash('User not found for this email.', 'danger')
+        return redirect(url_for('forgot_password'))
+        
     return redirect(url_for('verify_code'))
