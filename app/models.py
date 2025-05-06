@@ -16,6 +16,8 @@ class UserInfo(db.Model):
     age = db.Column(db.Integer, nullable=False)
     height = db.Column(db.Float, nullable=False)  
     weight = db.Column(db.Float, nullable=False)  
+    fitness_entries = db.relationship('FitnessEntry', backref='user', lazy=True)
+    food_entries = db.relationship('FoodEntry', backref='user', lazy=True)
 
     def __repr__(self):
         return f'<UserInfo {self.date} - {self.gender} - {self.weight}kg>'
@@ -26,6 +28,7 @@ class FitnessEntry(db.Model):
     __tablename__ = 'fitness_entries'
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user_info.id'), nullable=False)
     date = db.Column(db.Date, default=date.today)
     activity_type = db.Column(db.String(64), nullable=False) 
     duration = db.Column(db.Float, nullable=False)  
@@ -41,6 +44,7 @@ class FoodEntry(db.Model):
     __tablename__ = 'food_entries'
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user_info.id'), nullable=False)
     date = db.Column(db.Date, default=date.today)
     food_name = db.Column(db.String(64), nullable=False)
     quantity = db.Column(db.Float, nullable=False)  
