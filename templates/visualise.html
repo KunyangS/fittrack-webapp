@@ -1,6 +1,14 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div class="container mx-auto px-4 py-8 lg:py-12"> {# Added container and padding #}
+{% if username %}
+<div class="text-right p-4">
+    <p class="text-sm text-gray-600 dark:text-gray-300">
+      Logged in as <span class="font-bold">{{ username }}</span> |
+      <a href="{{ url_for('logout') }}" class="text-blue-600 hover:underline">Logout</a>
+    </p>
+</div>
+{% endif %}
 
   <!-- Page Header -->
   <h2 class="text-3xl lg:text-4xl font-heading font-bold mb-10 text-center text-neutral-800 dark:text-neutral-100"> {# Applied header styles #}
