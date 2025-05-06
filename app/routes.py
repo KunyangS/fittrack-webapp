@@ -73,10 +73,15 @@ def register():
             'code': code
         }
 
-# ✅ ADDED: Route to handle "Verify via Email instead"
-@app.route('/verify-email')
-def verify_email():
-    return render_template('verify_email.html', title='Email Verification')
+        # Generate Verification Link
+        query_params = urlencode({'email': email, 'code': code})
+        verification_link = f"http://127.0.0.1:5000/verify-email?{query_params}"
+
+        print(f"🔔 Verification Link for {email}: {verification_link}")
+
+        flash("A verification link has been sent to your email (Check Console).", "info")
+        return redirect('/login')
+    return render_template('register.html')
 
 # m.extra
 def forgot_password():
