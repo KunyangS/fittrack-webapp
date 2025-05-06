@@ -105,10 +105,18 @@
   </div>
 </section>
 
-<section id="call-to-action">
-  <h2>Call to Action</h2>
-  <p>Jump right in! Register, log in, or start tracking your activities now — your fitness journey begins here.</p>
+<section id="call-to-action" class="flex flex-col md:flex-row-reverse items-center justify-between max-w-7xl mx-auto py-16 px-6 gap-10">
+  <div class="md:w-1/2">
+    <h2 class="text-3xl font-bold mb-4 text-primary dark:text-blue-400">Call to Action</h2>
+    <p class="text-gray-600 dark:text-gray-300">
+      Jump right in! Register, log in, or start tracking your activities now — your fitness journey begins here.
+    </p>
+  </div>
+  <div class="md:w-1/2">
+    <img src="{{ url_for('static', filename='images/start_demo.png') }}" alt="Start Demo" class="rounded-lg shadow-lg">
+  </div>
 </section>
+
 <section id="user-testimonials">
   <h2>User Testimonials</h2>
   <p>Hear directly from our users — real stories about staying motivated, reaching goals, and building better routines.</p>
