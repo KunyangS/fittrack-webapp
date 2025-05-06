@@ -1,10 +1,10 @@
-# Contribution fix by Ethika Biswas (24201328)
 from datetime import datetime, timedelta
 # routes.py
 
 from app import app
 from flask import render_template
-
+import random
+from urllib.parse import urlencode
 
 # Route for the Introduction/Home page
 @app.route('/')
