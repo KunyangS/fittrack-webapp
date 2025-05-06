@@ -16,20 +16,19 @@ def index():
     """Renders the introduction page."""
     return render_template('index.html', title='Welcome') # Pass title variable
 
-
 # Route for Data Visualisation page (placeholder)
 @app.route('/visualise')
 def visualise():
-    """Renders the data visualisation page."""
-    # We will create visualise.html in the next iteration
-    return render_template('visualise.html', title='Visualise Data')
+    if 'user' not in session:
+        return redirect('/login')
+    return render_template('visualise.html', username=session.get('user'))
 
 # Route for Data Sharing page (placeholder)
 @app.route('/share')
 def share():
-    """Renders the data sharing page."""
-    # We will create share.html in the next iteration
-    return render_template('share.html', title='Share Data')
+    if 'user' not in session:
+        return redirect('/login')
+    return render_template('share.html', username=session.get('user'))
 
 # Route for Login page (placeholder)
 @app.route('/login')
