@@ -83,6 +83,19 @@ def register():
         return redirect('/login')
     return render_template('register.html')
 
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    flash('You have been logged out.', 'info')
+    return redirect('/login')
+
+# ✅ New UPLOAD Page after successful login
+@app.route('/upload')
+def upload():
+    if 'user' not in session:
+        return redirect('/login')
+    return render_template('upload.html', username=session.get('user'))
+
 # m.extra
 def forgot_password():
     return render_template('forgot_password.html', title='Forgot Password')
