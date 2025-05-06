@@ -27,8 +27,6 @@ from app import routes
 #  Register Bluprints
 from app.upload import upload_bp
 app.register_blueprint(upload_bp)
-# Set a secret key for session management, which needs to be refined after "Security" lecture
-app.config['SECRET_KEY'] = os.urandom(24)
 
 
 
