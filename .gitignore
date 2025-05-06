@@ -16,7 +16,7 @@ Thumbs.db
 .idea/
 
 # Environment variables file (if you use one later)
-# .env
+.env
 
 # Flask specific files
 instance/
