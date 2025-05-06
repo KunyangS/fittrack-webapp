@@ -6,6 +6,10 @@ from flask import render_template
 import random
 from urllib.parse import urlencode
 
+# Temporary in-memory user storage
+users = {}
+temp_users = {}  # Temporary unverified users
+
 # Route for the Introduction/Home page
 @app.route('/')
 def index():
