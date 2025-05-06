@@ -58,12 +58,20 @@ def login():
 
 
 # Route for Registration page (placeholder)
-@app.route('/register')
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    """Renders the registration page."""
-    # We will create register.html later if needed
-    # Let's create a simple placeholder register.html
-    return render_template('register.html', title='Register')
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        code = str(random.randint(100000, 999999))  # Random 6 digit code
+
+        temp_users[email] = {
+            'username': username,
+            'password': password,
+            'code': code
+        }
 
 # ✅ ADDED: Route to handle "Verify via Email instead"
 @app.route('/verify-email')
