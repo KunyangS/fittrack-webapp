@@ -93,11 +93,18 @@
   </div>
 </section>
 
-
-<section id="live-stats">
-  <h2>Live Stats</h2>
-  <p>See real-time community stats — total workouts logged, calories tracked, and how many users are staying on track.</p>
+<section id="live-stats" class="flex flex-col md:flex-row items-center justify-between max-w-7xl mx-auto py-16 px-6 gap-10">
+  <div class="md:w-1/2">
+    <h2 class="text-3xl font-bold mb-4 text-primary dark:text-blue-400">Live Stats</h2>
+    <p class="text-gray-600 dark:text-gray-300">
+      See real-time community stats — total workouts logged, calories tracked, and how many users are staying on track.
+    </p>
+  </div>
+  <div class="md:w-1/2">
+    <img src="{{ url_for('static', filename='images/stats_demo.png') }}" alt="Live Stats Demo" class="rounded-lg shadow-lg">
+  </div>
 </section>
+
 <section id="call-to-action">
   <h2>Call to Action</h2>
   <p>Jump right in! Register, log in, or start tracking your activities now — your fitness journey begins here.</p>
