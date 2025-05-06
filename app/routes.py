@@ -96,6 +96,31 @@ def upload():
         return redirect('/login')
     return render_template('upload.html', username=session.get('user'))
 
+# ✅ (ALL YOUR OTHER ROUTES REMAIN SAME AS YOU GAVE)
+# ✅ UPDATED /verify-email Route
+@app.route('/verify-email')
+def verify_email():
+    email = request.args.get('email')
+    code = request.args.get('code')
+
+    if not email or not code:
+        flash('❌ Invalid verification link.', 'danger')
+        return redirect('/login')
+
+    user = temp_users.get(email)
+
+    if user and user['code'] == code:
+        users[email] = {
+            'username': user['username'],
+            'password': user['password']
+        }
+        temp_users.pop(email, None)
+        flash('✅ Email verified successfully! Please login.', 'success')
+        return redirect('/login')
+    else:
+        flash('❌ Verification failed. Invalid or expired link.', 'danger')
+        return redirect('/login')
+    
 # m.extra
 def forgot_password():
     return render_template('forgot_password.html', title='Forgot Password')
