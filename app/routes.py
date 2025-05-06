@@ -30,14 +30,32 @@ def share():
         return redirect('/login')
     return render_template('share.html', username=session.get('user'))
 
-# Route for Login page (placeholder)
-@app.route('/login')
+# --- 🛠 UPDATED LOGIN route ---
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    """Renders the login page."""
-    # We will create login.html later if needed, or handle via modals
-    # For now, just show a basic template or redirect
-    # Let's create a simple placeholder login.html
+    if request.method == 'POST':
+        input_value = request.form.get('email')  # still using 'email' field name for both
+        password = request.form.get('password')
+
+        # First, try to match by email
+        user = users.get(input_value)
+
+        # If not found by email, try to match by username
+        if not user:
+            for u in users.values():
+                if u['username'] == input_value:
+                    user = u
+                    break
+
+        if user and user['password'] == password:
+            session['user'] = user['username']
+            return redirect('/upload')
+        else:
+            flash("❌ Invalid email/username or password.", "danger")
+            return redirect('/login')
+
     return render_template('login.html', title='Login')
+
 
 # Route for Registration page (placeholder)
 @app.route('/register')
