@@ -1,38 +1,39 @@
+
 # __init__.py
 # Imports
+
 from flask import Flask
 import os
 from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
+from app.config import Config
+from flask_migrate import Migrate
+
+# Load the environment variable
+load_dotenv()
 
 # Initialize Flask app, redirect the tamplate folder outside the app folder
 template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'templates')
 static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'static')
 
+#Create Flask
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
-# Set a secret key for session management, which needs to be refined after "Security" lecture
-app.config['SECRET_KEY'] = os.urandom(24)
-
-# Configure database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///fitness.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Initialize SQLAlchemy
+# Read config.py
+app.config.from_object(Config)
+# Initialise database
 db = SQLAlchemy(app)
-
-# --- Routes ---
+# migrate database
+migrate = Migrate(app,db)
+# import models 
+from app import models
+#  Input routes
 from app import routes
+#  Register Bluprints
+from app.upload import upload_bp
+app.register_blueprint(upload_bp)
 
-# Register Blueprints
-from app.upload import upload_bp   
-app.register_blueprint(upload_bp) 
 
-app.secret_key = "fittrack@2025_secret_reset_feature"
 
-# =============================
-# OAuth Setup using Flask-Dance
-# =============================
-
-# Google OAuth setup
 from flask_dance.contrib.google import make_google_blueprint
 google_bp = make_google_blueprint(
     client_id="YOUR_GOOGLE_CLIENT_ID",
