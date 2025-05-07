@@ -5,7 +5,7 @@ from flask import Flask
 import os
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
-from app.config import Config
+from config import Config
 from flask_migrate import Migrate
 from flask_login import LoginManager
 
