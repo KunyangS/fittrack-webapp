@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta
 # routes.py
-
+from app.models import User
 from app import app
 from flask import render_template
 import random
 from urllib.parse import urlencode
+from app import db
 
 # Temporary in-memory user storage
-users = {}
 temp_users = {}  # Temporary unverified users
 
 # Route for the Introduction/Home page
@@ -27,28 +27,25 @@ def visualise():
 @app.route('/share')
 def share():
     if 'user' not in session:
-        return redirect('/login')
+        return redirect('/login') 
     return render_template('share.html', username=session.get('user'))
 
 # --- 🛠 UPDATED LOGIN route ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        input_value = request.form.get('email')  # still using 'email' field name for both
+        input_value = request.form.get('email')  # Can be email or username
         password = request.form.get('password')
 
-        # First, try to match by email
-        user = users.get(input_value)
+        # Check database: base on email
+        user = User.query.filter_by(email=input_value).first()
 
-        # If not found by email, try to match by username
         if not user:
-            for u in users.values():
-                if u['username'] == input_value:
-                    user = u
-                    break
+            # then check username :))
+            user = User.query.filter_by(username=input_value).first()
 
-        if user and user['password'] == password:
-            session['user'] = user['username']
+        if user and user.password == password:
+            session['user'] = user.username
             return redirect('/upload')
         else:
             flash("❌ Invalid email/username or password.", "danger")
@@ -89,17 +86,9 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect('/login')
 
-# ✅ New UPLOAD Page after successful login
-@app.route('/upload')
-def upload():
-    if 'user' not in session:
-        return redirect('/login')
-    return render_template('upload.html', username=session.get('user'))
-
-# ✅ (ALL YOUR OTHER ROUTES REMAIN SAME AS YOU GAVE)
-# ✅ UPDATED /verify-email Route
 @app.route('/verify-email')
 def verify_email():
+
     email = request.args.get('email')
     code = request.args.get('code')
 
@@ -108,18 +97,28 @@ def verify_email():
         return redirect('/login')
 
     user = temp_users.get(email)
-
     if user and user['code'] == code:
-        users[email] = {
-            'username': user['username'],
-            'password': user['password']
-        }
+        new_user = User(
+            username=user['username'],
+            email=email,
+            password=user['password']
+        )
+        db.session.add(new_user)
+        db.session.commit()
         temp_users.pop(email, None)
         flash('✅ Email verified successfully! Please login.', 'success')
         return redirect('/login')
     else:
         flash('❌ Verification failed. Invalid or expired link.', 'danger')
         return redirect('/login')
+
+# ✅ New UPLOAD Page after successful login
+@app.route('/upload')
+def upload():
+    if 'user' not in session:
+        return redirect('/login')
+    return render_template('upload.html', username=session.get('user'))
+
     
 # m.extra
 def forgot_password():
