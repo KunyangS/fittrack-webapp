@@ -16,8 +16,8 @@ Fitness tracking data analysis and sharing app for CITS5505 Agile Web Dev projec
 ## How to Install
 
 1. Install Python virtual environment if not installed, first update apt `sudo apt update` ,then install venv `apt install python3-venv`
-2. Create a virtual environment: `python3 -m venv .venv`
-3. Active the virtual environment on macOS or Linux:  `source venv/bin/activate`
+2. Create a virtual environment:: `python3 -m venv ..venv`
+3. Active the virtual environment on macOS or Linux:: `source .venv/bin/activate`
 4. Install all required packages: `pip install -r requirements.txt`
 5. Update the database: `flask db upgrade`
 
