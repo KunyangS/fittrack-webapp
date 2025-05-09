@@ -16,23 +16,23 @@
   
   <!-- Basic Info -->
   <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
-    <h3 class="text-xl font-semibold mb-4">Basic Information (Optional)</h3>
+    <h3 class="text-xl font-semibold mb-4">Basic Information</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <input type="date" name="date" class="input" required>
-      <input type="time" name="time" class="input">
-      <input type="text" name="gender" placeholder="Gender" class="input">
-      <input type="number" name="age" placeholder="Age" class="input">
-      <input type="number" name="height" placeholder="Height (cm)" class="input">
-      <input type="number" name="weight" placeholder="Weight (kg)" class="input">
+      <input type="time" name="time" class="input" required>
+      <input type="text" name="gender" placeholder="Gender" class="input" required>
+      <input type="number" name="age" placeholder="Age" class="input" required>
+      <input type="number" name="height" placeholder="Height (cm)" class="input" required>
+      <input type="number" name="weight" placeholder="Weight (kg)" class="input" required>
     </div>
   </div>
 
   <!-- Exercise -->
   <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
-    <h3 class="text-xl font-semibold mb-4">Exercise (Optional)</h3>
+    <h3 class="text-xl font-semibold mb-4">Exercise</h3>
     <div id="exerciseContainer">
       <div class="exercise-block grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <select name="activity_type" class="input">
+        <select name="activity_type" class="input" required>
           <option value="">Select Activity</option>
           <option value="Running">Running</option>
           <option value="Cycling">Cycling</option>
@@ -40,8 +40,8 @@
           <option value="Yoga">Yoga</option>
           <option value="Walking">Walking</option>
         </select>
-        <input type="number" name="duration" placeholder="Duration (min)" class="input">
-        <input type="number" name="calories_burned" placeholder="Calories Burned" class="input">
+        <input type="number" name="duration" placeholder="Duration (min)" class="input" required>
+        <input type="number" name="calories_burned" placeholder="Calories Burned" class="input" required>
         <select name="emotion" class="input">
           <option value="">Emotion</option>
           <option value="happy">Happy</option>
@@ -56,11 +56,11 @@
 
   <!-- Food -->
   <div class="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
-    <h3 class="text-xl font-semibold mb-4">Food Intake (Optional)</h3>
+    <h3 class="text-xl font-semibold mb-4">Food Intake</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <input type="text" name="food_name" placeholder="Food Name" class="input">
-      <input type="number" name="food_quantity" placeholder="Quantity" class="input">
-      <input type="number" name="food_calories" placeholder="Calories" class="input">
+      <input type="text" name="food_name" placeholder="Food Name" class="input" required>
+      <input type="number" name="food_quantity" placeholder="Quantity" class="input" required>
+      <input type="number" name="food_calories" placeholder="Calories" class="input" required>
       <select name="meal_type" class="input">
         <option value="">Meal Type</option>
         <option value="breakfast">Breakfast</option>
