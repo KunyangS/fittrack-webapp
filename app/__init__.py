@@ -37,7 +37,7 @@ from app import models
 @login_manager.user_loader
 def load_user(user_id):
     print(f"--- load_user called with user_id: {user_id} ---")
-    user = models.UserInfo.query.get(int(user_id))
+    user = models.User.query.get(int(user_id)) # Changed UserInfo to User
     print(f"--- load_user returning: {user} ---")
     return user
 

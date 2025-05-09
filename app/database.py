@@ -15,13 +15,13 @@ def login_user(email_or_username, password):
         User: The User object if login is successful, None otherwise.
     """
     user = User.query.filter(or_(User.email == email_or_username, User.username == email_or_username)).first()
-    if user and user.check_password(password):
+    if user and user.check_password(password):  # Assumes User model has check_password method
         return user
     return None
 
 def register_user(username, email, password, gender, age, height, weight):
     """
-    Registers a new user.
+    Registers a new user and creates an associated UserInfo record.
     Args:
         username (str): The user's username.
         email (str): The user's email.
@@ -33,31 +33,33 @@ def register_user(username, email, password, gender, age, height, weight):
     Returns:
         User: The newly created User object if registration is successful, None otherwise.
     """
-    if User.query.filter_by(email=email).first() is not None:  # Changed from UserInfo to User
+    if User.query.filter_by(email=email).first() is not None:
         return None  # Email already exists
-    if User.query.filter_by(username=username).first() is not None:  # Changed from UserInfo to User
+    if User.query.filter_by(username=username).first() is not None:
         return None  # Username already exists
     
-    new_user = User(  # Changed from UserInfo to User
-        username=username,
-        email=email
-    )
-    new_user.set_password(password)
-    db.session.add(new_user)
-    db.session.commit()  # Commit to get new_user.id
+    try:
+        new_user = User(username=username, email=email)
+        new_user.set_password(password)  # Assumes User model has set_password method
+        db.session.add(new_user)
+        db.session.flush()  # Flush to get the new_user.id for the UserInfo record
 
-    # Create UserInfo associated with the new User
-    new_user_info = UserInfo(
-        user_id=new_user.id,  # Link to the new User
-        gender=gender,
-        age=age,
-        height=height,
-        weight=weight,
-        date=date.today()  # Add default date
-    )
-    db.session.add(new_user_info)
-    db.session.commit()
-    return new_user
+        new_user_info = UserInfo(
+            user_id=new_user.id,
+            gender=gender,
+            age=age,
+            height=height,
+            weight=weight,
+            date=date.today()
+        )
+        db.session.add(new_user_info)
+        db.session.commit()  # Commit both User and UserInfo records together
+        return new_user
+    except Exception as e:
+        db.session.rollback()
+        # Consider logging the error e
+        print(f"Error during user registration: {str(e)}")
+        return None
 
 def find_user_by_email(email):
     """
