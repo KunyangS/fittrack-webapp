@@ -61,20 +61,15 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    print("DEBUG: Entered /register route")
     form = RegistrationForm()
 
     if request.method == 'POST':
-        print("DEBUG: POST request received")
         if not form.validate_on_submit():
-            print("DEBUG: Form did not validate")
-            print("Form errors:", form.errors)
             for field, errors in form.errors.items():
                 for error in errors:
                     flash(f"❌ {error}", "danger")
             return redirect('/register')
 
-        print("DEBUG: Form validated successfully")
         username = form.username.data
         email = form.email.data
         password = form.password.data
@@ -85,8 +80,7 @@ def register():
             'password': password,
             'code': code
         }
-        query_params = urlencode({'email': email, 'code': code})
-        verification_link = f"http://127.0.0.1:5000/verify-email?{query_params}"
+        verification_link = url_for('verify_email', email=email, code=code, _external=True)
         print("DEBUG: Registration passed validation, about to print verification link")
         print(f"🔔 Verification Link for {email}: {verification_link}")
 
