@@ -6,6 +6,11 @@
       <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
         Create Account
       </h2>
+
+      <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
+        Register to start tracking your fitness journey!
+      </p>
+
     </div>
 
     <!-- Flash messages -->
@@ -20,45 +25,39 @@
     {% endwith %}
 
     <form class="mt-8 space-y-6" method="POST">
+      {{ form.hidden_tag() }}
       <div class="rounded-md shadow-sm space-y-4">
 
         <!-- Username -->
         <div>
-          <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
-          <input id="username" name="username" type="text" required
-            class="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white">
+          {{ form.username.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+          {{ form.username(class="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white") }}
         </div>
 
         <!-- Email -->
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-          <input id="email" name="email" type="email" required
-            class="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white">
+          {{ form.email.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
+          {{ form.email(class="appearance-none w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white") }}
         </div>
 
         <!-- Password -->
         <div>
-          <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+          {{ form.password.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
           <div class="password-wrapper relative">
-            <input id="password" name="password" type="password" required
-              class="appearance-none w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white"
-              autocomplete="new-password" oninput="checkPasswordStrength(this.value)">
-              <i class="fa-regular fa-eye toggle-password" onclick="togglePassword(this)"></i>
+            {{ form.password(class="appearance-none w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white") }}
+            <i class="fa-regular fa-eye toggle-password" onclick="togglePassword(this)"></i>
           </div>
           <p id="password-strength" class="text-sm mt-1 text-gray-500 dark:text-gray-400"></p>
         </div>
 
         <!-- Confirm Password -->
         <div>
-          <label for="confirm-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
+          {{ form.confirm_password.label(class="block text-sm font-medium text-gray-700 dark:text-gray-300") }}
           <div class="password-wrapper relative">
-            <input id="confirm-password" name="confirm-password" type="password" required
-              class="appearance-none w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white"
-              autocomplete="new-password">
-              <i class="fa-regular fa-eye toggle-password" onclick="togglePassword(this)"></i>
+            {{ form.confirm_password(class="appearance-none w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white") }}
+            <i class="fa-regular fa-eye toggle-password" onclick="togglePassword(this)"></i>
           </div>
         </div>
-
       </div>
 
       <!-- Terms Checkbox -->
@@ -71,9 +70,7 @@
 
       <!-- Register Button -->
       <div class="mt-4">
-        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 font-semibold">
-          Register
-        </button>
+        {{ form.submit(class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 font-semibold") }}
       </div>
     </form>
 
@@ -81,7 +78,6 @@
       Already have an account?
       <a href="{{ url_for('login') }}" class="font-medium text-blue-600 hover:text-blue-500">Login here</a>
     </p>
-
   </div>
 </div>
 
@@ -101,5 +97,5 @@
   </div>
 </div>
 
-<script src="auth.js"></script>
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 {% endblock %}

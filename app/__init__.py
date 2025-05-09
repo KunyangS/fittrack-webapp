@@ -5,9 +5,11 @@ from flask import Flask
 import os
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
-from config import Config
+from config import Config, instance_path # Import instance_path
 from flask_migrate import Migrate
+from flask_wtf import CSRFProtect
 from flask_login import LoginManager
+
 
 # Load the environment variable
 load_dotenv()
@@ -20,6 +22,11 @@ static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'sta
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 # Read config.py
 app.config.from_object(Config)
+
+# Ensure the instance folder exists
+if not os.path.exists(instance_path):
+    os.makedirs(instance_path)
+
 # Initialise database
 db = SQLAlchemy(app)
 # migrate database

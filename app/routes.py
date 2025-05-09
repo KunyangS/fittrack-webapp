@@ -1,9 +1,15 @@
+# routes.py
 from datetime import datetime, timedelta
+
 from app import app, db, login_manager
 from flask import render_template, request, session, redirect, url_for, flash
 import random
 from urllib.parse import urlencode
 from app.models import User, UserInfo, ShareEntry, FitnessEntry, FoodEntry
+from app.forms import RegistrationForm
+import re
+
+# Database helpers
 from app.database import (
     login_user as db_login_user, 
     register_user as db_register_user, 
@@ -16,10 +22,13 @@ from app.database import (
     get_share_entry_by_id,
     get_user_activity_data
 )
+
+# Flask-Login helpers
 from flask_login import login_user as flask_login_user, logout_user, login_required, current_user
 
 # Temporary in-memory user storage
 temp_users = {}  # Temporary unverified users
+verification_codes = {}  # Temporary in-memory store for verification codes
 
 # User loader for Flask-Login
 @login_manager.user_loader
@@ -67,31 +76,34 @@ def login():
     return render_template('login.html', title='Login')
 
 
-# Route for Registration page (placeholder)
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    form = RegistrationForm()
+
     if request.method == 'POST':
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
+        if not form.validate_on_submit():
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(f"❌ {error}", "danger")
+            return redirect('/register')
 
-        code = str(random.randint(100000, 999999))  # Random 6 digit code
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
 
+        code = str(random.randint(100000, 999999))
         temp_users[email] = {
             'username': username,
             'password': password,
             'code': code
         }
-
-        # Generate Verification Link
-        query_params = urlencode({'email': email, 'code': code})
-        verification_link = f"http://127.0.0.1:5000/verify-email?{query_params}"
-
+        verification_link = url_for('verify_email', email=email, code=code, _external=True)
+        print("DEBUG: Registration passed validation, about to print verification link")
         print(f"🔔 Verification Link for {email}: {verification_link}")
 
         flash("A verification link has been sent to your email (Check Console).", "info")
         return redirect('/login')
-    return render_template('register.html')
+    return render_template('register.html', form=form)
 
 @app.route('/logout')
 def logout():
@@ -134,62 +146,6 @@ def verify_email():
 @login_required
 def upload():
     return render_template('upload.html', username=current_user.username)
-
-    
-# m.extra
-def forgot_password():
-    return render_template('forgot_password.html', title='Forgot Password')
-
-def reset_password():
-    reset_success = session.pop('reset_success', False)
-    return render_template('reset_password.html', title='Reset Password', reset_success=reset_success)
-
-def reset_password():
-    reset_success = session.pop('reset_success', False)
-    return render_template('reset_password.html', title='Reset Password', reset_success=reset_success)
-
-from flask import request, session, redirect, url_for, flash
-import random
-
-# Temporary in-memory store
-verification_codes = {}
-
-def reset_password():
-    step = session.get('reset_step', 'email')
-
-    if request.method == 'POST':
-        if step == 'email':
-            email = request.form.get('email')
-            if email:
-                code = str(random.randint(100000, 999999))
-                verification_codes[email] = code
-                session['reset_email'] = email
-                session['reset_step'] = 'verify'
-                print(f"🔐 Verification code for {email} is: {code}")
-                flash("Verification code sent to your email. (Check console for test)", "info")
-                return redirect(url_for('reset_password'))
-        elif step == 'verify':
-            email = session.get('reset_email')
-            code_input = request.form.get('code')
-            new_pass = request.form.get('new_password')
-            confirm_pass = request.form.get('confirm_password')
-            if code_input == verification_codes.get(email):
-                if new_pass == confirm_pass:
-                    db_reset_password(email, new_pass)
-                    flash("✅ Password successfully reset!", "success")
-                    session.pop('reset_email', None)
-                    session.pop('reset_step', None)
-                    verification_codes.pop(email, None)
-                    return redirect(url_for('login'))
-                else:
-                    flash("❌ Passwords do not match.", "danger")
-            else:
-                flash("❌ Invalid verification code.", "danger")
-
-    step = session.get('reset_step', 'email')
-    return render_template('reset_password.html', step=step, title='Reset Password')
-
-verification_codes = {}
 
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
