@@ -1,14 +1,30 @@
 from datetime import datetime, timedelta
-# routes.py
-from app.models import User
-from app import app
-from flask import render_template
+from app import app, db, login_manager
+from flask import render_template, request, session, redirect, url_for, flash
 import random
 from urllib.parse import urlencode
-from app import db
+from app.models import User, UserInfo, ShareEntry, FitnessEntry, FoodEntry
+from app.database import (
+    login_user as db_login_user, 
+    register_user as db_register_user, 
+    find_user_by_email, 
+    find_user_by_username, 
+    reset_password as db_reset_password,
+    create_share_entry,
+    get_shares_by_sharer,
+    revoke_share_entry,
+    get_share_entry_by_id,
+    get_user_activity_data
+)
+from flask_login import login_user as flask_login_user, logout_user, login_required, current_user
 
 # Temporary in-memory user storage
 temp_users = {}  # Temporary unverified users
+
+# User loader for Flask-Login
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 # Route for the Introduction/Home page
 @app.route('/')
@@ -18,38 +34,35 @@ def index():
 
 # Route for Data Visualisation page (placeholder)
 @app.route('/visualise')
+@login_required
 def visualise():
-    if 'user' not in session:
-        return redirect('/login')
-    return render_template('visualise.html', username=session.get('user'))
+    return render_template('visualise.html', username=current_user.username)
 
 # Route for Data Sharing page (placeholder)
 @app.route('/share')
+@login_required
 def share():
-    if 'user' not in session:
-        return redirect('/login') 
-    return render_template('share.html', username=session.get('user'))
+    return render_template('share.html', username=current_user.username)
 
 # --- 🛠 UPDATED LOGIN route ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('upload')) # Or wherever you want logged-in users to go
+
     if request.method == 'POST':
         input_value = request.form.get('email')  # Can be email or username
         password = request.form.get('password')
 
-        # Check database: base on email
-        user = User.query.filter_by(email=input_value).first()
+        user = db_login_user(input_value, password) # Use database function
 
-        if not user:
-            # then check username :))
-            user = User.query.filter_by(username=input_value).first()
-
-        if user and user.password == password:
-            session['user'] = user.username
-            return redirect('/upload')
+        if user:
+            flask_login_user(user) # Use Flask-Login to handle the session
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('upload'))
         else:
             flash("❌ Invalid email/username or password.", "danger")
-            return redirect('/login')
+            return redirect(url_for('login'))
 
     return render_template('login.html', title='Login')
 
@@ -82,42 +95,45 @@ def register():
 
 @app.route('/logout')
 def logout():
-    session.pop('user', None)
+    logout_user()
     flash('You have been logged out.', 'info')
     return redirect('/login')
 
 @app.route('/verify-email')
 def verify_email():
-
     email = request.args.get('email')
     code = request.args.get('code')
 
     if not email or not code:
         flash('❌ Invalid verification link.', 'danger')
-        return redirect('/login')
+        return redirect(url_for('login'))
 
-    user = temp_users.get(email)
-    if user and user['code'] == code:
-        new_user = User(
-            username=user['username'],
+    user_data = temp_users.get(email)
+    if user_data and user_data['code'] == code:
+        registered_user = db_register_user(
+            username=user_data['username'],
             email=email,
-            password=user['password']
+            password=user_data['password'],
+            gender=None,
+            age=None,
+            height=None,
+            weight=None
         )
-        db.session.add(new_user)
-        db.session.commit()
-        temp_users.pop(email, None)
-        flash('✅ Email verified successfully! Please login.', 'success')
-        return redirect('/login')
+        if registered_user:
+            temp_users.pop(email, None)
+            flash('✅ Email verified successfully! Please login.', 'success')
+        else:
+            flash('❌ Registration failed. Username or email may already exist, or an error occurred.', 'danger')
+        return redirect(url_for('login'))
     else:
         flash('❌ Verification failed. Invalid or expired link.', 'danger')
-        return redirect('/login')
+        return redirect(url_for('login'))
 
 # ✅ New UPLOAD Page after successful login
 @app.route('/upload')
+@login_required
 def upload():
-    if 'user' not in session:
-        return redirect('/login')
-    return render_template('upload.html', username=session.get('user'))
+    return render_template('upload.html', username=current_user.username)
 
     
 # m.extra
@@ -159,6 +175,7 @@ def reset_password():
             confirm_pass = request.form.get('confirm_password')
             if code_input == verification_codes.get(email):
                 if new_pass == confirm_pass:
+                    db_reset_password(email, new_pass)
                     flash("✅ Password successfully reset!", "success")
                     session.pop('reset_email', None)
                     session.pop('reset_step', None)
@@ -230,6 +247,8 @@ def reset_password():
         new_pass = request.form.get('new_password')
         confirm_pass = request.form.get('confirm_password')
         if new_pass == confirm_pass:
+            email = session.get('reset_email')
+            db_reset_password(email, new_pass)
             flash("✅ Password successfully reset!", "success")
             session['reset_success'] = True
             return redirect(url_for('reset_password'))
