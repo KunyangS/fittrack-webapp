@@ -1,4 +1,3 @@
-
 # routes.py
 from datetime import datetime, timedelta
 
@@ -29,6 +28,7 @@ from flask_login import login_user as flask_login_user, logout_user, login_requi
 
 # Temporary in-memory user storage
 temp_users = {}  # Temporary unverified users
+verification_codes = {}  # Temporary in-memory store for verification codes
 
 # User loader for Flask-Login
 @login_manager.user_loader
@@ -146,62 +146,6 @@ def verify_email():
 @login_required
 def upload():
     return render_template('upload.html', username=current_user.username)
-
-    
-# m.extra
-def forgot_password():
-    return render_template('forgot_password.html', title='Forgot Password')
-
-def reset_password():
-    reset_success = session.pop('reset_success', False)
-    return render_template('reset_password.html', title='Reset Password', reset_success=reset_success)
-
-def reset_password():
-    reset_success = session.pop('reset_success', False)
-    return render_template('reset_password.html', title='Reset Password', reset_success=reset_success)
-
-from flask import request, session, redirect, url_for, flash
-import random
-
-# Temporary in-memory store
-verification_codes = {}
-
-def reset_password():
-    step = session.get('reset_step', 'email')
-
-    if request.method == 'POST':
-        if step == 'email':
-            email = request.form.get('email')
-            if email:
-                code = str(random.randint(100000, 999999))
-                verification_codes[email] = code
-                session['reset_email'] = email
-                session['reset_step'] = 'verify'
-                print(f"🔐 Verification code for {email} is: {code}")
-                flash("Verification code sent to your email. (Check console for test)", "info")
-                return redirect(url_for('reset_password'))
-        elif step == 'verify':
-            email = session.get('reset_email')
-            code_input = request.form.get('code')
-            new_pass = request.form.get('new_password')
-            confirm_pass = request.form.get('confirm_password')
-            if code_input == verification_codes.get(email):
-                if new_pass == confirm_pass:
-                    db_reset_password(email, new_pass)
-                    flash("✅ Password successfully reset!", "success")
-                    session.pop('reset_email', None)
-                    session.pop('reset_step', None)
-                    verification_codes.pop(email, None)
-                    return redirect(url_for('login'))
-                else:
-                    flash("❌ Passwords do not match.", "danger")
-            else:
-                flash("❌ Invalid verification code.", "danger")
-
-    step = session.get('reset_step', 'email')
-    return render_template('reset_password.html', step=step, title='Reset Password')
-
-verification_codes = {}
 
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():

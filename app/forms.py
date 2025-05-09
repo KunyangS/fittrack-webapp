@@ -16,8 +16,7 @@ class RegistrationForm(FlaskForm):
         Email(message="Enter a valid email address.")
     ])
     password = PasswordField('Password', validators=[
-        DataRequired(),
-        Length(min=8, message="Password must be at least 8 characters long.")
+        DataRequired()
     ])
     confirm_password = PasswordField('Confirm Password', validators=[
         DataRequired(),
