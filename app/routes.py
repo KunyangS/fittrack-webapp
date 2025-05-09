@@ -1,11 +1,16 @@
-from datetime import datetime, timedelta
+
 # routes.py
+from datetime import datetime, timedelta
+
 from app.models import User
 from app import app
-from flask import render_template
+from flask import render_template, redirect, url_for, flash, request, session
 import random
 from urllib.parse import urlencode
 from app import db
+from app.forms import RegistrationForm
+import re 
+
 
 # Temporary in-memory user storage
 temp_users = {}  # Temporary unverified users
@@ -54,31 +59,40 @@ def login():
     return render_template('login.html', title='Login')
 
 
-# Route for Registration page (placeholder)
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    print("DEBUG: Entered /register route")
+    form = RegistrationForm()
+
     if request.method == 'POST':
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
+        print("DEBUG: POST request received")
+        if not form.validate_on_submit():
+            print("DEBUG: Form did not validate")
+            print("Form errors:", form.errors)
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(f"❌ {error}", "danger")
+            return redirect('/register')
 
-        code = str(random.randint(100000, 999999))  # Random 6 digit code
+        print("DEBUG: Form validated successfully")
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
 
+        code = str(random.randint(100000, 999999))
         temp_users[email] = {
             'username': username,
             'password': password,
             'code': code
         }
-
-        # Generate Verification Link
         query_params = urlencode({'email': email, 'code': code})
         verification_link = f"http://127.0.0.1:5000/verify-email?{query_params}"
-
+        print("DEBUG: Registration passed validation, about to print verification link")
         print(f"🔔 Verification Link for {email}: {verification_link}")
 
         flash("A verification link has been sent to your email (Check Console).", "info")
         return redirect('/login')
-    return render_template('register.html')
+    return render_template('register.html', form=form)
 
 @app.route('/logout')
 def logout():
