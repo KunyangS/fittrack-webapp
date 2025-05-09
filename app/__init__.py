@@ -8,6 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from app.config import Config
 from flask_migrate import Migrate
+from flask_wtf import CSRFProtect
 
 # Load the environment variable
 load_dotenv()
