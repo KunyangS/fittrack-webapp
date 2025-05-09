@@ -1,8 +1,7 @@
-\
 import datetime
 import random
 from app import app, db
-from app.models import UserInfo
+from app.models import UserInfo, User
 from app.database import add_user_fitness_entry, upsert_user_food_entry
 
 # Sample data for generation
@@ -15,32 +14,20 @@ sample_foods = [
 ]
 sample_meal_types = ["Breakfast", "Lunch", "Dinner", "Snack"]
 
-USER_ID = 1
-
-def create_batch_data():
+def create_batch_data(target_user_id):  # Modified to accept target_user_id
     """
     Generates and inserts batch data for fitness and food entries for a specific user
     over a defined date range.
     """
     with app.app_context():
-        # Check if the target user exists
-        user = UserInfo.query.get(USER_ID)
-        if not user:
-            print(f"Error: User with ID {USER_ID} not found in the database.")
-            print("Please create this user before running the script.")
-            # Example: You might want to create a dummy user here if needed for full automation
-            # from app.database import register_user # Assuming such a function exists
-            # register_user(username=f"testuser{USER_ID}", email=f"test{USER_ID}@example.com", password="password",
-            #               gender="Other", age=30, height=170, weight=70)
-            # db.session.commit() # If register_user doesn't commit
-            # user = UserInfo.query.get(USER_ID)
-            # if not user:
-            #     print("Failed to create dummy user. Exiting.")
-            #     return
-            # print(f"Created dummy user {USER_ID} for testing.")
+        # Check if the target user exists in the User table
+        target_user_record = User.query.get(target_user_id)  # Use target_user_id
+        if not target_user_record:
+            print(f"Error: User with ID {target_user_id} not found in the 'users' table.")  # Use target_user_id
+            print("Please ensure a user with this ID exists in the 'users' table before running the script.")
             return
 
-        print(f"Starting batch data insertion for User ID: {USER_ID}")
+        print(f"Starting batch data insertion for User ID: {target_user_id} (Username: {target_user_record.username})")  # Use target_user_id
 
         start_date = datetime.date(2025, 4, 1)
         end_date = datetime.date(2025, 4, 30)
@@ -60,7 +47,7 @@ def create_batch_data():
                 
                 try:
                     entry = add_user_fitness_entry(
-                        user_id=USER_ID,
+                        user_id=target_user_id,  # Use target_user_id
                         date_val=current_date,
                         activity_type_val=activity,
                         duration_val=duration,
@@ -79,18 +66,18 @@ def create_batch_data():
             meal_types_for_day = random.sample(sample_meal_types, min(num_food_entries, len(sample_meal_types)))
             
             for i in range(num_food_entries):
-                if i >= len(meal_types_for_day): # In case num_food_entries > len(sample_meal_types)
-                    meal_type = random.choice(sample_meal_types) # Fallback to random if we need more entries than unique types
+                if i >= len(meal_types_for_day):  # In case num_food_entries > len(sample_meal_types)
+                    meal_type = random.choice(sample_meal_types)  # Fallback to random if we need more entries than unique types
                 else:
                     meal_type = meal_types_for_day[i]
                 
                 food_name = random.choice(sample_foods)
                 quantity = round(random.uniform(50.0, 600.0), 1)  # Quantity in grams or ml
-                calories = round(random.uniform(50.0, 1000.0), 1) # Calories for the food item
+                calories = round(random.uniform(50.0, 1000.0), 1)  # Calories for the food item
                 
                 try:
                     upsert_user_food_entry(
-                        user_id=USER_ID,
+                        user_id=target_user_id,  # Use target_user_id
                         date_val=current_date,
                         food_name_val=food_name,
                         quantity_val=quantity,
@@ -109,13 +96,25 @@ def create_batch_data():
         # unless there are other operations outside those calls that need committing.
         # However, it's good practice if you modify those functions later.
         try:
-            db.session.commit() # Commit any other potential changes if any
-            print("\\nBatch data insertion process completed successfully.")
+            db.session.commit()  # Commit any other potential changes if any
+            print("\nBatch data insertion process completed successfully.")
         except Exception as e:
             db.session.rollback()
-            print(f"\\nAn error occurred during the final commit: {e}")
+            print(f"\nAn error occurred during the final commit: {e}")
 
 if __name__ == "__main__":
     print("Script execution started...")
-    create_batch_data()
+    user_id_to_process = 1  # Default USER_ID
+
+    try:
+        raw_input = input(f"Enter User ID to inject data into (default: {user_id_to_process}): ")
+        if raw_input.strip() == "":
+            print(f"No User ID provided. Defaulting to User ID {user_id_to_process}.")
+        else:
+            user_id_to_process = int(raw_input)
+            print(f"Targeting User ID from user input: {user_id_to_process}")
+    except ValueError:
+        print(f"Invalid User ID provided: '{raw_input}'. Must be an integer. Defaulting to User ID {user_id_to_process}.")
+    
+    create_batch_data(user_id_to_process)
     print("Script execution finished.")
