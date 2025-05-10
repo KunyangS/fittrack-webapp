@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function checkPasswordStrength(password) {
   const strengthDisplay = document.getElementById("password-strength");
   // Adjust regex to match your backend requirements
-  const strongRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+ const strongRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{}|;':",.<>/?~`]).{8,}$/;
 
   if (!strengthDisplay) return;
 

@@ -126,7 +126,10 @@ def verify_email():
             username=user_data['username'],
             email=email,
             password=user_data['password'],
-        
+            gender=None,
+            age=None,
+            height=None,
+            weight=None
         )
         if registered_user:
             temp_users.pop(email, None)

@@ -27,7 +27,7 @@ class RegistrationForm(FlaskForm):
     def validate_password(self, field):
         password = field.data
         # At least 8 chars, one uppercase, one digit, one special char
-        if not re.match(r"^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", password):
+        if not re.match(r"^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{}|;':\",.<>/?~`]).{8,}$", password):
             raise ValidationError(
                 "Password must be at least 8 characters long and include at least one uppercase letter, one digit, and one special character."
             )
