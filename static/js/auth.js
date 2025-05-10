@@ -99,3 +99,17 @@ if (document.getElementById('resendBtn')) {
     }
   }, 1000);
 }
+
+//Back to Top Button 
+document.addEventListener('scroll', function() {
+    const btn = document.getElementById('backToTop');
+    if (!btn) return;
+    if (window.scrollY > 200) {
+        btn.classList.add('visible');
+    } else {
+        btn.classList.remove('visible');
+    }
+});
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
