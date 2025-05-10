@@ -7,6 +7,8 @@ import random
 from urllib.parse import urlencode
 from app.models import User, UserInfo, ShareEntry, FitnessEntry, FoodEntry
 from app.forms import RegistrationForm
+import os
+from werkzeug.utils import secure_filename
 import re
 
 # Database helpers
@@ -234,3 +236,23 @@ def resend_code():
     print(f"[Resent] Verification code sent to {session['email']}: {new_code}")
     flash('A new verification code has been sent to your email. (Check console)', 'info')
     return redirect(url_for('verify_code'))
+@app.route('/upload_avatar', methods=['POST'])
+@login_required
+def upload_avatar():
+    if 'avatar' not in request.files:
+        flash('No file part', 'danger')
+        return redirect(request.referrer or url_for('upload'))
+    file = request.files['avatar']
+    if file.filename == '':
+        flash('No selected file', 'danger')
+        return redirect(request.referrer or url_for('upload'))
+    if file:
+        filename = secure_filename(file.filename)
+        avatar_folder = os.path.join(app.static_folder, 'avatars')
+        os.makedirs(avatar_folder, exist_ok=True)
+        file.save(os.path.join(avatar_folder, filename))
+        # Save filename to user (make sure your User model has avatar_url)
+        current_user.avatar_url = filename
+        db.session.commit()
+        flash('Avatar updated!', 'success')
+    return redirect(request.referrer or url_for('upload'))
