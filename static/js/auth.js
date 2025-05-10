@@ -43,9 +43,11 @@ document.addEventListener("DOMContentLoaded", function () {
   if (passwordInput) {
     passwordInput.addEventListener("input", function () {
       checkPasswordStrength(passwordInput.value);
+      checkConfirmPassword();
     });
   }
 });
+
 
 // Password Strength Checker
 function checkPasswordStrength(password) {
