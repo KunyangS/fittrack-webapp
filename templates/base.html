@@ -73,37 +73,49 @@
                         <i class="fas fa-sun text-base"></i>
                     </button>
                 </li>
-                {% if current_user.is_authenticated and request.endpoint in ['upload', 'visualise', 'share'] %}
-                    <!-- User Info and Logout (styled, replaces login/register) -->
-                    <li class="ml-4 flex items-center gap-2">
-                         <!-- Avatar with upload option -->
-                        <div class="relative group">
-                            <form id="avatarUploadForm" action="{{ url_for('upload_avatar') }}" method="post" enctype="multipart/form-data">
-                                <label for="avatarInput" class="cursor-pointer">
-                                    {% if current_user.avatar_url %}
-                                        <img src="{{ url_for('static', filename='avatars/' ~ current_user.avatar_url) }}"
-                                            alt="Avatar"
-                                            class="w-9 h-9 rounded-full object-cover border-2 border-blue-400">
-                                    {% else %}
-                                        <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 text-white font-bold text-lg">
-                                            {{ current_user.username[0]|upper }}
+                {% if current_user.is_authenticated %}
+                    {% if request.endpoint in ['upload', 'visualise', 'share'] %}
+                        <!-- User Info and Logout (styled, replaces login/register) -->
+                        <li class="ml-4 flex items-center gap-2">
+                            <!-- Avatar with upload option -->
+                            <div class="relative group">
+                                <form id="avatarUploadForm" action="{{ url_for('upload_avatar') }}" method="post" enctype="multipart/form-data">
+                                    <label for="avatarInput" class="cursor-pointer">
+                                        {% if current_user.avatar_url %}
+                                            <img src="{{ url_for('static', filename='avatars/' ~ current_user.avatar_url) }}"
+                                                alt="Avatar"
+                                                class="w-9 h-9 rounded-full object-cover border-2 border-blue-400">
+                                        {% else %}
+                                            <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 text-white font-bold text-lg">
+                                                {{ current_user.username[0]|upper }}
+                                            </span>
+                                        {% endif %}
+                                        <!-- Camera icon overlay (shows on hover) -->
+                                        <span class="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow group-hover:block hidden">
+                                            <i class="fa fa-camera text-blue-500 text-xs"></i>
                                         </span>
-                                    {% endif %}
-                                    <!-- Camera icon overlay (shows on hover) -->
-                                    <span class="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow group-hover:block hidden">
-                                        <i class="fa fa-camera text-blue-500 text-xs"></i>
-                                    </span>
-                                </label>
-                                <input id="avatarInput" name="avatar" type="file" accept="image/*" class="hidden" onchange="document.getElementById('avatarUploadForm').submit();">
-                            </form>
-                        </div>
-                        <span class="font-semibold text-primary dark:text-blue-300">{{ current_user.username }}</span>
-                        <a href="{{ url_for('logout') }}"
-                        class="inline-block bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-400 text-white font-semibold py-2 px-5 rounded-full shadow-sm hover:shadow-md transition duration-200 ease-in-out text-sm ml-2">
-                            Logout
-                        </a>
-                    </li>
-                {% elif not current_user.is_authenticated %}
+                                    </label>
+                                    <input id="avatarInput" name="avatar" type="file" accept="image/*" class="hidden" onchange="document.getElementById('avatarUploadForm').submit();">
+                                </form>
+                            </div>
+                            <span class="font-semibold text-primary dark:text-blue-300">{{ current_user.username }}</span>
+                            <a href="{{ url_for('logout') }}"
+                            class="inline-flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-400 text-white font-semibold py-2 px-5 rounded-full shadow transition duration-200 ease-in-out text-sm ml-2">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </li>
+                    {% else %}
+                        <!-- Only Logout button on other pages -->
+                        <li class="ml-4">
+                            <a href="{{ url_for('logout') }}"
+                            class="inline-flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-400 text-white font-semibold py-2 px-5 rounded-full shadow transition duration-200 ease-in-out text-sm ml-2">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </li>
+                    {% endif %}
+                {% else %}
                     <!-- Login/Register Buttons -->
                     <li class="ml-4">
                         <a href="{{ url_for('login') }}" 
