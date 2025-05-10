@@ -126,10 +126,7 @@ def verify_email():
             username=user_data['username'],
             email=email,
             password=user_data['password'],
-            gender=None,
-            age=None,
-            height=None,
-            weight=None
+        
         )
         if registered_user:
             temp_users.pop(email, None)
@@ -204,10 +201,14 @@ def reset_password():
         confirm_pass = request.form.get('confirm_password')
         if new_pass == confirm_pass:
             email = session.get('reset_email')
-            db_reset_password(email, new_pass)
-            flash("✅ Password successfully reset!", "success")
-            session['reset_success'] = True
-            return redirect(url_for('reset_password'))
+            user = find_user_by_email(email)
+            if user:
+                db_reset_password(user, new_pass)
+                flash("✅ Password successfully reset!", "success")
+                session['reset_success'] = True
+                return redirect(url_for('reset_password'))
+            else:
+                flash("❌ User not found.", "danger")
         else:
             flash("❌ Passwords do not match.", "danger")
 
