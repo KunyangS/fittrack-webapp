@@ -231,3 +231,15 @@ html {
   display: block;
 }
 
+#about img,
+#live-stats img {
+  width: 100%;
+  max-width: 400px;
+  height: 256px;      /* h-64 in Tailwind */
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}

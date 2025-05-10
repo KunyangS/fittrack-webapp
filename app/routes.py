@@ -236,6 +236,7 @@ def resend_code():
     print(f"[Resent] Verification code sent to {session['email']}: {new_code}")
     flash('A new verification code has been sent to your email. (Check console)', 'info')
     return redirect(url_for('verify_code'))
+
 @app.route('/upload_avatar', methods=['POST'])
 @login_required
 def upload_avatar():
@@ -256,3 +257,15 @@ def upload_avatar():
         db.session.commit()
         flash('Avatar updated!', 'success')
     return redirect(request.referrer or url_for('upload'))
+
+@app.route('/privacy-policy')
+def privacy_policy():
+    return render_template('privacy_policy.html', title="Privacy Policy")
+
+@app.route('/terms-of-service')
+def terms_of_service():
+    return render_template('terms_of_service.html', title="Terms of Service")
+
+@app.context_processor
+def inject_current_year():
+    return {'current_year': datetime.now().year}

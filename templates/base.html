@@ -146,14 +146,15 @@
  
      <!-- Footer -->
      <footer class="bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-center py-4 mt-auto">
-         <div class="container mx-auto px-4">
-             <p>&copy; 2025 Fitness Tracker. All rights reserved.</p>
-             <p class="text-sm">
-                 <a href="#" class="hover:text-primary dark:hover:text-blue-400">Privacy Policy</a> |
-                 <a href="#" class="hover:text-primary dark:hover:text-blue-400">Terms of Service</a>
-             </p>
-         </div>
-     </footer>
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-center items-center gap-4">
+            <a href="{{ url_for('privacy_policy') }}" class="hover:underline text-sm">Privacy Policy</a>
+            <span class="hidden md:inline">|</span>
+            <a href="{{ url_for('terms_of_service') }}" class="hover:underline text-sm">Terms of Service</a>
+        </div>
+        <div class="mt-2 text-xs">&copy; {{ current_year }} FitTrack. All rights reserved.</div>
+    </div>
+</footer>
 
      <!-- Back to Top Button -->
      <button id="backToTop" onclick="scrollToTop()" class="back-to-top">
