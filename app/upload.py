@@ -9,6 +9,8 @@ upload_bp = Blueprint('upload', __name__)
 # Page routing: for displaying HTML forms
 @upload_bp.route('/upload', methods=['GET'])
 def upload_page():
+    print("🔍 Current endpoint is:", request.endpoint)
+
     if not current_user or not current_user.is_authenticated:
         return redirect('/login')
 
@@ -27,7 +29,7 @@ def upload_page():
         db.session.add(user_info)
         db.session.commit()
 
-    return render_template('upload.html', title="Upload", user_info=user_info)
+    return render_template('upload.html', title="Upload", user_info=user_info, active_page='upload.upload_page')
 
 
 # API routing: used to receive JSON data and write to the database

@@ -141,11 +141,6 @@ def verify_email():
         flash('❌ Verification failed. Invalid or expired link.', 'danger')
         return redirect(url_for('login'))
 
-# ✅ New UPLOAD Page after successful login
-@app.route('/upload')
-@login_required
-def upload():
-    return render_template('upload.html', username=current_user.username)
 
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
