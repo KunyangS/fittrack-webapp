@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, redirect
 from app import db
 from app.models import UserInfo, FitnessEntry, FoodEntry
 from datetime import datetime, date, time
@@ -9,7 +9,26 @@ upload_bp = Blueprint('upload', __name__)
 # Page routing: for displaying HTML forms
 @upload_bp.route('/upload', methods=['GET'])
 def upload_page():
-    return render_template('upload.html', title="Upload")
+    if not current_user or not current_user.is_authenticated:
+        return redirect('/login')
+
+    user_info = UserInfo.query.filter_by(user_id=current_user.id).first()
+
+    if not user_info:
+        user_info = UserInfo(
+            user_id=current_user.id,
+            date=date.today(),
+            time=None,
+            gender=None,
+            age=None,
+            height=None,
+            weight=None
+        )
+        db.session.add(user_info)
+        db.session.commit()
+
+    return render_template('upload.html', title="Upload", user_info=user_info)
+
 
 # API routing: used to receive JSON data and write to the database
 @upload_bp.route('/api/upload', methods=['POST'])
