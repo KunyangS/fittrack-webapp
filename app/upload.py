@@ -9,7 +9,6 @@ upload_bp = Blueprint('upload', __name__)
 # Page routing: for displaying HTML forms
 @upload_bp.route('/upload', methods=['GET'])
 def upload_page():
-    print("🔍 Current endpoint is:", request.endpoint)
 
     if not current_user or not current_user.is_authenticated:
         return redirect('/login')
