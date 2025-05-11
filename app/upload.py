@@ -84,22 +84,24 @@ def api_upload():
         if fitness_entries_to_add:
             db.session.add_all(fitness_entries_to_add)
 
-        # FoodEntry: Add user_id
-        if any([
-        data.get('food_name'),
-        data.get('food_quantity'),
-        data.get('food_calories'),
-        data.get('meal_type')
-        ]):
-            food_entry_to_add = FoodEntry(
-                user_id=user_id,
+        food_names = request.form.getlist('food_name')
+        quantities = request.form.getlist('food_quantity')
+        calories = request.form.getlist('food_calories')
+        meal_types = request.form.getlist('meal_type')
+
+        for i in range(len(food_names)):
+            if food_names[i]:
+                db.session.add(FoodEntry(
+                user_id=current_user.id,
                 date=date_obj,
-                food_name=data['food_name'] or None,
-                quantity=float(data['food_quantity']) if data.get('food_quantity') else None,
-                calories=float(data['food_calories']) if data.get('food_calories') else None,
-                meal_type=data.get('meal_type') or None,
-            )
-            db.session.add(food_entry_to_add)
+                food_name=food_names[i],
+                quantity=float(quantities[i]) if quantities[i] else None,
+                calories=float(calories[i]) if calories[i] else None,
+                meal_type=meal_types[i]
+            ))
+
+
+
 
         db.session.commit()
 
