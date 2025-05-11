@@ -18,8 +18,8 @@
   <div class="bg-light-bg dark:bg-gray-800 p-6 rounded-xl shadow-lg">
     <h3 class="text-2xl font-heading font-semibold mb-4">Basic Information</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <input type="date" name="date" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white transition shadow-sm" required>
-      <input type="time" name="time" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white transition shadow-sm" required>
+      <input type="date" name="date" value="{{ default_date }}" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white transition shadow-sm" required>
+      <input type="time" name="time" value="{{ default_time }}" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white transition shadow-sm" required>
       <input type="text" name="gender" placeholder="Gender" value="{{ user_info.gender if user_info else '' }}" class="..." required>
       <input type="number" name="age" placeholder="Age" value="{{ user_info.age if user_info else '' }}" class="..." required>
       <input type="number" name="height" placeholder="Height (cm)" value="{{ user_info.height if user_info else '' }}" class="..." required>
