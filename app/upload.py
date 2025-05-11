@@ -31,9 +31,9 @@ def api_upload():
             user_info_record.date = date_obj
             user_info_record.time = time_obj
             user_info_record.gender = data['gender']
-            user_info_record.age = int(data['age'])
-            user_info_record.height = float(data['height'])
-            user_info_record.weight = float(data['weight'])
+            user_info_record.age = int(data['age']) if data.get('age') else None
+            user_info_record.height = float(data['height']) if data.get('height') else None
+            user_info_record.weight = float(data['weight']) if data.get('weight') else None
             # SQLAlchemy tracks changes, no explicit add needed for update
         else:
             # Create new UserInfo if it doesn't exist
@@ -42,36 +42,44 @@ def api_upload():
                 date=date_obj,
                 time=time_obj,
                 gender=data['gender'],
-                age=int(data['age']),
-                height=float(data['height']),
-                weight=float(data['weight']),
+                age=int(data['age']) if data.get('age') else None,
+                height=float(data['height']) if data.get('height') else None,
+                weight=float(data['weight']) if data.get('weight') else None,
             )
             db.session.add(user_info_record)
 
         # FitnessEntry: Add user_id and prepare for batch add
         fitness_entries_to_add = []
         for act in data['activities']:
+         if any([act.get('activity_type'), act.get('duration'), act.get('calories_burned'), act.get('emotion')]):
+
             fitness_entries_to_add.append(FitnessEntry(
                 user_id=user_id,
                 date=date_obj,
                 activity_type=act['activity_type'],
-                duration=float(act['duration']),
-                calories_burned=float(act['calories_burned']),
+                duration=float(act['duration']) if act.get('duration') else None,
+                calories_burned=float(act['calories_burned']) if act.get('calories_burned') else None,
                 emotion=act['emotion'],
             ))
         if fitness_entries_to_add:
             db.session.add_all(fitness_entries_to_add)
 
         # FoodEntry: Add user_id
-        food_entry_to_add = FoodEntry(
-            user_id=user_id,
-            date=date_obj,
-            food_name=data['food_name'],
-            quantity=float(data['food_quantity']),
-            calories=float(data['food_calories']),
-            meal_type=data['meal_type'],
-        )
-        db.session.add(food_entry_to_add)
+        if any([
+        data.get('food_name'),
+        data.get('food_quantity'),
+        data.get('food_calories'),
+        data.get('meal_type')
+        ]):
+            food_entry_to_add = FoodEntry(
+                user_id=user_id,
+                date=date_obj,
+                food_name=data['food_name'] or None,
+                quantity=float(data['food_quantity']) if data.get('food_quantity') else None,
+                calories=float(data['food_calories']) if data.get('food_calories') else None,
+                meal_type=data.get('meal_type') or None,
+            )
+            db.session.add(food_entry_to_add)
 
         db.session.commit()
 

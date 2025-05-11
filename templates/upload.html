@@ -32,14 +32,14 @@
     <h3 class="text-2xl font-heading font-semibold mb-4">Exercise</h3>
     <div id="exerciseContainer">
       <div class="exercise-block grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-        <select name="activity_type" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 dark:text-white transition shadow-sm" required>
+        <select name="activity_type" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 dark:text-white transition shadow-sm">
           <option value="">Select Activity</option>
           {% for activity in ['Running', 'Cycling', 'Swimming', 'Yoga', 'Walking'] %}
             <option value="{{ activity }}">{{ activity }}</option>
           {% endfor %}
         </select>
-        <input type="number" name="duration" placeholder="Duration (min)" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm" required>
-        <input type="number" name="calories_burned" placeholder="Calories Burned" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm" required>
+        <input type="number" name="duration" placeholder="Duration (min)" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm">
+        <input type="number" name="calories_burned" placeholder="Calories Burned" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm">
         <select name="emotion" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 dark:text-white transition shadow-sm">
           <option value="">Emotion</option>
           {% for mood in ['happy', 'tired', 'stressed', 'relaxed'] %}
@@ -55,9 +55,9 @@
   <div class="bg-light-bg dark:bg-gray-800 p-6 rounded-xl shadow-lg">
     <h3 class="text-2xl font-heading font-semibold mb-4">Food Intake</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <input type="text" name="food_name" placeholder="Food Name" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm" required>
-      <input type="number" name="food_quantity" placeholder="Quantity" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm" required>
-      <input type="number" name="food_calories" placeholder="Calories" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm" required>
+      <input type="text" name="food_name" placeholder="Food Name" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm">
+      <input type="number" name="food_quantity" placeholder="Quantity" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm">
+      <input type="number" name="food_calories" placeholder="Calories" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm">
       <select name="meal_type" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 dark:text-white transition shadow-sm">
         <option value="">Meal Type</option>
         {% for meal in ['breakfast', 'lunch', 'dinner', 'snack'] %}
