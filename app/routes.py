@@ -107,11 +107,11 @@ def register():
         return redirect('/login')
     return render_template('register.html', form=form)
 
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
+@login_required
 def logout():
     logout_user()
-    flash('You have been logged out.', 'info')
-    return redirect('/login')
+    return redirect(url_for('index'))
 
 @app.route('/verify-email')
 def verify_email():
