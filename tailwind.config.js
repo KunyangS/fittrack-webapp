@@ -21,7 +21,10 @@ module.exports = {
   content: [
     './src/**/*.{js,jsx,ts,tsx,html,vue}', // Covers common frontend frameworks/files
     './public/index.html',
+    './templates/**/*.html',
   ],
+// Enable JIT mode for faster builds and arbitrary values
+  mode: 'jit',
 
   theme: {
     // Extend the default Tailwind theme
@@ -132,7 +135,21 @@ module.exports = {
         'fast': '100ms',
         'slow': '300ms',
       },
+    // --- ANIMATIONS ---
+      animation: {
+        'fade-in': 'fadeIn 0.5s ease-in',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: 0 },
+          '100%': { opacity: 1 },
+        },
+      },
 
+      // --- GRADIENTS ---
+      backgroundImage: {
+        'brand-gradient': 'linear-gradient(90deg, #13ADC7 0%, #945DD6 100%)',
+      },
       // --- OTHER UTILITIES ---
       minHeight: {
         'screen-1/2': '50vh',

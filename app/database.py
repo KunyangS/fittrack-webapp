@@ -4,6 +4,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import date, time, datetime, timedelta  # Added datetime, timedelta
 from sqlalchemy.exc import IntegrityError  # Added IntegrityError
 from sqlalchemy import or_  # Added or_
+from typing import Optional  # <-- Added for Python 3.9 compatibility
 
 def login_user(email_or_username, password):
     """
@@ -91,13 +92,15 @@ def reset_password(user, new_password):
     user.set_password(new_password)
     db.session.commit()
 
-def update_user_profile_details(user_id_to_update: int, 
-                                date_val: date | None = None, 
-                                time_val: time | None = None, 
-                                gender_val: str | None = None, 
-                                age_val: int | None = None, 
-                                height_val: float | None = None, 
-                                weight_val: float | None = None):
+def update_user_profile_details(
+    user_id_to_update: int, 
+    date_val: Optional[date] = None, 
+    time_val: Optional[time] = None, 
+    gender_val: Optional[str] = None, 
+    age_val: Optional[int] = None, 
+    height_val: Optional[float] = None, 
+    weight_val: Optional[float] = None
+):
     """
     Updates specified profile details for a given user.
     'user_id_to_update' now refers to the User.id.
