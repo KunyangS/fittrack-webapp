@@ -32,38 +32,39 @@
     </div>
 </div>
 
-<!-- Example Feature Section using Cards (Responsive Grid) -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+<!-- Feature Cards Section -->
+  <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 px-6">
     <!-- Card 1: Record Habits -->
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-        <div class="text-center">
-             <i class="fas fa-pencil-alt text-3xl text-primary dark:text-blue-400 mb-4"></i>
-             <h3 class="text-xl font-semibold mb-2">Record Habits Easily</h3>
-             <p class="text-gray-600 dark:text-gray-400">
-                 Quickly add your workouts manually or upload data files. Keep track of duration, type, and intensity.
-             </p>
-        </div>
+    <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-200">
+      <div class="flex items-center justify-center w-16 h-16 rounded-full bg-green-50 dark:bg-green-900 mb-4 mx-auto group-hover:scale-110 transition">
+        <i class="fas fa-pencil-alt text-3xl text-primary dark:text-blue-400"></i>
+      </div>
+      <h3 class="text-xl font-semibold mb-2 text-center">Effortless Tracking</h3>
+      <p class="text-gray-600 dark:text-gray-300 text-center">
+        Log workouts, nutrition, and mood in seconds. Upload data or enter manually—your habits, your way.
+      </p>
     </div>
     <!-- Card 2: Visualise Progress -->
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-        <div class="text-center">
-             <i class="fas fa-chart-line text-3xl text-green-500 mb-4"></i>
-             <h3 class="text-xl font-semibold mb-2">Visualise Your Progress</h3>
-             <p class="text-gray-600 dark:text-gray-400">
-                 See insightful statistics and charts about your activity trends. Understand your patterns and stay motivated.
-             </p>
-        </div>
+    <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-200">
+      <div class="flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900 mb-4 mx-auto group-hover:scale-110 transition">
+        <i class="fas fa-chart-line text-3xl text-green-500"></i>
+      </div>
+      <h3 class="text-xl font-semibold mb-2 text-center">Insightful Visualizations</h3>
+      <p class="text-gray-600 dark:text-gray-300 text-center">
+        Instantly see trends and progress with beautiful charts. Stay motivated with clear, actionable insights.
+      </p>
     </div>
     <!-- Card 3: Share with Friends -->
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-         <div class="text-center">
-             <i class="fas fa-share-alt text-3xl text-red-500 mb-4"></i>
-             <h3 class="text-xl font-semibold mb-2">Share Achievements</h3>
-             <p class="text-gray-600 dark:text-gray-400">
-                 Connect with friends, compare progress (if they allow!), and celebrate milestones together.
-             </p>
-        </div>
+    <div class="group bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-200">
+      <div class="flex items-center justify-center w-16 h-16 rounded-full bg-pink-50 dark:bg-pink-900 mb-4 mx-auto group-hover:scale-110 transition">
+        <i class="fas fa-share-alt text-3xl text-red-500"></i>
+      </div>
+      <h3 class="text-xl font-semibold mb-2 text-center">Celebrate & Share</h3>
+      <p class="text-gray-600 dark:text-gray-300 text-center">
+        Share milestones with friends or on social media. Compare progress and celebrate your achievements together.
+      </p>
     </div>
+  </div>
 </div>
 </section>
 
@@ -103,7 +104,6 @@
       See real-time community stats — total workouts logged, calories tracked, and how many users are staying on track.
     </p>
     <div class="mt-6 bg-gray-50 dark:bg-gray-800 rounded-lg p-5 shadow">
-  <h3 class="text-lg font-semibold mb-2 text-primary dark:text-blue-300">Visualise Page Features</h3>
   <ul class="list-disc list-inside text-gray-700 dark:text-gray-200 text-base space-y-1">
     <li>See a summary of your recent activity</li>
     <li>Track workout duration and calories burned trends</li>
@@ -121,8 +121,26 @@
   </div>
 </section>
 
+<section id="share" class="flex flex-col md:flex-row-reverse items-center justify-between max-w-7xl mx-auto py-16 px-6 gap-10">
+  <div class="md:w-1/2">
+    <h2 class="text-3xl font-bold mb-4 text-primary dark:text-blue-400">Share Your Progress</h2>
+    <p class="text-gray-600 dark:text-gray-300 mb-4">
+      Celebrate your achievements and inspire others! Share your fitness milestones, workout summaries, or nutrition stats with friends and your community in just a few clicks.
+    </p>
+    <ol class="list-decimal list-inside text-gray-700 dark:text-gray-200 space-y-2">
+      <li>Go to your dashboard and select the data or chart you want to share.</li>
+      <li>Click the <span class="font-semibold">Share</span> button.</li>
+      <li>Copy a secure link or share directly to social media.</li>
+      <li>Control your privacy—share only what you want, when you want.</li>
+    </ol>
+  </div>
+  <div class="md:w-1/2 flex justify-center">
+    <img src="static/img/share.jpg" alt="Share Progress Demo" class="rounded-lg shadow-lg">
+  </div>
+</section>
+
 <!-- Call to Action Section -->
-<section id="call-to-action" class="flex flex-col md:flex-row-reverse items-center justify-between max-w-7xl mx-auto py-16 px-6 gap-10">
+<section id="call-to-action" class="flex flex-col md:flex-row items-center justify-between max-w-7xl mx-auto py-16 px-6 gap-10">
   <div class="md:w-1/2">
     <h2 class="text-3xl font-bold mb-4 text-primary dark:text-blue-400">Ready to Take Control?</h2>
     <p class="text-gray-600 dark:text-gray-300">
@@ -143,31 +161,61 @@
   </div>
 </section>
 
+<!-- User Testimonials Section -->
 <section id="user-testimonials" class="py-16 px-6 max-w-6xl mx-auto">
-  <h2 class="text-3xl font-bold mb-6 text-center text-primary dark:text-blue-400">User Testimonials</h2>
-  <p class="text-gray-600 dark:text-gray-300 text-center max-w-2xl mx-auto">
-    Hear directly from our users — real stories about staying motivated, reaching goals, and building better routines.
+  <h2 class="text-3xl font-bold mb-6 text-center text-primary dark:text-blue-400">What Our Users Say</h2>
+  <p class="text-gray-600 dark:text-gray-300 text-center max-w-2xl mx-auto mb-8">
+    FitTrack is launching soon! Once we go live, this space will feature inspiring stories and feedback from real users just like you.
   </p>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg flex flex-col items-center border border-dashed border-primary dark:border-blue-400 opacity-80">
+      <div class="w-16 h-16 rounded-full mb-4 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+        <i class="fas fa-user-astronaut text-3xl text-primary dark:text-blue-400"></i>
+      </div>
+      <p class="text-lg italic text-gray-500 dark:text-gray-400 mb-4">"Your success story could be the first one here. Join us after launch and inspire others!"</p>
+      <span class="font-semibold text-primary dark:text-blue-400">— Future FitTracker</span>
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg flex flex-col items-center border border-dashed border-primary dark:border-blue-400 opacity-80">
+      <div class="w-16 h-16 rounded-full mb-4 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+        <i class="fas fa-user-friends text-3xl text-primary dark:text-blue-400"></i>
+      </div>
+      <p class="text-lg italic text-gray-500 dark:text-gray-400 mb-4">"We're excited to celebrate your milestones and progress here soon. Stay tuned!"</p>
+      <span class="font-semibold text-primary dark:text-blue-400">— The FitTrack Team</span>
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg flex flex-col items-center border border-dashed border-primary dark:border-blue-400 opacity-80">
+      <div class="w-16 h-16 rounded-full mb-4 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+        <i class="fas fa-star text-3xl text-primary dark:text-blue-400"></i>
+      </div>
+      <p class="text-lg italic text-gray-500 dark:text-gray-400 mb-4">"Be among the first to share your FitTrack journey and motivate others to reach their goals."</p>
+      <span class="font-semibold text-primary dark:text-blue-400">— Future Community Member</span>
+    </div>
+  </div>
 </section>
 
+<!-- Feature Highlights Section -->
 <section id="feature-highlights" class="py-16 px-6 max-w-6xl mx-auto">
-  <h2 class="text-3xl font-bold mb-6 text-center text-primary dark:text-blue-400">Feature Highlights</h2>
-  <p class="text-gray-600 dark:text-gray-300 text-center max-w-2xl mx-auto">
-    Explore powerful features: track your workouts, visualize trends, and stay consistent with daily habit goals.
-  </p>
+  <h2 class="text-3xl font-bold mb-6 text-center text-primary dark:text-blue-400">Why Choose FitTrack?</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow text-center">
+      <h3 class="text-xl font-semibold mb-2">Comprehensive Tracking</h3>
+      <p class="text-gray-600 dark:text-gray-300">Log workouts, nutrition, and mood in one place for a complete view of your health.</p>
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow text-center">
+      <h3 class="text-xl font-semibold mb-2">Insightful Visualizations</h3>
+      <p class="text-gray-600 dark:text-gray-300">Interactive charts and stats help you spot trends and stay motivated.</p>
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow text-center">
+      <h3 class="text-xl font-semibold mb-2">Easy Sharing</h3>
+      <p class="text-gray-600 dark:text-gray-300">Share your progress securely with friends or on social media—your data, your choice.</p>
+    </div>
+  </div>
 </section>
 
-<section id="demos" class="py-16 px-6 max-w-6xl mx-auto">
-  <h2 class="text-3xl font-bold mb-6 text-center text-primary dark:text-blue-400">Demos</h2>
-  <p class="text-gray-600 dark:text-gray-300 text-center max-w-2xl mx-auto">
-    Get a sneak peek of FitTrack in action. Check out our clean interface and intuitive tools designed just for you.
-  </p>
-</section>
-
+<!-- Timeline Section -->
 <section id="timeline" class="py-16 px-6 max-w-6xl mx-auto">
-  <h2 class="text-3xl font-bold mb-6 text-center text-primary dark:text-blue-400">Timeline</h2>
+  <h2 class="text-3xl font-bold mb-6 text-center text-primary dark:text-blue-400">Your Fitness Journey</h2>
   <p class="text-gray-600 dark:text-gray-300 text-center max-w-2xl mx-auto">
-    Track the evolution of your habits — milestones, streaks, and key achievements all in one visual journey.
+    Visualize your milestones, streaks, and achievements over time. FitTrack helps you celebrate every step forward and stay on track for your long-term goals.
   </p>
 </section>
 
