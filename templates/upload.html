@@ -1,17 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 
-
-{% if username %}
-<div class="text-right p-4">
-    <p class="text-sm text-muted-text dark:text-gray-300 dark">
-        Logged in as <span class="font-bold">{{ username }}</span> |
-        <a href="{{ url_for('logout') }}" class="text-primary hover:underline">Logout</a>
-    </p>
-</div>
-{% endif %}
-
-
 <h2 class="text-3xl font-heading font-bold mb-6 text-primary">Upload Your Daily Fitness Data</h2>
 
 <form id="uploadForm" method="POST" action="{{ url_for('upload.api_upload') }}" class="space-y-10 max-w-prose mx-auto text-gray-500">
