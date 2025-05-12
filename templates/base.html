@@ -95,6 +95,22 @@
                             <a href="{{ url_for('reset_password') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                                 Change Password
                             </a>
+                              <!-- Avatar Upload Form -->
+                            <form action="{{ url_for('upload_avatar') }}" method="post" enctype="multipart/form-data" class="px-4 py-2 space-y-2">
+                                {% if csrf_token %}
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                {% endif %}
+                                <label for="avatar-upload" class="block text-sm text-gray-700 dark:text-gray-200 mb-1">
+                                    Update Profile Picture
+                                </label>
+                                <input id="avatar-upload" type="file" name="avatar" accept="image/*"
+                                    class="block w-full text-sm mb-2"
+                                    required>
+                                <button type="submit"
+                                        class="w-full px-2 py-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition">
+                                    Upload
+                                </button>
+                            </form>
                             <form action="{{ url_for('logout') }}" method="post">
                                 {% if csrf_token %}
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
