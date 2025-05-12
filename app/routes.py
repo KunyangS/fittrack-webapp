@@ -59,7 +59,7 @@ def share():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('upload')) # Or wherever you want logged-in users to go
+        return redirect(url_for('upload.upload_page')) # Or wherever you want logged-in users to go
 
     if request.method == 'POST':
         input_value = request.form.get('email')  # Can be email or username
@@ -70,7 +70,7 @@ def login():
         if user:
             flask_login_user(user) # Use Flask-Login to handle the session
             next_page = request.args.get('next')
-            return redirect(next_page or url_for('upload'))
+            return redirect(next_page or url_for('upload.upload_page'))
         else:
             flash("❌ Invalid email/username or password.", "danger")
             return redirect(url_for('login'))
@@ -143,11 +143,6 @@ def verify_email():
         flash('❌ Verification failed. Invalid or expired link.', 'danger')
         return redirect(url_for('login'))
 
-# ✅ New UPLOAD Page after successful login
-@app.route('/upload')
-@login_required
-def upload():
-    return render_template('upload.html', username=current_user.username)
 
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():

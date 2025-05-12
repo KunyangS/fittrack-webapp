@@ -1,15 +1,39 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, redirect
 from app import db
 from app.models import UserInfo, FitnessEntry, FoodEntry
 from datetime import datetime, date, time
-from flask_login import current_user  # Added for accessing logged-in user
+from flask_login import current_user
+from flask_login import login_required
+
 
 upload_bp = Blueprint('upload', __name__)
 
 # Page routing: for displaying HTML forms
 @upload_bp.route('/upload', methods=['GET'])
+@login_required
 def upload_page():
-    return render_template('upload.html', title="Upload")
+
+    if not current_user or not current_user.is_authenticated:
+        return redirect('/login')
+
+    user_info = UserInfo.query.filter_by(user_id=current_user.id).first()
+
+    if not user_info:
+        user_info = UserInfo(
+            user_id=current_user.id,
+            date=date.today(),
+            time=None,
+            gender=None,
+            age=None,
+            height=None,
+            weight=None
+        )
+        db.session.add(user_info)
+        db.session.commit()
+        
+    now = datetime.now()
+    return render_template('upload.html', title="Upload", user_info=user_info, active_page='upload.upload_page',username=current_user.username,default_date=now.strftime('%Y-%m-%d'), default_time=now.strftime('%H:%M'))
+
 
 # API routing: used to receive JSON data and write to the database
 @upload_bp.route('/api/upload', methods=['POST'])
@@ -31,9 +55,9 @@ def api_upload():
             user_info_record.date = date_obj
             user_info_record.time = time_obj
             user_info_record.gender = data['gender']
-            user_info_record.age = int(data['age'])
-            user_info_record.height = float(data['height'])
-            user_info_record.weight = float(data['weight'])
+            user_info_record.age = int(data['age']) if data.get('age') else None
+            user_info_record.height = float(data['height']) if data.get('height') else None
+            user_info_record.weight = float(data['weight']) if data.get('weight') else None
             # SQLAlchemy tracks changes, no explicit add needed for update
         else:
             # Create new UserInfo if it doesn't exist
@@ -42,36 +66,46 @@ def api_upload():
                 date=date_obj,
                 time=time_obj,
                 gender=data['gender'],
-                age=int(data['age']),
-                height=float(data['height']),
-                weight=float(data['weight']),
+                age=int(data['age']) if data.get('age') else None,
+                height=float(data['height']) if data.get('height') else None,
+                weight=float(data['weight']) if data.get('weight') else None,
             )
             db.session.add(user_info_record)
 
         # FitnessEntry: Add user_id and prepare for batch add
         fitness_entries_to_add = []
         for act in data['activities']:
+         if any([act.get('activity_type'), act.get('duration'), act.get('calories_burned'), act.get('emotion')]):
+
             fitness_entries_to_add.append(FitnessEntry(
                 user_id=user_id,
                 date=date_obj,
                 activity_type=act['activity_type'],
-                duration=float(act['duration']),
-                calories_burned=float(act['calories_burned']),
+                duration=float(act['duration']) if act.get('duration') else None,
+                calories_burned=float(act['calories_burned']) if act.get('calories_burned') else None,
                 emotion=act['emotion'],
             ))
         if fitness_entries_to_add:
             db.session.add_all(fitness_entries_to_add)
 
-        # FoodEntry: Add user_id
-        food_entry_to_add = FoodEntry(
-            user_id=user_id,
-            date=date_obj,
-            food_name=data['food_name'],
-            quantity=float(data['food_quantity']),
-            calories=float(data['food_calories']),
-            meal_type=data['meal_type'],
-        )
-        db.session.add(food_entry_to_add)
+        food_names = request.form.getlist('food_name')
+        quantities = request.form.getlist('food_quantity')
+        calories = request.form.getlist('food_calories')
+        meal_types = request.form.getlist('meal_type')
+
+        for i in range(len(food_names)):
+            if food_names[i]:
+                db.session.add(FoodEntry(
+                user_id=current_user.id,
+                date=date_obj,
+                food_name=food_names[i],
+                quantity=float(quantities[i]) if quantities[i] else None,
+                calories=float(calories[i]) if calories[i] else None,
+                meal_type=meal_types[i]
+            ))
+
+
+
 
         db.session.commit()
 
