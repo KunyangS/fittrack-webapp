@@ -43,15 +43,17 @@ document.addEventListener("DOMContentLoaded", function () {
   if (passwordInput) {
     passwordInput.addEventListener("input", function () {
       checkPasswordStrength(passwordInput.value);
+      checkConfirmPassword();
     });
   }
 });
+
 
 // Password Strength Checker
 function checkPasswordStrength(password) {
   const strengthDisplay = document.getElementById("password-strength");
   // Adjust regex to match your backend requirements
-  const strongRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+ const strongRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{}|;':",.<>/?~`]).{8,}$/;
 
   if (!strengthDisplay) return;
 
@@ -96,4 +98,18 @@ if (document.getElementById('resendBtn')) {
       clearInterval(resendInterval);
     }
   }, 1000);
+}
+
+//Back to Top Button 
+document.addEventListener('scroll', function() {
+    const btn = document.getElementById('backToTop');
+    if (!btn) return;
+    if (window.scrollY > 200) {
+        btn.classList.add('visible');
+    } else {
+        btn.classList.remove('visible');
+    }
+});
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }

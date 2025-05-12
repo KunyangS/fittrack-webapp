@@ -7,6 +7,8 @@ import random
 from urllib.parse import urlencode
 from app.models import User, UserInfo, ShareEntry, FitnessEntry, FoodEntry
 from app.forms import RegistrationForm
+import os
+from werkzeug.utils import secure_filename
 import re
 
 # Database helpers
@@ -105,11 +107,11 @@ def register():
         return redirect('/login')
     return render_template('register.html', form=form)
 
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
+@login_required
 def logout():
     logout_user()
-    flash('You have been logged out.', 'info')
-    return redirect('/login')
+    return redirect(url_for('index'))
 
 @app.route('/verify-email')
 def verify_email():
@@ -199,10 +201,14 @@ def reset_password():
         confirm_pass = request.form.get('confirm_password')
         if new_pass == confirm_pass:
             email = session.get('reset_email')
-            db_reset_password(email, new_pass)
-            flash("✅ Password successfully reset!", "success")
-            session['reset_success'] = True
-            return redirect(url_for('reset_password'))
+            user = find_user_by_email(email)
+            if user:
+                db_reset_password(user, new_pass)
+                flash("✅ Password successfully reset!", "success")
+                session['reset_success'] = True
+                return redirect(url_for('reset_password'))
+            else:
+                flash("❌ User not found.", "danger")
         else:
             flash("❌ Passwords do not match.", "danger")
 
@@ -225,3 +231,36 @@ def resend_code():
     print(f"[Resent] Verification code sent to {session['email']}: {new_code}")
     flash('A new verification code has been sent to your email. (Check console)', 'info')
     return redirect(url_for('verify_code'))
+
+@app.route('/upload_avatar', methods=['POST'])
+@login_required
+def upload_avatar():
+    if 'avatar' not in request.files:
+        flash('No file part', 'danger')
+        return redirect(request.referrer or url_for('upload'))
+    file = request.files['avatar']
+    if file.filename == '':
+        flash('No selected file', 'danger')
+        return redirect(request.referrer or url_for('upload'))
+    if file:
+        filename = secure_filename(file.filename)
+        avatar_folder = os.path.join(app.static_folder, 'avatars')
+        os.makedirs(avatar_folder, exist_ok=True)
+        file.save(os.path.join(avatar_folder, filename))
+        # Save filename to user (make sure your User model has avatar_url)
+        current_user.avatar_url = filename
+        db.session.commit()
+        flash('Avatar updated!', 'success')
+    return redirect(request.referrer or url_for('upload'))
+
+@app.route('/privacy-policy')
+def privacy_policy():
+    return render_template('privacy_policy.html', title="Privacy Policy")
+
+@app.route('/terms-of-service')
+def terms_of_service():
+    return render_template('terms_of_service.html', title="Terms of Service")
+
+@app.context_processor
+def inject_current_year():
+    return {'current_year': datetime.now().year}

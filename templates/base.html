@@ -1,128 +1,175 @@
 <!-- templates/base.html -->
- <!-- Here is the root html for all to extend-->
- <!DOCTYPE html>
- <!-- Add 'dark' class here via JS for dark mode -->
- <html lang="en">
- <head>
-     <meta charset="UTF-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <!-- Use the title variable passed from Flask -->
-     <title>{{ title }} - Fitness Tracker</title>
-     <!-- Tailwind CSS CDN -->
-     <script src="https://cdn.tailwindcss.com"></script>
-     <!-- Link to custom CSS -->
-     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-     <!-- Font Awesome for Icons -->
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-     <!-- Configuration for Tailwind Dark Mode -->
-     <script>
-         // Immediately apply the theme from localStorage or system preference to prevent FOUC
-         (function() {
-             const theme = localStorage.getItem('theme');
-             const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-             if (theme === 'dark' || (!theme && prefersDark)) {
-                 document.documentElement.classList.add('dark');
-             } else {
-                 document.documentElement.classList.remove('dark'); // Ensure light mode is default if no preference
-             }
-         })();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Fitness Tracker</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Link to custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Configuration for Tailwind Dark Mode -->
+    <script>
+        // Immediately apply the theme from localStorage or system preference to prevent FOUC
+        (function() {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark'); // Ensure light mode is default if no preference
+            }
+        })();
 
-         // Tailwind config (can remain here or be moved)
-         tailwind.config = {
-             darkMode: 'class', // Enable class-based dark mode
-             theme: {
-                 extend: {
-                     colors: {
-                         primary: '#3490dc', // Example primary color
-                     }
-                 }
-             }
-         }
-     </script>
-     <style>
-         /* Simple smooth transition for color changes */
-         body, html {
-             transition: background-color 0.3s ease, color 0.3s ease;
-         }
-     </style>
- </head>
- <!-- Apply base background and text colors for light/dark modes -->
- <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans flex flex-col min-h-screen">
- 
-     <!-- Floating Header -->
-     <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
-         <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
-             <!-- Logo/Brand Name -->
-             <a href="{{ url_for('index') }}" class="text-xl font-bold text-primary dark:text-blue-400">
+        // Tailwind config (can remain here or be moved)
+        tailwind.config = {
+            darkMode: 'class', // Enable class-based dark mode
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3490dc', // Example primary color
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Simple smooth transition for color changes */
+        body, html {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans flex flex-col min-h-screen">
+
+    <!-- Floating Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <!-- Logo/Brand Name -->
+            <a href="{{ url_for('index') }}" class="text-xl font-bold text-primary dark:text-blue-400">
                 <i class="fa-solid fa-person-running"></i>  FitTrack
-             </a>
- 
-             <!-- Navigation Links -->
-             <ul class="flex space-x-2 items-center"> <!-- Reduced space slightly -->
-                 {% set active_class = "bg-teal-100 dark:bg-neutral-700 text-teal-700 dark:text-teal-300 font-semibold border-teal-500 dark:border-teal-400" %}
-                 {% set inactive_class = "text-neutral-700 dark:text-neutral-200 hover:bg-teal-50 dark:hover:bg-neutral-700 hover:text-teal-600 dark:hover:text-teal-400 border-slate-300 dark:border-slate-500" %}
+            </a>
 
-                 <li><a href="{{ url_for('index') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'index' else inactive_class }}">Home</a></li>
-                 <li><a href="{{ url_for('upload.upload_page') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if active_page == 'upload.upload_page' else inactive_class }}">Upload</a></li>
-                 <li><a href="{{ url_for('visualise') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'visualise' else inactive_class }}">Visualise</a></li>
-                 <li><a href="{{ url_for('share') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'share' else inactive_class }}">Share</a></li>
-                 <!-- Dark Mode Toggle Button - Adjusted for consistent size -->
-                 <li>
-                     <button id="darkModeToggle"
-                             class="w-9 h-9 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ inactive_class }} flex items-center justify-center">
-                         <i class="fas fa-moon text-base" style="display: none;"></i> <!-- Moon initially hidden -->
-                         <i class="fas fa-sun text-base"></i> <!-- Sun initially visible -->
-                     </button>
-                 </li>
-                 <!-- Login/Register Buttons -->
-                 <li class="ml-4">
-                     <a href="{{ url_for('login') }}" 
+            <ul class="flex space-x-2 items-center">
+                {% set active_class = "bg-teal-100 dark:bg-neutral-700 text-teal-700 dark:text-teal-300 font-semibold border-teal-500 dark:border-teal-400" %}
+                {% set inactive_class = "text-neutral-700 dark:text-neutral-200 hover:bg-teal-50 dark:hover:bg-neutral-700 hover:text-teal-600 dark:hover:text-teal-400 border-slate-300 dark:border-slate-500" %}
+
+
+                <li><a href="{{ url_for('index') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'index' else inactive_class }}">Home</a></li>
+                <li><a href="{{ url_for('upload.upload_page') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'upload.upload_page' else inactive_class }}">Upload</a></li>
+                <li><a href="{{ url_for('visualise') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'visualise' else inactive_class }}">Visualise</a></li>
+                <li><a href="{{ url_for('share') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'share' else inactive_class }}">Share</a></li>
+                <!-- Dark Mode Toggle Button -->
+                <li>
+                    <button id="darkModeToggle"
+                            class="w-9 h-9 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ inactive_class }} flex items-center justify-center">
+                        <i class="fas fa-moon text-base" style="display: none;"></i>
+                        <i class="fas fa-sun text-base"></i>
+                    </button>
+                </li>
+                {% if current_user.is_authenticated %}
+                    <!-- User Dropdown Menu -->
+                    <li class="ml-4 relative user-dropdown">
+                        <button type="button" class="flex items-center gap-2 focus:outline-none px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition" id="userMenuButton">
+                            {% if current_user.avatar_url %}
+                                <img src="{{ url_for('static', filename='avatars/' ~ current_user.avatar_url) }}"
+                                    alt="Avatar"
+                                    class="w-9 h-9 rounded-full object-cover border-2 border-blue-400">
+                            {% else %}
+                                <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 text-white font-bold text-lg">
+                                    {{ current_user.username[0]|upper }}
+                                </span>
+                            {% endif %}
+                            <span class="font-semibold text-primary dark:text-blue-300">{{ current_user.username }}</span>
+                            <i class="fas fa-chevron-down text-xs text-gray-500 ml-1"></i>
+                        </button>
+                        <!-- Dropdown -->
+                        <div id="userDropdownMenu" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 py-2">
+                            <div class="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700">
+                                <div class="font-semibold">{{ current_user.username }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">Already logged in</div>
+                            </div>
+                            <a href="{{ url_for('reset_password') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                                Change Password
+                            </a>
+                            <form action="{{ url_for('logout') }}" method="post">
+                                {% if csrf_token %}
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                {% endif %}
+                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                {% else %}
+                    <!-- Login/Register Buttons -->
+                    <li class="ml-4">
+                        <a href="{{ url_for('login') }}" 
+
                         class="inline-block bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light text-white font-semibold py-2 px-5 rounded-full shadow-sm hover:shadow-md transition duration-200 ease-in-out text-sm">
-                         Login
-                     </a>
-                 </li>
-                 <li>
-                     <a href="{{ url_for('register') }}" 
+                            Login
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('register') }}" 
                         class="inline-block bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400 text-white font-semibold py-2 px-5 rounded-full shadow-sm hover:shadow-md transition duration-200 ease-in-out text-sm">
-                         Register
-                     </a>
-                 </li>
-             </ul>
-         </nav>
-     </header>
- 
-     <!-- Main Content Area -->
-     <!-- 'flex-grow' makes this section fill available space -->
-     <main class="container mx-auto px-4 py-8 flex-grow">
-         <!-- Content from child templates will be injected here -->
-         {% block content %}
-         <!-- Default content if block is empty -->
-         <p>This is the default content area.</p>
-         {% endblock %}
-     </main>
- 
-     <!-- Footer -->
-     <footer class="bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-center py-4 mt-auto">
-         <div class="container mx-auto px-4">
-             <p>&copy; 2025 Fitness Tracker. All rights reserved.</p>
-             <p class="text-sm">
-                 <a href="#" class="hover:text-primary dark:hover:text-blue-400">Privacy Policy</a> |
-                 <a href="#" class="hover:text-primary dark:hover:text-blue-400">Terms of Service</a>
-             </p>
-         </div>
-     </footer>
+                            Register
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
 
-     <!-- Back to Top Button -->
-     <button id="backToTop" onclick="scrollToTop()" class="back-to-top">
-         <i class="fas fa-arrow-up"></i>
-     </button>
+    <!-- Main Content Area -->
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        {% block content %}
+        <p>This is the default content area.</p>
+        {% endblock %}
+    </main>
 
-     <!-- Include jQuery -->
-     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-     <!-- Include main JavaScript file -->
-     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-     <!-- Include auth JavaScript for password toggle -->
-     <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
- 
- </body>
- </html>
+    <!-- Footer -->
+    <footer class="bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-center py-4 mt-auto">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-center items-center gap-4">
+                <a href="{{ url_for('privacy_policy') }}" class="hover:underline text-sm">Privacy Policy</a>
+                <span class="hidden md:inline">|</span>
+                <a href="{{ url_for('terms_of_service') }}" class="hover:underline text-sm">Terms of Service</a>
+            </div>
+            <div class="mt-2 text-xs">&copy; {{ current_year }} FitTrack. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" onclick="scrollToTop()" class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include main JavaScript file -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!-- Include auth JavaScript for password toggle -->
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <!-- User Dropdown JS (no Alpine.js needed) -->
+    <script>
+        $(function() {
+            // Toggle user dropdown
+            $('#userMenuButton').on('click', function(e) {
+                e.stopPropagation();
+                $('#userDropdownMenu').toggleClass('hidden');
+            });
+            // Hide dropdown when clicking outside
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.user-dropdown').length) {
+                    $('#userDropdownMenu').addClass('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
