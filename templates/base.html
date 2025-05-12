@@ -95,6 +95,7 @@
                             <a href="{{ url_for('reset_password') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                                 Change Password
                             </a>
+                            
                             <form action="{{ url_for('logout') }}" method="post">
                                 {% if csrf_token %}
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
