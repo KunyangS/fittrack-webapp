@@ -2,7 +2,7 @@ import datetime
 import random
 from app import app, db
 from app.models import UserInfo, User
-from app.database import add_user_fitness_entry, upsert_user_food_entry
+from app.database import add_user_fitness_entry, upsert_user_food_entry, register_user
 
 # Sample data for generation
 sample_activities = [
