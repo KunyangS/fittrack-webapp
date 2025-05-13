@@ -49,29 +49,35 @@ def index():
 @app.route('/visualise')
 @login_required
 def visualise():
-
     try:
+        # Connect to the SQLite database (adjust path if necessary)
+        conn = sqlite3.connect("instance/fitness.db")
+
+        # Read fitness and food entry data using pandas
         fitness_df = pd.read_sql_query(
-            "SELECT date, activity_type, duration, calories_burned FROM fitness_entries", db.session.bind)
+            "SELECT date, activity_type, duration, calories_burned FROM fitness_entries", conn)
         food_df = pd.read_sql_query(
-            "SELECT date, food_name, calories FROM food_entries", db.session.bind)
-        
-    
+            "SELECT date, food_name, calories FROM food_entries", conn)
+
+        # Convert DataFrames to list of dictionaries for rendering in the template
         fitness_data = fitness_df.to_dict(orient='records')
         food_data = food_df.to_dict(orient='records')
 
+        # Close the database connection
+        conn.close()
+
     except Exception as e:
         print(f"Error fetching data: {e}")
+        # Render a fallback error page if any database issue occurs
         return render_template('error.html', error_message="Database error occurred")
 
-   
+    # Render the visualisation page with the fetched data
     return render_template(
         'visualise.html',
         username=current_user.username,
         fitness_data=fitness_data,
         food_data=food_data
     )
-
 
 # Route for Data Sharing page (placeholder)
 @app.route('/share')
