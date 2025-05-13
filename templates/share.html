@@ -13,6 +13,19 @@
     Configure the specific data categories, time range, and recipients for sharing your information.
   </p>
 
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="mb-4">
+      {% for category, message in messages %}
+        <div class="p-3 rounded text-white {% if category == 'danger' %}bg-red-500{% elif category == 'success' %}bg-green-500{% elif category == 'warning' %}bg-yellow-400 text-gray-800{% else %}bg-blue-500{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
   <!-- Main Content Grid -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
 
@@ -62,6 +75,7 @@
             </div>
             {% endfor %}
           </div>
+          <p id="category-error" class="text-xs text-red-600 dark:text-red-400 mt-1.5 hidden">Please select at least one data category.</p>
            <p class="text-xs text-warning dark:text-amber-400 mt-3">Note: Sharing 'Basic Profile' includes potentially sensitive information.</p>
         </div>
 
@@ -110,6 +124,7 @@
           <p id="user-help-text" class="text-xs text-neutral-500 dark:text-neutral-400 mt-1.5">
             Enter the username or email of the user(s) you wish to share data with. Separate multiple entries with commas if applicable.
           </p>
+          <p id="recipient-error" class="text-xs text-red-600 dark:text-red-400 mt-1.5 hidden">Please enter at least one recipient.</p>
         </div>
 
         <!-- Submit Button - Centered -->
@@ -194,4 +209,57 @@
   </div> <!-- End Main Grid -->
 
 </div> <!-- End Container -->
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[action="#"]');
+    const input = document.getElementById('share-with-users');
+    const error = document.getElementById('recipient-error');
+    const categoryError = document.getElementById('category-error');
+    const categoryCheckboxes = document.querySelectorAll('input[name="share_options"]');
+    if (form && input && error && categoryError && categoryCheckboxes.length) {
+      form.addEventListener('submit', function(e) {
+        let valid = true;
+        if (!input.value.trim()) {
+          error.classList.remove('hidden');
+          input.classList.add('border-red-500');
+          input.focus();
+          valid = false;
+        } else {
+          error.classList.add('hidden');
+          input.classList.remove('border-red-500');
+        }
+        let checked = false;
+        categoryCheckboxes.forEach(function(box) {
+          if (box.checked) checked = true;
+        });
+        if (!checked) {
+          categoryError.classList.remove('hidden');
+          valid = false;
+        } else {
+          categoryError.classList.add('hidden');
+        }
+        if (!valid) e.preventDefault();
+      });
+      input.addEventListener('input', function() {
+        if (input.value.trim()) {
+          error.classList.add('hidden');
+          input.classList.remove('border-red-500');
+        }
+      });
+      categoryCheckboxes.forEach(function(box) {
+        box.addEventListener('change', function() {
+          let checked = false;
+          categoryCheckboxes.forEach(function(b) { if (b.checked) checked = true; });
+          if (checked) {
+            categoryError.classList.add('hidden');
+          }
+        });
+      });
+    }
+  });
+</script>
 {% endblock %}
