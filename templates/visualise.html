@@ -71,6 +71,11 @@
 
   <!-- Chart.js and custom logic -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    window.rawData = {{ fitness_data | tojson | safe }};
+    window.foodData = {{ food_data | tojson | safe }};
+  </script>
+
   <script src="{{ url_for('static', filename='js/visualise.js') }}"></script>
 
 </div> {# Close container #}
