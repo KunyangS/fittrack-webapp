@@ -202,6 +202,96 @@
 
     </div> <!-- End Card 2 -->
 
+    <!-- Card 3: Shared with You -->
+    <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700">
+      <h2 class="text-2xl font-heading font-semibold mb-6 text-primary-dark dark:text-primary-light">
+        Shared with You
+      </h2>
+      <div class="space-y-4">
+        {% if shared_with_you %}
+          {% for share in shared_with_you %}
+          <div class="bg-white dark:bg-neutral-700 rounded-xl shadow-md border border-neutral-100 dark:border-neutral-600 overflow-hidden transition hover:shadow-lg">
+            <div class="flex items-center justify-between p-4 border-b border-neutral-100 dark:border-neutral-600">
+              <div class="flex items-center gap-3">
+                <div class="flex-shrink-0 h-9 w-9 rounded-full bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center text-white shadow-sm">
+                  <span class="font-semibold text-base">{{ share.sharer_name[0]|upper }}</span>
+                </div>
+                <h3 class="text-base font-semibold text-primary dark:text-primary-light">{{ share.sharer_name }}</h3>
+              </div>
+              <span class="text-xs text-neutral-500 dark:text-neutral-400">Shared: {{ share.shared_at }}</span>
+            </div>
+            <div class="p-4 bg-neutral-50 dark:bg-neutral-800/30">
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-2">Shared data:</p>
+              <div class="flex flex-wrap gap-2">
+                {% for item in share.data_categories %}
+                <span class="inline-block border border-primary/70 dark:border-primary-light/70 text-primary-dark dark:text-primary-light text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary/5 dark:bg-primary-light/10">
+                  {{ item }}
+                </span>
+                {% endfor %}
+                <span class="inline-block border border-secondary/70 dark:border-secondary-light/70 text-secondary-dark dark:text-secondary-light text-xs font-medium px-2.5 py-0.5 rounded-full bg-secondary/5 dark:bg-secondary-light/10">
+                  Time: {{ share.time_range }}
+                </span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-center text-neutral-500 dark:text-neutral-400 py-6 bg-neutral-100 dark:bg-neutral-700/50 rounded-lg">
+            No data has been shared with you yet.
+          </p>
+        {% endif %}
+      </div>
+    </div> <!-- End Card 3 -->
+
+    <!-- Card 4: Share History -->
+    <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700">
+      <h2 class="text-2xl font-heading font-semibold mb-6 text-secondary-dark dark:text-secondary-light">
+        Share History
+      </h2>
+      <div class="space-y-4">
+        {% if share_history %}
+          {% for history_entry in share_history %}
+          <div class="bg-white dark:bg-neutral-700 rounded-xl shadow-md border border-neutral-100 dark:border-neutral-600 overflow-hidden opacity-75">
+            <div class="flex items-center justify-between p-4 border-b border-neutral-100 dark:border-neutral-600">
+              <div class="flex items-center gap-3">
+                <div class="flex-shrink-0 h-9 w-9 rounded-full bg-gradient-to-br from-neutral-400 to-neutral-500 flex items-center justify-center text-white shadow-sm">
+                  <span class="font-semibold text-base">{{ history_entry.sharer_name[0]|upper if history_entry.sharer_name == current_user.username else history_entry.sharee_name[0]|upper }}</span>
+                </div>
+                <div>
+                  <h3 class="text-base font-semibold text-neutral-700 dark:text-neutral-300">
+                    {% if history_entry.sharer_name == current_user.username %}
+                      You shared with {{ history_entry.sharee_name }}
+                    {% else %}
+                      {{ history_entry.sharer_name }} shared with you
+                    {% endif %}
+                  </h3>
+                  <span class="text-xs text-red-500 dark:text-red-400">{{ history_entry.status }} on {{ history_entry.shared_at }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="p-4 bg-neutral-50 dark:bg-neutral-800/30">
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-2">Originally shared data:</p>
+              <div class="flex flex-wrap gap-2">
+                {% for item in history_entry.data_categories %}
+                <span class="inline-block border border-neutral-400/70 text-neutral-600 dark:text-neutral-400 text-xs font-medium px-2.5 py-0.5 rounded-full bg-neutral-200/30 dark:bg-neutral-600/30">
+                  {{ item }}
+                </span>
+                {% endfor %}
+                <span class="inline-block border border-neutral-400/70 text-neutral-600 dark:text-neutral-400 text-xs font-medium px-2.5 py-0.5 rounded-full bg-neutral-200/30 dark:bg-neutral-600/30">
+                  Time: {{ history_entry.time_range }}
+                </span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-center text-neutral-500 dark:text-neutral-400 py-6 bg-neutral-100 dark:bg-neutral-700/50 rounded-lg">
+            No past sharing activity found.
+          </p>
+        {% endif %}
+      </div>
+    </div> <!-- End Card 4 -->
+
   </div> <!-- End Main Grid -->
 
 </div> <!-- End Container -->
@@ -216,7 +306,7 @@
     const errorAlert = document.getElementById('share-form-error');
     const errorMsg = document.getElementById('share-form-error-msg');
     const categoryCheckboxes = document.querySelectorAll('input[name="share_options"]');
-    const hasFlashMessages = {% if messages %}true{% else %}false{% endif %};
+    const hasFlashMessages = {{ messages|length > 0 | tojson }};
     
     if (form && input && errorAlert && errorMsg && categoryCheckboxes.length) {
       form.addEventListener('submit', function(e) {

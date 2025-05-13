@@ -163,7 +163,43 @@ def share():
             'time_range': time_range_display,
             'share_id': entry.id
         })
-    return render_template('share.html', current_shares=current_shares, username=current_user.username) # Added username
+
+    # Get shares shared with the current user
+    shares_with_user = ShareEntry.query.filter_by(sharee_user_id=current_user.id, is_active=True).all()
+    shared_with_you_data = []
+    for entry in shares_with_user:
+        sharer_name = entry.sharer.username if hasattr(entry.sharer, 'username') else str(entry.sharer_user_id)
+        categories_keys = entry.data_categories.split(',')
+        categories_display = [category_map.get(cat, cat.replace('_', ' ').title()) for cat in categories_keys if cat]
+        time_range_display = time_map.get(entry.time_range, entry.time_range.replace('_', ' ').title())
+        shared_with_you_data.append({
+            'sharer_name': sharer_name,
+            'data_categories': categories_display,
+            'time_range': time_range_display,
+            'shared_at': entry.shared_at.strftime('%Y-%m-%d %H:%M')
+        })
+
+    # Get share history (inactive shares)
+    share_history_entries = ShareEntry.query.filter(
+        ((ShareEntry.sharer_user_id == current_user.id) | (ShareEntry.sharee_user_id == current_user.id)) & (ShareEntry.is_active == False)
+    ).order_by(ShareEntry.shared_at.desc()).all()
+    share_history_data = []
+    for entry in share_history_entries:
+        sharer_name = entry.sharer.username if hasattr(entry.sharer, 'username') else str(entry.sharer_user_id)
+        sharee_name = entry.sharee.username if hasattr(entry.sharee, 'username') else str(entry.sharee_user_id)
+        categories_keys = entry.data_categories.split(',')
+        categories_display = [category_map.get(cat, cat.replace('_', ' ').title()) for cat in categories_keys if cat]
+        time_range_display = time_map.get(entry.time_range, entry.time_range.replace('_', ' ').title())
+        share_history_data.append({
+            'sharer_name': sharer_name,
+            'sharee_name': sharee_name,
+            'data_categories': categories_display,
+            'time_range': time_range_display,
+            'shared_at': entry.shared_at.strftime('%Y-%m-%d %H:%M'),
+            'status': 'Revoked' # Or determine based on other fields if necessary
+        })
+
+    return render_template('share.html', current_shares=current_shares, username=current_user.username, shared_with_you=shared_with_you_data, share_history=share_history_data)
 
 @app.route('/revoke_share/<int:share_id>', methods=['POST'])
 @login_required
