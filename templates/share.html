@@ -164,7 +164,10 @@
               <form method="post" action="{{ url_for('revoke_share', share_id=share.share_id) }}">
                 <button
                   type="submit"
-                  class="text-xs font-medium text-error hover:text-error-dark dark:text-red-400 dark:hover:text-red-300 py-1 px-2.5 rounded-full border border-error/50 hover:border-error/80 dark:border-red-400/50 dark:hover:border-red-400/80 transition bg-error/5 hover:bg-error/10 dark:bg-red-900/20 dark:hover:bg-red-900/40 flex items-center gap-1"
+                  class="text-xs font-medium text-error dark:text-red-400 py-1 px-2.5 rounded-full border border-error/50 dark:border-red-400/50 
+                         hover:bg-revoke-hover-bg_light dark:hover:bg-revoke-hover-bg_dark 
+                         flex items-center gap-1 transition transform hover:text-error-dark hover:border-error hover:scale-105 
+                         dark:hover:text-red-300 dark:hover:border-red-400"
                   title="Revoke this share"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -217,6 +220,14 @@
     
     if (form && input && errorAlert && errorMsg && categoryCheckboxes.length) {
       form.addEventListener('submit', function(e) {
+        // Confirmation dialog for sharing
+        const recipientUsername = input.value.trim();
+        if (recipientUsername) {
+          if (!confirm(`Are you sure you want to share data with ${recipientUsername}?`)) {
+            e.preventDefault(); // Stop form submission if user cancels
+            return;
+          }
+        }
         // Only validate with frontend if no backend flash messages exist
         if (!hasFlashMessages) {
           let valid = true;
@@ -278,6 +289,21 @@
         });
       });
     }
+
+    // Add confirmation for revoke buttons
+    const revokeForms = document.querySelectorAll('form[action*="revoke_share"]');
+    revokeForms.forEach(revokeForm => {
+      revokeForm.addEventListener('submit', function(e) {
+        const shareeNameElement = revokeForm.closest('.bg-white').querySelector('.text-primary'); // Adjust selector if needed
+        let shareeName = 'this user'; // Default message
+        if (shareeNameElement && shareeNameElement.textContent) {
+          shareeName = shareeNameElement.textContent.trim();
+        }
+        if (!confirm(`Are you sure you want to revoke sharing with ${shareeName}?`)) {
+          e.preventDefault(); // Stop form submission if user cancels
+        }
+      });
+    });
   });
 </script>
 {% endblock %}
