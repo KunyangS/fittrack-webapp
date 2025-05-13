@@ -20,7 +20,13 @@
           <option value="week" selected>Weekly</option>
           <option value="month">Monthly</option>
         </select>
-        <button id="applyFilter" class="inline-block bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light text-white font-semibold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg transition duration-200 ease-in-out transform hover:scale-105">Apply</button>
+        <button id="applyFilter"
+  class="inline-block bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-6 rounded-full 
+         shadow-md hover:shadow-lg transition duration-200 ease-in-out transform hover:scale-105 focus:outline-none 
+         focus:ring-2 focus:ring-offset-2 focus:ring-primary-light">
+  🎯 Apply Filter
+</button>
+
       </div>
     </div>
   </div>
@@ -28,7 +34,11 @@
   <!-- Summary overview section -->
   {# Applied card styles #}
   <div id="analytics" class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 px-4 mb-12">
-    <div id="summary-card" class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700 col-span-1 md:col-span-3">
+    <div id="summary-card"
+  class="bg-white dark:bg-neutral-800 p-8 rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-700
+         transition-all duration-300 hover:shadow-2xl transform hover:scale-[1.01]">
+  <!-- Summary content will be injected here -->
+</div>
         {# Summary content will be loaded here by JS #}
         <h3 class="text-2xl font-heading font-semibold mb-6 text-primary-dark dark:text-primary-light text-center">Data Summary</h3>
         <div id="summary-content" class="text-center text-neutral-600 dark:text-neutral-400">Loading summary...</div>
@@ -72,9 +82,9 @@
   <!-- Chart.js and custom logic -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    window.rawData = {{ fitness_data | tojson | safe }};
-    window.foodData = {{ food_data | tojson | safe }};
-  </script>
+    window.rawData = {{ fitness_data|tojson }};
+    window.foodData = {{ food_data|tojson }};
+  </script>  
 
   <script src="{{ url_for('static', filename='js/visualise.js') }}"></script>
 
