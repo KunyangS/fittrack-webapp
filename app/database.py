@@ -185,14 +185,14 @@ def upsert_user_food_entry(user_id, date_val: date, food_name_val: str, quantity
 # --- Share Functions ---
 def create_share_entry(sharer_user_id: int, sharee_user_id: int, data_categories: str, time_range: str):
     """
-    Creates a new share entry.
+    Creates a new share entry or reactivates an existing inactive one.
     Args:
         sharer_user_id (int): The ID of the user sharing the data.
         sharee_user_id (int): The ID of the user with whom data is shared.
         data_categories (str): Comma-separated string of data categories (e.g., "basic_profile,activity_log").
         time_range (str): String representing the time range (e.g., "last_7_days").
     Returns:
-        ShareEntry: The created ShareEntry object, or None if creation failed (e.g. duplicate).
+        ShareEntry: The created or updated ShareEntry object, or None if creation/update failed.
     """
     try:
         # Check if sharer and sharee exist
@@ -200,25 +200,44 @@ def create_share_entry(sharer_user_id: int, sharee_user_id: int, data_categories
         sharee = User.query.get(sharee_user_id)
         if not sharer or not sharee:
             print(f"[DEBUG] Sharer or sharee not found: sharer_id={sharer_user_id}, sharee_id={sharee_user_id}")
-            return None # Or raise an error
+            return None
 
-        # Explicitly set is_active to True
-        new_share = ShareEntry(
+        # Look for an existing entry (active or inactive) with the same parameters
+        existing_entry = ShareEntry.query.filter_by(
             sharer_user_id=sharer_user_id,
             sharee_user_id=sharee_user_id,
-            data_categories=data_categories,
-            time_range=time_range,
-            is_active=True,
-            shared_at=datetime.utcnow()  # Set current UTC time for shared_at
-        )
-        db.session.add(new_share)
-        db.session.commit()
-        print(f"[DEBUG] ShareEntry created: {new_share}")
-        return new_share
+            data_categories=data_categories, # Assumes data_categories is consistently ordered
+            time_range=time_range
+        ).first()
+
+        if existing_entry:
+            if not existing_entry.is_active:
+                existing_entry.is_active = True
+                existing_entry.shared_at = datetime.utcnow()  # Update timestamp on reactivation
+                db.session.commit()
+                print(f"[DEBUG] ShareEntry reactivated: {existing_entry}")
+            else:
+                # Entry already exists and is active.
+                print(f"[DEBUG] ShareEntry already active and found: {existing_entry}")
+            return existing_entry
+        else:
+            # No existing entry found, create a new one
+            new_share = ShareEntry(
+                sharer_user_id=sharer_user_id,
+                sharee_user_id=sharee_user_id,
+                data_categories=data_categories,
+                time_range=time_range,
+                is_active=True,
+                shared_at=datetime.utcnow() 
+            )
+            db.session.add(new_share)
+            db.session.commit()
+            print(f"[DEBUG] New ShareEntry created: {new_share}")
+            return new_share
     except IntegrityError as e:
         db.session.rollback()
-        print(f"[DEBUG] IntegrityError: {e}")
-        return None # Duplicate entry or other integrity issue
+        print(f"[DEBUG] IntegrityError in create_share_entry: {e}. This could be due to a race condition or unexpected duplicate.")
+        return None 
     except Exception as e:
         db.session.rollback()
         print(f"[DEBUG] Exception in create_share_entry: {e}")

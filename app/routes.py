@@ -58,42 +58,59 @@ def share():
     """
     if request.method == 'POST':
         recipient_username_or_email = request.form.get('share_users')
-        data_categories = request.form.getlist('share_options') # Get list of selected categories
+        data_categories_list = request.form.getlist('share_options') # Get list of selected categories
         time_range = request.form.get('time_range')
 
         if not recipient_username_or_email:
             flash('Recipient username or email cannot be empty.', 'danger')
             return redirect(url_for('share'))
 
-        if not data_categories:
+        if not data_categories_list:
             flash('Please select at least one data category to share.', 'danger')
             return redirect(url_for('share'))
 
-        # Proceed if basic validations pass
         recipient = User.query.filter((User.username == recipient_username_or_email) | (User.email == recipient_username_or_email)).first()
 
-        if recipient and recipient.id != current_user.id:
-            # Check for existing share to this recipient from the current user
-            existing_share = ShareEntry.query.filter_by(
-                sharer_user_id=current_user.id,
-                sharee_user_id=recipient.id
-            ).first()
-
-            if existing_share:
-                flash(f"Data has already been shared with {recipient_username_or_email}. You can manage existing shares below or revoke the current one to create a new share.", 'warning')
-                return redirect(url_for('share')) # Prevent creating a new share
-            else:
-                create_share_entry(
-                    sharer_user_id=current_user.id,
-                    sharee_user_id=recipient.id,
-                    data_categories=','.join(data_categories),
-                    time_range=time_range
-                )
-                flash(f"Data shared successfully with {recipient.username}.", 'success')
-        elif recipient and recipient.id == current_user.id:
-            flash("You cannot share data with yourself.", 'warning')
-        else:
+        if not recipient:
             flash(f"User '{recipient_username_or_email}' not found.", 'warning')
+            return redirect(url_for('share'))
+            
+        if recipient.id == current_user.id:
+            flash("You cannot share data with yourself.", 'warning')
+            return redirect(url_for('share'))
+
+        # Sort data categories for a canonical string representation
+        sorted_data_categories_str = ','.join(sorted(data_categories_list))
+
+        # Check current state of this specific share configuration before attempting to create/update
+        pre_existing_share_config = ShareEntry.query.filter_by(
+            sharer_user_id=current_user.id,
+            sharee_user_id=recipient.id,
+            data_categories=sorted_data_categories_str,
+            time_range=time_range
+        ).first()
+
+        # Attempt to create or update the share entry using the improved database function
+        share_entry_instance = create_share_entry(
+            sharer_user_id=current_user.id,
+            sharee_user_id=recipient.id,
+            data_categories=sorted_data_categories_str,
+            time_range=time_range
+        )
+
+        if share_entry_instance:
+            if pre_existing_share_config and pre_existing_share_config.is_active:
+                # The share was already active with these exact settings
+                flash(f"This sharing configuration with {recipient.username} is already active.", 'info')
+            elif pre_existing_share_config and not pre_existing_share_config.is_active:
+                # The share was inactive and has been reactivated
+                flash(f"Sharing with {recipient.username} has been reactivated with the specified settings.", 'success')
+            else: # No pre_existing_share_config, so it's a brand new share
+                flash(f"Data shared successfully with {recipient.username}.", 'success')
+        else:
+            # create_share_entry returned None, indicating an issue (e.g., DB error, though users are checked)
+            flash(f"Failed to process the share request with {recipient.username}. Please try again.", 'danger')
+        
         return redirect(url_for('share'))
 
     # Query current shares for this user
