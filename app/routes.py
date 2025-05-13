@@ -49,11 +49,85 @@ def index():
 def visualise():
     return render_template('visualise.html', username=current_user.username)
 
-# Route for Data Sharing page (placeholder)
-@app.route('/share')
+# Route for Data Sharing page
+@app.route('/share', methods=['GET', 'POST'])
 @login_required
 def share():
-    return render_template('share.html', username=current_user.username)
+    """
+    Handles the sharing page. Allows the user to create new share entries and view/revoke existing ones.
+    """
+    if request.method == 'POST':
+        # Parse form data for sharing
+        share_users = request.form.get('share_users', '').strip()
+        data_categories = request.form.getlist('share_options')
+        time_range = request.form.get('time_range', '')
+        # Only proceed if all required fields are present
+        if share_users and data_categories and time_range:
+            # Support multiple recipients separated by comma
+            recipients = [u.strip() for u in share_users.split(',') if u.strip()]
+            for recipient in recipients:
+                # Try to find user by username or email
+                sharee = find_user_by_username(recipient) or find_user_by_email(recipient)
+                if sharee and sharee.id != current_user.id:
+                    # Create share entry in database
+                    create_share_entry(
+                        sharer_user_id=current_user.id,
+                        sharee_user_id=sharee.id,
+                        data_categories=','.join(data_categories),
+                        time_range=time_range
+                    )
+                else:
+                    flash(f"User '{recipient}' not found or cannot share with yourself.", 'warning')
+            return redirect(url_for('share'))
+        else:
+            flash('Please fill in all required fields for sharing.', 'danger')
+
+    # Query current shares for this user
+    share_entries = get_shares_by_sharer(current_user.id)
+    # Prepare data for template
+    current_shares = []
+    for entry in share_entries:
+        # Get sharee's username or email for display
+        sharee_name = entry.sharee.username if hasattr(entry.sharee, 'username') else str(entry.sharee_user_id)
+        # Convert data_categories string to list of readable labels
+        category_map = {
+            'basic_profile': 'Basic Profile',
+            'activity_summary': 'Activity Summary',
+            'activity': 'Activity Log',
+            'meal_log': 'Meal Log',
+            'daily_nutrition': 'Daily Nutrition Summary',
+            'mood_entries': 'Mood Entries',
+            'fitness_log': 'Activity Log',
+            'food_log': 'Meal Log',
+        }
+        categories = [category_map.get(cat, cat) for cat in entry.data_categories.split(',') if cat]
+        # Map time_range to readable string
+        time_map = {
+            'last_7_days': 'Last 7 Days',
+            'last_30_days': 'Last 30 Days',
+            'all_time': 'All Time',
+        }
+        time_range_str = time_map.get(entry.time_range, entry.time_range)
+        current_shares.append({
+            'sharee_name': sharee_name,
+            'data_categories': categories,
+            'time_range': time_range_str,
+            'share_id': entry.id
+        })
+    return render_template('share.html', current_shares=current_shares)
+
+@app.route('/revoke_share/<int:share_id>', methods=['POST'])
+@login_required
+def revoke_share(share_id):
+    """
+    Handles revoking a share entry. Only the sharer can revoke.
+    """
+    success = revoke_share_entry(share_id, current_user.id)
+    if success:
+        flash('Share revoked successfully.', 'success')
+    else:
+        flash('Failed to revoke share.', 'danger')
+    return redirect(url_for('share'))
 
 # --- 🛠 UPDATED LOGIN route ---
 @app.route('/login', methods=['GET', 'POST'])
