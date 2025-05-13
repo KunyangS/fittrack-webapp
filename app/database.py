@@ -208,7 +208,8 @@ def create_share_entry(sharer_user_id: int, sharee_user_id: int, data_categories
             sharee_user_id=sharee_user_id,
             data_categories=data_categories,
             time_range=time_range,
-            is_active=True
+            is_active=True,
+            shared_at=datetime.utcnow()  # Set current UTC time for shared_at
         )
         db.session.add(new_share)
         db.session.commit()
