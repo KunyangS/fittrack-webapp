@@ -199,23 +199,28 @@ def create_share_entry(sharer_user_id: int, sharee_user_id: int, data_categories
         sharer = User.query.get(sharer_user_id)
         sharee = User.query.get(sharee_user_id)
         if not sharer or not sharee:
+            print(f"[DEBUG] Sharer or sharee not found: sharer_id={sharer_user_id}, sharee_id={sharee_user_id}")
             return None # Or raise an error
 
+        # Explicitly set is_active to True
         new_share = ShareEntry(
             sharer_user_id=sharer_user_id,
             sharee_user_id=sharee_user_id,
             data_categories=data_categories,
-            time_range=time_range
+            time_range=time_range,
+            is_active=True
         )
         db.session.add(new_share)
         db.session.commit()
+        print(f"[DEBUG] ShareEntry created: {new_share}")
         return new_share
-    except IntegrityError:
+    except IntegrityError as e:
         db.session.rollback()
+        print(f"[DEBUG] IntegrityError: {e}")
         return None # Duplicate entry or other integrity issue
     except Exception as e:
         db.session.rollback()
-        # Log error e
+        print(f"[DEBUG] Exception in create_share_entry: {e}")
         return None
 
 def get_shares_by_sharer(sharer_user_id: int):
