@@ -70,20 +70,18 @@ def share():
             return redirect(url_for('share'))
 
         # Proceed if basic validations pass
-        # Assuming 'share_users' contains a single username/email for simplicity here
-        # For multiple users, you'd need to split and process each
         recipient = User.query.filter((User.username == recipient_username_or_email) | (User.email == recipient_username_or_email)).first()
 
         if recipient and recipient.id != current_user.id:
-            # Check for existing share to prevent duplicates (optional, based on requirements)
-            existing_share = Share.query.filter_by(
+            # Check for existing share to this recipient from the current user
+            existing_share = ShareEntry.query.filter_by(
                 sharer_user_id=current_user.id,
-                sharee_user_id=recipient.id,
-                # Potentially also check for identical data_categories and time_range if updates aren't allowed
+                sharee_user_id=recipient.id
             ).first()
 
             if existing_share:
-                flash(f"You are already sharing data with {recipient_username_or_email} with similar settings.", 'info')
+                flash(f"Data has already been shared with {recipient_username_or_email}. You can manage existing shares below or revoke the current one to create a new share.", 'warning')
+                return redirect(url_for('share')) # Prevent creating a new share
             else:
                 create_share_entry(
                     sharer_user_id=current_user.id,
