@@ -10,6 +10,8 @@ from app.forms import RegistrationForm
 import os
 from werkzeug.utils import secure_filename
 import re
+import sqlite3
+import pandas as pd
 
 # Database helpers
 from app.database import (
@@ -47,7 +49,29 @@ def index():
 @app.route('/visualise')
 @login_required
 def visualise():
-    return render_template('visualise.html', username=current_user.username)
+
+    try:
+        fitness_df = pd.read_sql_query(
+            "SELECT date, activity_type, duration, calories_burned FROM fitness_entries", db.session.bind)
+        food_df = pd.read_sql_query(
+            "SELECT date, food_name, calories FROM food_entries", db.session.bind)
+        
+    
+        fitness_data = fitness_df.to_dict(orient='records')
+        food_data = food_df.to_dict(orient='records')
+
+    except Exception as e:
+        print(f"Error fetching data: {e}")
+        return render_template('error.html', error_message="Database error occurred")
+
+   
+    return render_template(
+        'visualise.html',
+        username=current_user.username,
+        fitness_data=fitness_data,
+        food_data=food_data
+    )
+
 
 # Route for Data Sharing page (placeholder)
 @app.route('/share')
