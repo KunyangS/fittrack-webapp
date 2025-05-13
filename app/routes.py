@@ -57,30 +57,46 @@ def share():
     Handles the sharing page. Allows the user to create new share entries and view/revoke existing ones.
     """
     if request.method == 'POST':
-        # Parse form data for sharing
-        share_users = request.form.get('share_users', '').strip()
-        data_categories = request.form.getlist('share_options')
-        time_range = request.form.get('time_range', '')
-        # Only proceed if all required fields are present
-        if share_users and data_categories and time_range:
-            # Support multiple recipients separated by comma
-            recipients = [u.strip() for u in share_users.split(',') if u.strip()]
-            for recipient in recipients:
-                # Try to find user by username or email
-                sharee = find_user_by_username(recipient) or find_user_by_email(recipient)
-                if sharee and sharee.id != current_user.id:
-                    # Create share entry in database
-                    create_share_entry(
-                        sharer_user_id=current_user.id,
-                        sharee_user_id=sharee.id,
-                        data_categories=','.join(data_categories),
-                        time_range=time_range
-                    )
-                else:
-                    flash(f"User '{recipient}' not found or cannot share with yourself.", 'warning')
+        recipient_username_or_email = request.form.get('share_users')
+        data_categories = request.form.getlist('share_options') # Get list of selected categories
+        time_range = request.form.get('time_range')
+
+        if not recipient_username_or_email:
+            flash('Recipient username or email cannot be empty.', 'danger')
             return redirect(url_for('share'))
+
+        if not data_categories:
+            flash('Please select at least one data category to share.', 'danger')
+            return redirect(url_for('share'))
+
+        # Proceed if basic validations pass
+        # Assuming 'share_users' contains a single username/email for simplicity here
+        # For multiple users, you'd need to split and process each
+        recipient = User.query.filter((User.username == recipient_username_or_email) | (User.email == recipient_username_or_email)).first()
+
+        if recipient and recipient.id != current_user.id:
+            # Check for existing share to prevent duplicates (optional, based on requirements)
+            existing_share = Share.query.filter_by(
+                sharer_user_id=current_user.id,
+                sharee_user_id=recipient.id,
+                # Potentially also check for identical data_categories and time_range if updates aren't allowed
+            ).first()
+
+            if existing_share:
+                flash(f"You are already sharing data with {recipient_username_or_email} with similar settings.", 'info')
+            else:
+                create_share_entry(
+                    sharer_user_id=current_user.id,
+                    sharee_user_id=recipient.id,
+                    data_categories=','.join(data_categories),
+                    time_range=time_range
+                )
+                flash(f"Data shared successfully with {recipient.username}.", 'success')
+        elif recipient and recipient.id == current_user.id:
+            flash("You cannot share data with yourself.", 'warning')
         else:
-            flash('Please fill in all required fields for sharing.', 'danger')
+            flash(f"User '{recipient_username_or_email}' not found.", 'warning')
+        return redirect(url_for('share'))
 
     # Query current shares for this user
     share_entries = get_shares_by_sharer(current_user.id)
