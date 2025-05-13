@@ -53,19 +53,28 @@ def visualise():
 @app.route('/share', methods=['GET', 'POST'])
 @login_required
 def share():
-    """
-    Handles the sharing page. Allows the user to create new share entries and view/revoke existing ones.
-    """
+    category_map = {
+        'basic_profile': 'Basic Profile',
+        'fitness_log': 'Activity Log',
+        'food_log': 'Meal Log',
+        # Add other mappings as they appear in your form/models
+    }
+    time_map = {
+        'last_7_days': 'Last 7 Days',
+        'last_30_days': 'Last 30 Days',
+        'all_time': 'All Time',
+    }
+
     if request.method == 'POST':
         recipient_username_or_email = request.form.get('share_users')
-        data_categories_list = request.form.getlist('share_options') # Get list of selected categories
-        time_range = request.form.get('time_range')
+        data_categories_list_from_form = sorted(list(set(request.form.getlist('share_options')))) # Ensure unique and sorted
+        new_time_range_key = request.form.get('time_range')
 
         if not recipient_username_or_email:
             flash('Recipient username or email cannot be empty.', 'danger')
             return redirect(url_for('share'))
 
-        if not data_categories_list:
+        if not data_categories_list_from_form:
             flash('Please select at least one data category to share.', 'danger')
             return redirect(url_for('share'))
 
@@ -79,69 +88,82 @@ def share():
             flash("You cannot share data with yourself.", 'warning')
             return redirect(url_for('share'))
 
-        sorted_data_categories_str = ','.join(sorted(data_categories_list))
+        new_data_categories_str_from_form = ','.join(data_categories_list_from_form)
 
-        # Check if an ACTIVE share with the exact same parameters already exists.
-        active_existing_share = ShareEntry.query.filter_by(
+        existing_active_share = ShareEntry.query.filter_by(
             sharer_user_id=current_user.id,
             sharee_user_id=recipient.id,
-            data_categories=sorted_data_categories_str,
-            time_range=time_range,
             is_active=True
         ).first()
 
-        if active_existing_share:
-            flash(f"Data has already been shared with user {recipient.username} with the same active settings.", 'warning')
-            return redirect(url_for('share'))
+        if existing_active_share:
+            current_categories_in_db_set = set(existing_active_share.data_categories.split(','))
+            new_categories_from_form_set = set(data_categories_list_from_form)
+            current_time_range_in_db = existing_active_share.time_range
 
-        # If no active share exists, proceed to create (which might replace an inactive one or be entirely new)
-        share_entry_instance = create_share_entry(
-            sharer_user_id=current_user.id,
-            sharee_user_id=recipient.id,
-            data_categories=sorted_data_categories_str,
-            time_range=time_range
-        )
+            # Check if the new request is a subset of or equal to the current share and time range is the same
+            if new_categories_from_form_set.issubset(current_categories_in_db_set) and new_time_range_key == current_time_range_in_db:
+                requested_display_categories = [category_map.get(cat, cat) for cat in data_categories_list_from_form]
+                display_time_range = time_map.get(new_time_range_key, new_time_range_key)
+                flash(f"Data including the selected categories ({', '.join(requested_display_categories)}) is already shared with {recipient.username} for the time range {display_time_range}.", 'info')
+            else:
+                # Update existing share
+                combined_categories_set = current_categories_in_db_set.union(new_categories_from_form_set)
+                final_categories_str = ','.join(sorted(list(combined_categories_set)))
+                
+                actually_added_category_keys = combined_categories_set - current_categories_in_db_set
+                time_range_updated = new_time_range_key != current_time_range_in_db
 
-        if share_entry_instance:
-            flash(f"Data successfully shared with {recipient.username}.", 'success')
+                existing_active_share.data_categories = final_categories_str
+                existing_active_share.time_range = new_time_range_key
+                existing_active_share.shared_at = datetime.utcnow() # Update timestamp
+                db.session.commit()
+
+                update_messages = []
+                if actually_added_category_keys:
+                    added_display_names = [category_map.get(cat, cat) for cat in sorted(list(actually_added_category_keys))]
+                    update_messages.append(f"Added data categories: {', '.join(added_display_names)}")
+                
+                if time_range_updated:
+                    display_new_time_range = time_map.get(new_time_range_key, new_time_range_key)
+                    update_messages.append(f"Time range updated to {display_new_time_range}")
+                
+                if not update_messages and not actually_added_category_keys and not time_range_updated:
+                     # This case implies new_categories_from_form_set was not a subset, but union resulted in no change to categories, and time range was same.
+                     # This should ideally be caught by the issubset check if logic is perfect, but as a fallback.
+                    flash(f"Share with {recipient.username} is already up to date with the requested settings.", 'info')
+                else:
+                    flash(f"Share with {recipient.username} updated. {'. '.join(update_messages)}.", 'success')
         else:
-            flash(f"Failed to process share request with {recipient.username}. Please try again.", 'danger')
+            # No active share exists, create a new one
+            share_entry_instance = create_share_entry(
+                sharer_user_id=current_user.id,
+                sharee_user_id=recipient.id,
+                data_categories=new_data_categories_str_from_form,
+                time_range=new_time_range_key
+            )
+            if share_entry_instance:
+                flash(f"Data successfully shared with {recipient.username}.", 'success')
+            else:
+                flash(f"Failed to process share request with {recipient.username}. Please try again.", 'danger')
         
         return redirect(url_for('share'))
 
-    # Query current shares for this user
+    # GET request: Query current shares for this user (existing logic)
     share_entries = get_shares_by_sharer(current_user.id)
-    # Prepare data for template
     current_shares = []
     for entry in share_entries:
-        # Get sharee's username or email for display
         sharee_name = entry.sharee.username if hasattr(entry.sharee, 'username') else str(entry.sharee_user_id)
-        # Convert data_categories string to list of readable labels
-        category_map = {
-            'basic_profile': 'Basic Profile',
-            'activity_summary': 'Activity Summary',
-            'activity': 'Activity Log',
-            'meal_log': 'Meal Log',
-            'daily_nutrition': 'Daily Nutrition Summary',
-            'mood_entries': 'Mood Entries',
-            'fitness_log': 'Activity Log',
-            'food_log': 'Meal Log',
-        }
-        categories = [category_map.get(cat, cat) for cat in entry.data_categories.split(',') if cat]
-        # Map time_range to readable string
-        time_map = {
-            'last_7_days': 'Last 7 Days',
-            'last_30_days': 'Last 30 Days',
-            'all_time': 'All Time',
-        }
-        time_range_str = time_map.get(entry.time_range, entry.time_range)
+        categories_keys = entry.data_categories.split(',')
+        categories_display = [category_map.get(cat, cat.replace('_', ' ').title()) for cat in categories_keys if cat]
+        time_range_display = time_map.get(entry.time_range, entry.time_range.replace('_', ' ').title())
         current_shares.append({
             'sharee_name': sharee_name,
-            'data_categories': categories,
-            'time_range': time_range_str,
+            'data_categories': categories_display,
+            'time_range': time_range_display,
             'share_id': entry.id
         })
-    return render_template('share.html', current_shares=current_shares)
+    return render_template('share.html', current_shares=current_shares, username=current_user.username) # Added username
 
 @app.route('/revoke_share/<int:share_id>', methods=['POST'])
 @login_required
