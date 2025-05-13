@@ -79,18 +79,22 @@ def share():
             flash("You cannot share data with yourself.", 'warning')
             return redirect(url_for('share'))
 
-        # Sort data categories for a canonical string representation
         sorted_data_categories_str = ','.join(sorted(data_categories_list))
 
-        # Check current state of this specific share configuration before attempting to create/update
-        pre_existing_share_config = ShareEntry.query.filter_by(
+        # Check if an ACTIVE share with the exact same parameters already exists.
+        active_existing_share = ShareEntry.query.filter_by(
             sharer_user_id=current_user.id,
             sharee_user_id=recipient.id,
             data_categories=sorted_data_categories_str,
-            time_range=time_range
+            time_range=time_range,
+            is_active=True
         ).first()
 
-        # Attempt to create or update the share entry using the improved database function
+        if active_existing_share:
+            flash(f"Data has already been shared with user {recipient.username} with the same active settings.", 'warning')
+            return redirect(url_for('share'))
+
+        # If no active share exists, proceed to create (which might replace an inactive one or be entirely new)
         share_entry_instance = create_share_entry(
             sharer_user_id=current_user.id,
             sharee_user_id=recipient.id,
@@ -99,17 +103,9 @@ def share():
         )
 
         if share_entry_instance:
-            if pre_existing_share_config and pre_existing_share_config.is_active:
-                # The share was already active with these exact settings
-                flash(f"This sharing configuration with {recipient.username} is already active.", 'info')
-            elif pre_existing_share_config and not pre_existing_share_config.is_active:
-                # The share was inactive and has been reactivated
-                flash(f"Sharing with {recipient.username} has been reactivated with the specified settings.", 'success')
-            else: # No pre_existing_share_config, so it's a brand new share
-                flash(f"Data shared successfully with {recipient.username}.", 'success')
+            flash(f"Data successfully shared with {recipient.username}.", 'success')
         else:
-            # create_share_entry returned None, indicating an issue (e.g., DB error, though users are checked)
-            flash(f"Failed to process the share request with {recipient.username}. Please try again.", 'danger')
+            flash(f"Failed to process share request with {recipient.username}. Please try again.", 'danger')
         
         return redirect(url_for('share'))
 
@@ -157,7 +153,7 @@ def revoke_share(share_id):
     if success:
         flash('Share revoked successfully.', 'success')
     else:
-        flash('Failed to revoke share.', 'danger')
+        flash('Failed to revoke share. Ensure you are the owner or the share exists.', 'danger')
     return redirect(url_for('share'))
 
 # --- 🛠 UPDATED LOGIN route ---
