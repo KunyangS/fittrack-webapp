@@ -490,6 +490,7 @@ html {
 .card:hover {
   transform: translateY(-5px);
   box-shadow: var(--shadow-lg);
+  border-color: rgba(99, 102, 241, 0.3);
 }
 
 /* Fancy Card with Gradient Border */
@@ -497,8 +498,10 @@ html {
   position: relative;
   background: var(--bg-card);
   border-radius: var(--border-radius-xl);
-  padding: 1px;
+  padding: 2px;
   z-index: 1;
+  box-shadow: var(--shadow-md);
+  transition: all 0.5s ease;
 }
 
 .card-fancy::before {
@@ -511,12 +514,24 @@ html {
   border-radius: var(--border-radius-xl);
   padding: 2px;
   background: var(--gradient-blue);
-  mask: linear-gradient(#fff 0 0) content-box, 
-        linear-gradient(#fff 0 0);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, 
                 linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
+  z-index: -1;
+}
+
+.card-fancy:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.6);
+}
+
+.card-fancy:hover::before {
+  background: linear-gradient(135deg, #4f46e5 0%, #a5b4fc 50%, #4f46e5 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
 }
 
 .card-fancy .card-content {
@@ -526,11 +541,19 @@ html {
   height: 100%;
 }
 
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 /* Card with gradient highlight on hover */
 .card-highlight {
   position: relative;
   overflow: hidden;
   z-index: 1;
+  border: 1px solid transparent;
+  transition: border-color 0.3s ease;
 }
 
 .card-highlight::after {
@@ -546,8 +569,48 @@ html {
   z-index: -1;
 }
 
+.card-highlight:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
 .card-highlight:hover::after {
   opacity: 1;
+}
+
+/* Neon Border Card */
+.card-neon {
+  border: none;
+  background-color: var(--bg-card);
+  border-radius: var(--border-radius-xl);
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
+  transition: all 0.5s ease;
+}
+
+.card-neon::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: var(--gradient-purple);
+  z-index: -1;
+  border-radius: calc(var(--border-radius-xl) + 2px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.card-neon:hover {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+  transform: translateY(-5px) scale(1.01);
+}
+
+.card-neon:hover::before {
+  opacity: 1;
+  filter: blur(5px);
 }
 
 /* ===== BUTTONS ===== */
@@ -741,15 +804,20 @@ html {
 
 ::-webkit-scrollbar-track {
   background: var(--bg-main);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--primary-400);
   border-radius: 4px;
 }
 
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, var(--primary-400), var(--primary-600));
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-500);
+  background: linear-gradient(to bottom, var(--primary-500), var(--primary-700));
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
 /* ===== HOME PAGE HERO SECTION ===== */
@@ -757,6 +825,7 @@ html {
   position: relative;
   padding: 6rem 0;
   overflow: hidden;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.1);
 }
 
 .hero-section::before {
@@ -786,14 +855,17 @@ html {
 .feature-card {
   transition: var(--transition-all);
   cursor: pointer;
+  border: 1px solid transparent;
 }
 
 .feature-card:hover {
   transform: translateY(-10px);
+  border-color: rgba(99, 102, 241, 0.3);
 }
 
 .feature-card:hover .feature-icon {
   transform: scale(1.1) rotate(10deg);
+  box-shadow: 0 0 25px rgba(99, 102, 241, 0.5);
 }
 
 .feature-icon {
@@ -805,6 +877,7 @@ html {
   align-items: center;
   border-radius: var(--border-radius-full);
   margin-bottom: var(--space-4);
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
 }
 
 /* ===== ANIMATIONS ===== */
@@ -826,4 +899,20 @@ html {
 
 .animate-pulse {
   animation: pulse 2s ease-in-out infinite;
+}
+
+/* ===== TESTIMONIAL CARD BORDER ===== */
+.testimonial-card {
+  position: relative;
+  border: 1px dashed rgba(99, 102, 241, 0.3);
+  border-radius: var(--border-radius-xl);
+  padding: var(--space-6);
+  transition: all 0.3s ease;
+}
+
+.testimonial-card:hover {
+  border-style: solid;
+  border-color: rgba(99, 102, 241, 0.5);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
