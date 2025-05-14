@@ -109,7 +109,7 @@
                 id="time-{{ loop.index }}"
                 name="time_range"
                 value="{{ range|lower|replace(' ', '_') }}" {# Format value for backend processing #}
-                class="form-radio h-4 w-4 text-primary accent-primary focus:ring-primary focus:ring-offset-0 border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 transition"
+                class="form-radio h-4 w-4 mr-2 text-primary accent-primary focus:ring-primary focus:ring-offset-0 border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 transition"
                 {{ 'checked' if loop.first }} {# Default to the first option #}
               />
               <label for="time-{{ loop.index }}" class="ml-3 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
