@@ -115,5 +115,10 @@ class HomepageTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Login', response.data) # Adjust to your login page keyword
 
+    def test_forgot_password_page_loads(self):
+        response = self.client.get('/forgot-password')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Forgot Password', response.data)  # Adjust if needed
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
