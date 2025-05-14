@@ -124,6 +124,10 @@ class HomepageTestCase(unittest.TestCase):
         response = self.client.get('/verify-code', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Forgot Password', response.data)  # Adjust if your template shows something else
+    def test_reset_password_requires_verified_session(self):
+        response = self.client.get('/reset-password', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Forgot Password', response.data)  # Adjust if your template shows something else
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
