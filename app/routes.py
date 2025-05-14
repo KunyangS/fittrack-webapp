@@ -461,6 +461,9 @@ def fitness_ranking():
         # Get the time range parameter (default to 'week')
         time_range = request.args.get('time_range', 'week')
         
+        # Get the sort by parameter (default to 'calories')
+        sort_by = request.args.get('sort_by', 'calories')
+        
         # Calculate the start date based on the time range
         today = datetime.today().date()
         if time_range == 'week':
@@ -474,35 +477,53 @@ def fitness_ranking():
             start_date = today - timedelta(days=7)
 
         # Query for fitness entries within the date range
-        fitness_entries = db.session.query(
+        fitness_entries_query = db.session.query(
             User.username,
             db.func.sum(FitnessEntry.calories_burned).label('total_calories'),
-            db.func.sum(FitnessEntry.duration).label('total_duration')
+            db.func.sum(FitnessEntry.duration).label('total_duration'),
+            db.func.count(FitnessEntry.id).label('activity_count')
         ).join(
             FitnessEntry, User.id == FitnessEntry.user_id
         ).filter(
             FitnessEntry.date >= start_date
         ).group_by(
             User.username
-        ).order_by(
-            db.func.sum(FitnessEntry.calories_burned).desc()
-        ).all()
+        )
+        
+        # Apply ordering based on sort parameter
+        if sort_by == 'duration':
+            fitness_entries = fitness_entries_query.order_by(
+                db.func.sum(FitnessEntry.duration).desc()
+            ).all()
+        elif sort_by == 'activity_count':
+            fitness_entries = fitness_entries_query.order_by(
+                db.func.count(FitnessEntry.id).desc()
+            ).all()
+        else:  # default to calories
+            fitness_entries = fitness_entries_query.order_by(
+                db.func.sum(FitnessEntry.calories_burned).desc()
+            ).all()
 
         # Prepare the ranking data
         ranking_data = []
-        for i, (username, total_calories, total_duration) in enumerate(fitness_entries, 1):
+        for i, (username, total_calories, total_duration, activity_count) in enumerate(fitness_entries, 1):
             ranking_data.append({
                 'rank': i,
                 'username': username,
                 'total_calories_burned': round(total_calories, 2) if total_calories else 0,
-                'total_duration': round(total_duration, 2) if total_duration else 0
+                'total_duration': round(total_duration, 2) if total_duration else 0,
+                'activity_count': activity_count
             })
 
         # Highlight the current user in the rankings
         for entry in ranking_data:
             entry['is_current_user'] = (entry['username'] == current_user.username)
 
-        return jsonify({'ranking': ranking_data, 'time_range': time_range})
+        return jsonify({
+            'ranking': ranking_data, 
+            'time_range': time_range,
+            'sort_by': sort_by
+        })
     
     except Exception as e:
         app.logger.error(f"Error in fitness ranking API: {str(e)}")
