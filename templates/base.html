@@ -44,9 +44,11 @@
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans flex flex-col min-h-screen">
+    {# This area immediately inside body should be clear of unstyled flash message rendering loops #}
 
     <!-- Floating Header -->
     <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
+        {# This area at the start of the header should be clear of unstyled flash message rendering loops #}
         <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
             <!-- Logo/Brand Name -->
             <a href="{{ url_for('index') }}" class="text-xl font-bold text-primary dark:text-blue-400">
@@ -139,10 +141,12 @@
                 {% endif %}
             </ul>
         </nav>
+        {# This area at the end of the header should be clear of unstyled flash message rendering loops #}
     </header>
 
     <!-- Main Content Area -->
     <main class="container mx-auto px-4 py-8 flex-grow">
+        {# Ensure no general flash messages are looped here before the content block #}
         {% block content %}
         <p>This is the default content area.</p>
         {% endblock %}

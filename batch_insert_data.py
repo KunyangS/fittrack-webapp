@@ -2,7 +2,7 @@ import datetime
 import random
 from app import app, db
 from app.models import UserInfo, User
-from app.database import add_user_fitness_entry, upsert_user_food_entry
+from app.database import add_user_fitness_entry, upsert_user_food_entry, register_user
 
 # Sample data for generation
 sample_activities = [
@@ -107,51 +107,88 @@ def create_batch_data(target_user_id, start_date, end_date):
 if __name__ == "__main__":
     print("Script execution started...")
     with app.app_context():
-        users = User.query.all()
-        if not users:
-            print("No users found in the database. Please register a user first.")
-            exit(1)
-        print("Available users:")
-        for user in users:
-            print(f"  ID: {user.id}  Username: {user.username}")
-    user_id_to_process = 1  # Default USER_ID
-
-    try:
-        raw_input = input(f"Enter User ID to inject data into (default: {user_id_to_process}): ")
-        if raw_input.strip() == "":
-            print(f"No User ID provided. Defaulting to User ID {user_id_to_process}.")
-        else:
-            user_id_to_process = int(raw_input)
-            print(f"Targeting User ID from user input: {user_id_to_process}")
-    except ValueError:
-        print(f"Invalid User ID provided: '{raw_input}'. Must be an integer. Defaulting to User ID {user_id_to_process}.")
-
-    # Ask for month range
-    month_input = input("Enter month or month range to insert (e.g. 4 or 1-5, default: 4): ").strip()
-    if month_input == "":
-        month_start, month_end = 4, 4
-    elif "-" in month_input:
-        try:
-            month_start, month_end = map(int, month_input.split("-"))
-        except Exception:
-            print("Invalid month range, defaulting to April.")
-            month_start, month_end = 4, 4
-    else:
-        try:
-            month_start = month_end = int(month_input)
-        except Exception:
-            print("Invalid month, defaulting to April.")
-            month_start, month_end = 4, 4
-
-    # Calculate date range
-    year = 2025
-    start_date = datetime.date(year, month_start, 1)
-    # Calculate end_date as the last day of month_end
-    if month_end == 12:
-        end_date = datetime.date(year, 12, 31)
-    else:
-        end_date = datetime.date(year, month_end + 1, 1) - datetime.timedelta(days=1)
-
-    print(f"Inserting data from {start_date} to {end_date} ...")
-    create_batch_data(user_id_to_process, start_date, end_date)
-    print("Script execution finished.")
+        # Ask if user wants to insert data for an existing user
+        insert_data = input("Do you want to insert data for an existing user? (Y/N): ").strip().lower()
+        if insert_data == 'y':
+            users = User.query.all()
+            if not users:
+                print("No users found in the database. Please register a user first.")
+                exit(1)
+            print("Available users:")
+            for user in users:
+                print(f"  ID: {user.id}  Username: {user.username}  Email: {user.email}")
+            user_id_to_process = 1  # Default USER_ID
+            try:
+                raw_input_val = input(f"Enter User ID to inject data into (default: {user_id_to_process}): ")
+                if raw_input_val.strip() == "":
+                    print(f"No User ID provided. Defaulting to User ID {user_id_to_process}.")
+                else:
+                    user_id_to_process = int(raw_input_val)
+                    print(f"Targeting User ID from user input: {user_id_to_process}")
+            except ValueError:
+                print(f"Invalid User ID provided: '{raw_input_val}'. Must be an integer. Defaulting to User ID {user_id_to_process}.")
+            month_input = input("Enter month or month range to insert (e.g. 4 or 1-5, default: 4): ").strip()
+            if month_input == "":
+                month_start, month_end = 4, 4
+            elif "-" in month_input:
+                try:
+                    month_start, month_end = map(int, month_input.split("-"))
+                except Exception:
+                    print("Invalid month range, defaulting to April.")
+                    month_start, month_end = 4, 4
+            else:
+                try:
+                    month_start = month_end = int(month_input)
+                except Exception:
+                    print("Invalid month, defaulting to April.")
+                    month_start, month_end = 4, 4
+            year = 2025
+            start_date = datetime.date(year, month_start, 1)
+            if month_end == 12:
+                end_date = datetime.date(year, 12, 31)
+            else:
+                end_date = datetime.date(year, month_end + 1, 1) - datetime.timedelta(days=1)
+            print(f"Inserting data from {start_date} to {end_date} ...")
+            create_batch_data(user_id_to_process, start_date, end_date)
+            print("Data insertion finished.")
+        # Ask if user wants to create sharing test users
+        create_share_case = input("Do you want to create sharing test users and inject data? (Y/N): ").strip().lower()
+        if create_share_case == 'y':
+            share_usernames = ["David", "Emma", "Lucas", "Olivia", "Mason"]
+            share_users = []
+            for uname in share_usernames:
+                email = f"{uname.lower()}@example.com"
+                user = User.query.filter_by(username=uname).first()
+                if not user:
+                    user = register_user(
+                        username=uname,
+                        email=email,
+                        password="test1234",
+                        gender="Other",
+                        age=25,
+                        height=170.0,
+                        weight=65.0
+                    )
+                    if user:
+                        print(f"Created user: ID: {user.id}  Username: {user.username}  Email: {user.email}")
+                    else:
+                        print(f"Failed to create user: {uname}")
+                        continue
+                else:
+                    print(f"User already exists: ID: {user.id}  Username: {user.username}  Email: {user.email}")
+                share_users.append(user)
+            year = 2025
+            for user in share_users:
+                for month in range(1, 7):
+                    start_date = datetime.date(year, month, 1)
+                    if month == 12:
+                        end_date = datetime.date(year, 12, 31)
+                    else:
+                        end_date = datetime.date(year, month + 1, 1) - datetime.timedelta(days=1)
+                    print(f"Injecting data for {user.username} from {start_date} to {end_date} ...")
+                    create_batch_data(user.id, start_date, end_date)
+            print("Sharing test users and data injection completed.")
+            print("User IDs and emails:")
+            for user in share_users:
+                print(f"  ID: {user.id}  Username: {user.username}  Email: {user.email}")
+        print("Script execution finished.")

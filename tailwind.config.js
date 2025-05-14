@@ -78,6 +78,10 @@ module.exports = {
         'tag-hover': {
           bg: 'rgba(13, 148, 136, 0.15)',
           dark: 'rgba(45, 212, 191, 0.2)'
+        },
+        'revoke-hover': {
+          bg_light: 'rgba(239, 68, 68, 0.10)', // red-500 @ 10% opacity
+          bg_dark: 'rgba(248, 113, 113, 0.10)'  // red-400 @ 10% opacity
         }
       },
 

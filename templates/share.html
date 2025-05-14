@@ -1,11 +1,14 @@
-<!-- templates/share.html -->
+<!-- /Users/vincent/Desktop/share/fittrack-webapp/templates/share.html -->
+<!-- This template is responsible for managing data sharing permissions.
+     It allows users to configure what data they share, with whom, and for how long.
+     It also displays data shared with the user and a history of sharing activities. -->
 {% extends 'base.html' %}
 
 {% block content %}
+<!-- Container for the main content of the page -->
+<div class="container mx-auto px-4 py-8">
 
-
-
-  <!-- Page Header -->
+  <!-- Page Header: Title and introductory paragraph -->
   <h1 class="text-3xl lg:text-4xl font-heading font-bold mb-4 text-center text-neutral-800 dark:text-neutral-100">
     Manage Data Sharing Permissions
   </h1>
@@ -13,24 +16,47 @@
     Configure the specific data categories, time range, and recipients for sharing your information.
   </p>
 
-  <!-- Main Content Grid -->
+  <!-- Unified Alert Area: Displays flashed messages (success, error, warning) -->
+  {% set messages = get_flashed_messages(with_categories=true) %}
+  <div
+    id="share-form-error"
+    class="mb-4 flex items-center gap-2 p-3 rounded text-white text-sm font-medium
+           {% if not messages %}hidden{% endif %}
+           {% if messages and messages[0][0] == 'danger' %}bg-red-500
+           {% elif messages and messages[0][0] == 'success' %}bg-green-500
+           {% elif messages and messages[0][0] == 'warning' %}bg-yellow-400 text-gray-800
+           {% else %}bg-red-500{% endif %}"
+    role="alert"
+  >
+    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12A9 9 0 113 12a9 9 0 0118 0z"/>
+    </svg>
+    <span id="share-form-error-msg">
+      {% if messages %}{{ messages[0][1] }}{% endif %}
+    </span>
+  </div>
+
+  <!-- Main Content Grid: Organizes content into responsive columns -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
 
-    <!-- Card 1: Sharing Configuration -->
+    <!-- Card 1: Sharing Configuration Form -->
     <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700">
       <h2 class="text-2xl font-heading font-semibold mb-6 text-primary-dark dark:text-primary-light">
         Configure New Share
       </h2>
+      <!-- Form to set up new data sharing permissions -->
       <form action="#" method="post" class="space-y-6 font-sans">
 
-        <!-- Data Categories Selection -->
+        <!-- Data Categories Selection Section -->
         <div>
           <label class="block text-lg font-medium mb-3 text-neutral-700 dark:text-neutral-200">
             Select Data Categories to Share:
           </label>
-          <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-4">Select the types of information you permit the recipient(s) to access.</p>
+          <p class="text-sm text-neutral-500 dark:text-neutral-400 mb-4">
+            Select the types of information you permit the recipient(s) to access.
+          </p>
           <div class="flex flex-wrap gap-3">
-            {# --- Data Categories based on provided fields --- #}
+            {# Define available data categories for sharing #}
             {% set share_categories = [
               {'id': 'basic_profile', 'label': 'Basic Profile', 'details': '(Gender, Age, Height, Weight)'},
               {'id': 'activity_summary', 'label': 'Activity Summary', 'details': '(Type, Duration, Calories)'},
@@ -40,6 +66,7 @@
               {'id': 'mood_entries', 'label': 'Mood Entries', 'details': '(Emotion, Date/Time)'}
             ] %}
 
+            {# Loop through categories to create checkbox inputs and labels #}
             {% for category in share_categories %}
             <div class="category-tag-container">
               <input
@@ -49,28 +76,31 @@
                 value="{{ category.id }}"
                 class="hidden category-checkbox peer"
               />
-              {# --- Clickable pill-shaped tag style using Tailwind peer-checked --- #}
               <label
                 for="share-{{ category.id }}"
                 class="cursor-pointer border border-primary/60 dark:border-primary-light/60 text-primary-dark dark:text-primary-light text-xs font-medium px-3 py-1.5 rounded-full transition
                        hover:bg-primary/10 dark:hover:bg-primary-light/10
-                       peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary dark:peer-checked:bg-primary-light dark:peer-checked:text-white dark:peer-checked:border-primary-light"
-                title="{{ category.details }}" {# Tooltip for details #}
+                       peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary
+                       dark:peer-checked:bg-primary-light dark:peer-checked:text-white dark:peer-checked:border-primary-light"
+                title="{{ category.details }}" {# Tooltip displays details about the category #}
               >
                 {{ category.label }}
               </label>
             </div>
             {% endfor %}
           </div>
-           <p class="text-xs text-warning dark:text-amber-400 mt-3">Note: Sharing 'Basic Profile' includes potentially sensitive information.</p>
+          <p class="text-xs text-warning dark:text-amber-400 mt-3">
+            Note: Sharing 'Basic Profile' includes potentially sensitive information.
+          </p>
         </div>
 
-        <!-- Time Range Selection -->
+        <!-- Time Range Selection Section -->
         <div>
           <label class="block text-lg font-medium mb-3 text-neutral-700 dark:text-neutral-200">
             Select Time Range:
           </label>
           <div class="flex flex-wrap gap-x-6 gap-y-3">
+            {# Define available time ranges for sharing #}
             {% set time_ranges = ['Last 7 Days', 'Last 30 Days', 'All Time'] %}
             {% for range in time_ranges %}
             <div class="flex items-center">
@@ -78,20 +108,20 @@
                 type="radio"
                 id="time-{{ loop.index }}"
                 name="time_range"
-                value="{{ range|lower|replace(' ', '_') }}"
-                class="form-radio h-4 w-4 text-primary accent-primary focus:ring-primary focus:ring-offset-0 border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 transition"
-                {{ 'checked' if loop.first }}
+                value="{{ range|lower|replace(' ', '_') }}" {# Format value for backend processing #}
+                class="form-radio h-4 w-4 mr-2 text-primary accent-primary focus:ring-primary focus:ring-offset-0 border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700 transition"
+                {{ 'checked' if loop.first }} {# Default to the first option #}
               />
               <label for="time-{{ loop.index }}" class="ml-3 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                 {{ range }}
               </label>
             </div>
             {% endfor %}
-            <!-- Consider adding custom date range inputs here if required -->
+            <!-- TODO: Consider adding custom date range inputs here if required in the future -->
           </div>
         </div>
 
-        <!-- User Selection -->
+        <!-- User Selection Section -->
         <div>
           <label for="share-with-users" class="block text-lg font-medium mb-2 text-neutral-700 dark:text-neutral-200">
             Specify Recipient(s) (Username or Email):
@@ -105,15 +135,15 @@
               class="form-input w-full px-4 py-2.5 border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 dark:text-white transition shadow-sm"
               aria-describedby="user-help-text"
             />
-            <!-- Suggestion: Implement user search/selection logic here -->
+            <!-- Suggestion: Implement user search/selection logic (e.g., autocomplete) here via JavaScript -->
           </div>
           <p id="user-help-text" class="text-xs text-neutral-500 dark:text-neutral-400 mt-1.5">
             Enter the username or email of the user(s) you wish to share data with. Separate multiple entries with commas if applicable.
           </p>
         </div>
 
-        <!-- Submit Button - Centered -->
-        <div class="pt-4 text-center"> {# Added text-center here #}
+        <!-- Submit Button -->
+        <div class="pt-4 text-center">
           <button
             type="submit"
             class="inline-block bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light text-white font-semibold py-3 px-8 rounded-full shadow-md hover:shadow-lg transition duration-200 ease-in-out transform hover:scale-105"
@@ -123,7 +153,7 @@
         </div>
 
       </form>
-    </div> <!-- End Card 1 -->
+    </div> <!-- End Card 1: Sharing Configuration -->
 
     <!-- Card 2: Current Shares Management -->
     <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700">
@@ -131,68 +161,205 @@
         Manage Current Shares
       </h2>
 
-      <!-- List of Shared Users -->
-      <div class="space-y-4">
-        {# --- Example Data using New Categories --- #}
-        {% set current_shares = [
-          {'name': 'Analyst_Jane', 'avatar': 'placeholder', 'data': ['Activity Summary', 'Daily Nutrition', 'Time: Last 30d']},
-          {'name': 'Coach_Mike', 'avatar': 'placeholder', 'data': ['Activity Log', 'Mood Entries', 'Time: All Time']},
-          {'name': 'ResearchGroup', 'avatar': 'placeholder', 'data': ['Basic Profile', 'Activity Summary', 'Meal Log', 'Time: Last 7d']}
-        ] %}
-
+      <!-- List of active shares initiated by the current user -->
+      <div class="space-y-4 max-h-[500px] overflow-y-auto">
+        {#
+          This section displays current active shares for the user.
+          'current_shares' is expected to be a list of objects/dictionaries from the backend,
+          each containing:
+          - sharee_name: Recipient's username or email.
+          - data_categories: List of shared category labels.
+          - time_range: String representation of the shared time duration (e.g., 'Last 7 Days').
+          - share_id: Unique identifier for the share, used for revoking.
+        #}
         {% if current_shares %}
           {% for share in current_shares %}
           <div class="bg-white dark:bg-neutral-700 rounded-xl shadow-md border border-neutral-100 dark:border-neutral-600 overflow-hidden transition hover:shadow-lg">
-            <!-- Card Header with Avatar and Username -->
+            <!-- Share Item Header: Recipient info and revoke button -->
             <div class="flex items-center justify-between p-4 border-b border-neutral-100 dark:border-neutral-600">
-              {% set colors = {
-                  'Analyst_Jane': 'from-purple-500 to-pink-500',
-                  'Coach_Mike': 'from-blue-500 to-teal-400',
-                  'ResearchGroup': 'from-orange-500 to-amber-400',
-                  'default': 'from-indigo-600 to-violet-500'
-              } %}
               <div class="flex items-center gap-3">
-                <div class="flex-shrink-0 h-9 w-9 rounded-full bg-gradient-to-br {{ colors[share.name] if share.name in colors else colors['default'] }} flex items-center justify-center text-white shadow-sm">
-                  <span class="font-semibold text-base">{{ share.name[0] | upper }}</span>
+                <!-- Avatar Placeholder -->
+                <div class="flex-shrink-0 h-9 w-9 rounded-full bg-gradient-to-br from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-sm">
+                  <span class="font-semibold text-base">{{ share.sharee_name[0]|upper }}</span>
                 </div>
-                <h3 class="text-base font-semibold text-primary dark:text-primary-light">{{ share.name }}</h3>
+                <h3 class="text-base font-semibold text-primary dark:text-primary-light">{{ share.sharee_name }}</h3>
               </div>
-              
-              <!-- Cancel Sharing Button -->
-              <button
-                type="button"
-                class="text-xs font-medium text-error hover:text-error-dark dark:text-red-400 dark:hover:text-red-300 py-1 px-2.5 rounded-full border border-error/50 hover:border-error/80 dark:border-red-400/50 dark:hover:border-red-400/80 transition bg-error/5 hover:bg-error/10 dark:bg-red-900/20 dark:hover:bg-red-900/40 flex items-center gap-1"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                Revoke
-              </button>
+              <!-- Revoke Share Form -->
+              <form method="post" action="{{ url_for('revoke_share', share_id=share.share_id) }}">
+                <button
+                  type="submit"
+                  class="text-xs font-medium text-error dark:text-red-400 py-1 px-2.5 rounded-full border border-error/50 dark:border-red-400/50
+                         hover:bg-revoke-hover-bg_light dark:hover:bg-revoke-hover-bg_dark
+                         flex items-center gap-1 transition transform hover:text-error-dark hover:border-error hover:scale-105
+                         dark:hover:text-red-300 dark:hover:border-red-400"
+                  title="Revoke this share"
+                  onclick="return confirm('Are you sure you want to revoke this share?');" {# Confirmation dialog #}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Revoke
+                </button>
+              </form>
             </div>
-            
-            <!-- Shared Data Tags -->
+            <!-- Shared Data Details: Categories and time range -->
             <div class="p-4 bg-neutral-50 dark:bg-neutral-800/30">
               <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-2">Shared data:</p>
-              <div class="flex flex-wrap gap-2"> 
-                {% for item in share.data %}
+              <div class="flex flex-wrap gap-2">
+                {% for item in share.data_categories %}
                 <span class="inline-block border border-primary/70 dark:border-primary-light/70 text-primary-dark dark:text-primary-light text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary/5 dark:bg-primary-light/10">
                   {{ item }}
                 </span>
                 {% endfor %}
+                <span class="inline-block border border-secondary/70 dark:border-secondary-light/70 text-secondary-dark dark:text-secondary-light text-xs font-medium px-2.5 py-0.5 rounded-full bg-secondary/5 dark:bg-secondary-light/10">
+                  Time: {{ share.time_range }}
+                </span>
               </div>
             </div>
           </div>
           {% endfor %}
         {% else %}
+          <!-- Message displayed when no active shares are found -->
           <p class="text-center text-neutral-500 dark:text-neutral-400 py-6 bg-neutral-100 dark:bg-neutral-700/50 rounded-lg">
             No active data sharing permissions found.
           </p>
         {% endif %}
-      </div> <!-- End List -->
+      </div> <!-- End List of Current Shares -->
+    </div> <!-- End Card 2: Current Shares Management -->
 
-    </div> <!-- End Card 2 -->
+    <!-- Card 3: Shared with You -->
+    <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700">
+      <h2 class="text-2xl font-heading font-semibold mb-6 text-primary-dark dark:text-primary-light">
+        Shared with You
+      </h2>
+      <!-- List of data shared with the current user by others -->
+      <div class="space-y-4 max-h-[500px] overflow-y-auto">
+        {#
+          This section displays data shared with the current user.
+          'shared_with_you' is expected to be a list of objects/dictionaries from the backend,
+          each containing:
+          - sharer_name: Sharer's username or email.
+          - data_categories: List of shared category labels.
+          - time_range: String representation of the shared time duration.
+          - shared_at: Timestamp or formatted date string of when it was shared.
+        #}
+        {% if shared_with_you %}
+          {% for share in shared_with_you %}
+          <div class="bg-white dark:bg-neutral-700 rounded-xl shadow-md border border-neutral-100 dark:border-neutral-600 overflow-hidden transition hover:shadow-lg">
+            <!-- Share Item Header: Sharer info and shared date -->
+            <div class="flex items-center justify-between p-4 border-b border-neutral-100 dark:border-neutral-600">
+              <div class="flex items-center gap-3">
+                <!-- Avatar Placeholder -->
+                <div class="flex-shrink-0 h-9 w-9 rounded-full bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center text-white shadow-sm">
+                  <span class="font-semibold text-base">{{ share.sharer_name[0]|upper }}</span>
+                </div>
+                <h3 class="text-base font-semibold text-primary dark:text-primary-light">{{ share.sharer_name }}</h3>
+              </div>
+              <span class="text-xs text-neutral-500 dark:text-neutral-400">Shared: {{ share.shared_at }}</span>
+            </div>
+            <!-- Shared Data Details: Categories and time range -->
+            <div class="p-4 bg-neutral-50 dark:bg-neutral-800/30">
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-2">Shared data:</p>
+              <div class="flex flex-wrap gap-2">
+                {% for item in share.data_categories %}
+                <span class="inline-block border border-primary/70 dark:border-primary-light/70 text-primary-dark dark:text-primary-light text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary/5 dark:bg-primary-light/10">
+                  {{ item }}
+                </span>
+                {% endfor %}
+                <span class="inline-block border border-secondary/70 dark:border-secondary-light/70 text-secondary-dark dark:text-secondary-light text-xs font-medium px-2.5 py-0.5 rounded-full bg-secondary/5 dark:bg-secondary-light/10">
+                  Time: {{ share.time_range }}
+                </span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <!-- Message displayed when no data has been shared with the user -->
+          <p class="text-center text-neutral-500 dark:text-neutral-400 py-6 bg-neutral-100 dark:bg-neutral-700/50 rounded-lg">
+            No data has been shared with you yet.
+          </p>
+        {% endif %}
+      </div> <!-- End List of Data Shared with You -->
+    </div> <!-- End Card 3: Shared with You -->
 
-  </div> <!-- End Main Grid -->
+    <!-- Card 4: Share History -->
+    <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700">
+      <h2 class="text-2xl font-heading font-semibold mb-6 text-secondary-dark dark:text-secondary-light">
+        Share History
+      </h2>
+      <!-- List of past sharing activities (e.g., revoked shares, expired shares) -->
+      <div class="space-y-4 max-h-[500px] overflow-y-auto">
+        {#
+          This section displays the history of sharing activities.
+          'share_history' is expected to be a list of objects/dictionaries from the backend,
+          each containing:
+          - sharer_name: Name of the user who initiated the share.
+          - sharee_name: Name of the user who received the share.
+          - data_categories: List of originally shared category labels.
+          - time_range: String representation of the originally shared time duration.
+          - status: Current status of the share (e.g., 'Revoked', 'Expired').
+          - shared_at: Timestamp or formatted date string of when the action occurred.
+          - current_user.username: Username of the currently logged-in user (for context).
+        #}
+        {% if share_history %}
+          {% for history_entry in share_history %}
+          <div class="bg-white dark:bg-neutral-700 rounded-xl shadow-md border border-neutral-100 dark:border-neutral-600 overflow-hidden opacity-75">
+            <!-- History Item Header: Involved users and status -->
+            <div class="flex items-center justify-between p-4 border-b border-neutral-100 dark:border-neutral-600">
+              <div class="flex items-center gap-3">
+                <!-- Avatar Placeholder -->
+                <div class="flex-shrink-0 h-9 w-9 rounded-full bg-gradient-to-br from-neutral-400 to-neutral-500 flex items-center justify-center text-white shadow-sm">
+                  <span class="font-semibold text-base">
+                    {# Display initial of the other party involved in the share history #}
+                    {{ history_entry.sharer_name[0]|upper if history_entry.sharer_name == current_user.username else history_entry.sharee_name[0]|upper }}
+                  </span>
+                </div>
+                <div>
+                  <h3 class="text-base font-semibold text-neutral-700 dark:text-neutral-300">
+                    {% if history_entry.sharer_name == current_user.username %}
+                      You shared with {{ history_entry.sharee_name }}
+                    {% else %}
+                      {{ history_entry.sharer_name }} shared with you
+                    {% endif %}
+                  </h3>
+                  <span class="text-xs text-red-500 dark:text-red-400">
+                    {{ history_entry.status }} on {{ history_entry.shared_at }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <!-- Originally Shared Data Details -->
+            <div class="p-4 bg-neutral-50 dark:bg-neutral-800/30">
+              <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-2">Originally shared data:</p>
+              <div class="flex flex-wrap gap-2">
+                {% for item in history_entry.data_categories %}
+                <span class="inline-block border border-neutral-400/70 text-neutral-600 dark:text-neutral-400 text-xs font-medium px-2.5 py-0.5 rounded-full bg-neutral-200/30 dark:bg-neutral-600/30">
+                  {{ item }}
+                </span>
+                {% endfor %}
+                <span class="inline-block border border-neutral-400/70 text-neutral-600 dark:text-neutral-400 text-xs font-medium px-2.5 py-0.5 rounded-full bg-neutral-200/30 dark:bg-neutral-600/30">
+                  Time: {{ history_entry.time_range }}
+                </span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <!-- Message displayed when no past sharing activity is found -->
+          <p class="text-center text-neutral-500 dark:text-neutral-400 py-6 bg-neutral-100 dark:bg-neutral-700/50 rounded-lg">
+            No past sharing activity found.
+          </p>
+        {% endif %}
+      </div> <!-- End List of Share History -->
+    </div> <!-- End Card 4: Share History -->
 
-</div> <!-- End Container -->
+  </div> <!-- End Main Content Grid -->
+
+</div> <!-- End Page Container -->
+{% endblock %}
+
+{% block scripts %}
+{{ super() }} {# Include scripts from the base template #}
+<!-- Include JavaScript specific to the share page functionality -->
+<script src="{{ url_for('static', filename='js/share.js') }}"></script>
 {% endblock %}

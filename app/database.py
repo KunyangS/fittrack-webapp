@@ -185,37 +185,54 @@ def upsert_user_food_entry(user_id, date_val: date, food_name_val: str, quantity
 # --- Share Functions ---
 def create_share_entry(sharer_user_id: int, sharee_user_id: int, data_categories: str, time_range: str):
     """
-    Creates a new share entry.
-    Args:
-        sharer_user_id (int): The ID of the user sharing the data.
-        sharee_user_id (int): The ID of the user with whom data is shared.
-        data_categories (str): Comma-separated string of data categories (e.g., "basic_profile,activity_log").
-        time_range (str): String representing the time range (e.g., "last_7_days").
-    Returns:
-        ShareEntry: The created ShareEntry object, or None if creation failed (e.g. duplicate).
+    Creates a new share entry. If an inactive share entry with the exact same parameters
+    exists, it is deleted before creating the new active one.
+    Assumes that a check for an *already active* share has been performed by the caller.
     """
     try:
-        # Check if sharer and sharee exist
         sharer = User.query.get(sharer_user_id)
         sharee = User.query.get(sharee_user_id)
         if not sharer or not sharee:
-            return None # Or raise an error
+            print(f"[DEBUG] Sharer or sharee not found in create_share_entry: sharer_id={sharer_user_id}, sharee_id={sharee_user_id}")
+            return None
 
+        # Look for an existing INACTIVE entry with the same parameters to replace it
+        existing_inactive_share = ShareEntry.query.filter_by(
+            sharer_user_id=sharer_user_id,
+            sharee_user_id=sharee_user_id,
+            data_categories=data_categories, # Assumes data_categories is consistently ordered
+            time_range=time_range,
+            is_active=False
+        ).first()
+
+        if existing_inactive_share:
+            print(f"[DEBUG] Deleting existing inactive ShareEntry: {existing_inactive_share.id}")
+            db.session.delete(existing_inactive_share)
+            # The deletion will be committed along with the addition of the new share.
+
+        # Create the new active share entry
         new_share = ShareEntry(
             sharer_user_id=sharer_user_id,
             sharee_user_id=sharee_user_id,
             data_categories=data_categories,
-            time_range=time_range
+            time_range=time_range,
+            is_active=True,
+            shared_at=datetime.utcnow() 
         )
         db.session.add(new_share)
         db.session.commit()
+        print(f"[DEBUG] New ShareEntry created (replaced inactive if one existed): {new_share.id}")
         return new_share
-    except IntegrityError:
+        
+    except IntegrityError as e:
         db.session.rollback()
-        return None # Duplicate entry or other integrity issue
+        # This could happen due to a race condition if the unique constraint is violated
+        # (e.g., if an active share was created concurrently after the caller's check).
+        print(f"[DEBUG] IntegrityError in create_share_entry: {e}. This might be due to a race condition or an unexpected duplicate.")
+        return None 
     except Exception as e:
         db.session.rollback()
-        # Log error e
+        print(f"[DEBUG] General Exception in create_share_entry: {e}")
         return None
 
 def get_shares_by_sharer(sharer_user_id: int):
