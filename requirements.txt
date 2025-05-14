@@ -53,3 +53,6 @@ WTForms==3.2.1
 zipp==3.21.0
 pandas>=2.0.0
 flask-login>=0.6.3
+selenium>=4.10.0
+webdriver-manager>=4.0.1
+pytest>=7.0.0
