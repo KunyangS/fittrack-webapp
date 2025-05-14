@@ -90,19 +90,79 @@ document.addEventListener('DOMContentLoaded', () => {
       exerciseContainer.appendChild(createExerciseForm());
     }
   });
+
+
+  // To-Do List logic with localStorage persistence
   const addPlanBtn = document.getElementById('addPlanBtn');
   const todoListNotebook = document.getElementById('todoListNotebook');
+  const STORAGE_KEY = 'fittrack_todo_list';
+
+  function saveTodoList() {
+    const items = [];
+    const rows = todoListNotebook.querySelectorAll('li');
+    rows.forEach(li => {
+      const checkbox = li.querySelector('input[type="checkbox"]');
+      const input = li.querySelector('input[type="text"]');
+      if (checkbox && !checkbox.checked && input) {
+        items.push(input.value.trim());
+      }
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  }
+  
+
+  function addTodoItem(value = '') {
+    const li = document.createElement('li');
+    li.className = "flex items-start gap-2";
+  
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = "mt-1 form-checkbox text-primary";
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) {
+        li.remove();         
+        saveTodoList();      
+      }
+    });
+  
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = "Write your today's plan";
+    input.value = value;
+    input.className = "flex-1 bg-transparent border-b-2 border-dashed focus:outline-none";
+    input.addEventListener('input', saveTodoList);
+  
+    li.appendChild(checkbox);
+    li.appendChild(input);
+    todoListNotebook.appendChild(li);
+  }
+  
+  function loadTodoList() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return;
+    const items = JSON.parse(saved);
+    todoListNotebook.innerHTML = '';
+    items.forEach(text => addTodoItem(text));
+  }
 
   if (addPlanBtn && todoListNotebook) {
     addPlanBtn.addEventListener('click', () => {
-      const li = document.createElement('li');
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.placeholder = "Write your today's plan";
-      input.className = "w-full bg-transparent border-b-2 border-dashed focus:outline-none";
-      li.appendChild(input);
-      todoListNotebook.appendChild(li);
+      addTodoItem('');
     });
   }
-  
+
+  loadTodoList();
+  if (todoListNotebook.children.length === 0) {
+    addTodoItem('');
+  }
+  const saveTodoBtn = document.getElementById('saveTodoBtn');
+  if (saveTodoBtn) {
+    saveTodoBtn.addEventListener('click', () => {
+      saveTodoList();
+      alert('Your To-Do list has been saved!');
+    });
+}
+
 });
+  
+
