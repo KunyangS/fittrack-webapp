@@ -350,6 +350,14 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Function to initialize charts
   function initializeCharts(data) {
+    // Check if data is available
+    if (!data || !data.fitness_entries || !data.food_entries) {
+      console.error("No data available for visualization");
+      return;
+    }
+    
+    console.log("Initializing charts with data:", data);
+    
     // Initialize charts if they exist
     initDurationChart(data.fitness_entries);
     initIntensityChart(data.fitness_entries);
@@ -357,6 +365,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initActivityPieChart(data.fitness_entries);
     initGoalProgressChart(data.fitness_entries, data.summary);
     initCaloriesDashboard(data.fitness_entries, data.food_entries, data.summary);
+    
+    // If emotion data is available, initialize emotion chart
+    if (data.fitness_entries.some(entry => entry.emotion)) {
+      initEmotionChart(data.fitness_entries);
+    }
   }
   
   // Initialize Duration Chart
@@ -1149,6 +1162,77 @@ document.addEventListener('DOMContentLoaded', () => {
                 const calories = context.raw;
                 const percentage = totalCalories > 0 ? Math.round((calories / totalCalories) * 100) : 0;
                 return `${mealType}: ${calories} cal (${percentage}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+  
+  // New function to visualize emotions if available
+  function initEmotionChart(fitnessData) {
+    const canvas = document.getElementById('emotionChart');
+    if (!canvas) return;
+    
+    // Destroy existing chart if it exists
+    if (window.emotionChartInstance) {
+      window.emotionChartInstance.destroy();
+    }
+    
+    // Filter entries with emotion data
+    const entriesWithEmotion = fitnessData.filter(entry => entry.emotion);
+    
+    if (entriesWithEmotion.length === 0) {
+      console.warn("No emotion data available for chart");
+      return;
+    }
+    
+    // Count emotions
+    const emotionCounts = {};
+    entriesWithEmotion.forEach(entry => {
+      emotionCounts[entry.emotion] = (emotionCounts[entry.emotion] || 0) + 1;
+    });
+    
+    // Prepare data for chart
+    const labels = Object.keys(emotionCounts);
+    const data = Object.values(emotionCounts);
+    
+    // Create emotion chart
+    window.emotionChartInstance = new Chart(canvas, {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(153, 102, 255, 0.7)',
+            'rgba(255, 159, 64, 0.7)',
+            'rgba(201, 203, 207, 0.7)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Workout Emotions'
+          },
+          legend: {
+            position: 'bottom'
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const emotion = context.label;
+                const count = context.raw;
+                const percentage = Math.round((count / entriesWithEmotion.length) * 100);
+                return `${emotion}: ${count} workouts (${percentage}%)`;
               }
             }
           }

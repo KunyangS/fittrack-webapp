@@ -53,13 +53,13 @@ def visualise():
         # Connect to the SQLite database (adjust path if necessary)
         conn = sqlite3.connect("instance/fitness.db")
 
-        # Read fitness and food entry data using pandas with more complete fields
+        # Read fitness and food entry data using pandas with columns that match the actual database structure
         fitness_df = pd.read_sql_query(
-            "SELECT id, user_id, date, activity_type, duration, calories_burned FROM fitness_entries WHERE user_id = ?", 
+            "SELECT id, user_id, date, activity_type, duration, calories_burned, emotion FROM fitness_entries WHERE user_id = ?", 
             conn, params=(current_user.id,))
         
         food_df = pd.read_sql_query(
-            "SELECT id, user_id, date, food_name, calories, meal_type, quantity FROM food_entries WHERE user_id = ?", 
+            "SELECT id, user_id, date, food_name, quantity, calories, meal_type FROM food_entries WHERE user_id = ?", 
             conn, params=(current_user.id,))
 
         # Convert DataFrames to list of dictionaries for rendering in the template
@@ -570,7 +570,8 @@ def fitness_visualization():
                 'date': entry.date.isoformat(),
                 'activity_type': entry.activity_type,
                 'duration': entry.duration,
-                'calories_burned': entry.calories_burned
+                'calories_burned': entry.calories_burned,
+                'emotion': entry.emotion
             })
         
         # Prepare the food data for visualization
