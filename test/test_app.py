@@ -62,8 +62,7 @@ class HomepageTestCase(unittest.TestCase):
             user.set_password(password)  # Properly hash the password
             db.session.add(user)
             db.session.commit()
-            print(f"[DEBUG] ✅ Inserted and hashed user: {email}")
-
+    
         return email
     
 
@@ -76,6 +75,26 @@ class HomepageTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(b'Invalid email/username or password', response.data)
         self.assertIn(b'Visualise', response.data)  # or another known post-login keyword
+
+    def test_logout_works(self):
+        email = self.register_user()
+
+        # Login
+        self.client.post('/login', data={
+            'email': email,
+            'password': 'Test@1234'
+        }, follow_redirects=True)
+
+        # Logout
+        response = self.client.post('/logout', follow_redirects=True)
+
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Login', response.data)  # Adjust based on what your homepage/login shows after logout
+
+        # Try accessing protected page again
+        protected = self.client.get('/visualise', follow_redirects=True)
+        self.assertIn(b'Login', protected.data)
 
 
 if __name__ == '__main__':
