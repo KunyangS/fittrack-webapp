@@ -1,79 +1,114 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2 class="text-3xl font-heading font-bold mb-6 text-primary">Upload Your Daily Fitness Data</h2>
+<div class="min-h-screen bg-gradient-to-br from-white to-sky-50 dark:from-neutral-900 dark:to-gray-800 py-10 px-6">
+  <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-10 items-start">
 
-<form id="uploadForm" method="POST" action="{{ url_for('upload.api_upload') }}" class="space-y-10 max-w-prose mx-auto text-gray-500">
-  
-  <!-- Basic Info -->
-  <div class="bg-light-bg dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-    <h3 class="text-2xl font-heading font-semibold mb-4">Basic Information</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <input type="date" name="date" value="{{ default_date }}"
-        class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white transition shadow-sm" required>
-      <input type="time" name="time" value="{{ default_time }}"
-        class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white transition shadow-sm" required>
-      <input type="text" name="gender" placeholder="Gender" value="{{ user_info.gender if user_info else '' }}"
-        class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm" required>
-      <input type="number" name="age" placeholder="Age" value="{{ user_info.age if user_info else '' }}"
-        class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm" required>
-      <input type="number" name="height" placeholder="Height (cm)" value="{{ user_info.height if user_info else '' }}"
-        class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm" required>
-      <input type="number" name="weight" placeholder="Weight (kg)" value="{{ user_info.weight if user_info else '' }}"
-        class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm" required>
-    </div>
-  </div>
+    <!-- Sidebar Content -->
+    <div class="hidden md:flex flex-col items-center text-center space-y-6">
+      <!-- Motivational Image -->
+      <div class="w-full max-w-xs rounded-xl shadow-lg bg-white dark:bg-neutral-700 p-2">
+        <img src="{{ url_for('static', filename='img/fitness_motivation.jpg') }}" alt="Stay motivated" class="w-full object-cover rounded-md">
+        <div class="mt-2 text-sm text-gray-600 dark:text-gray-300 font-semibold">Stay motivated</div>
+      </div>
 
 
-  <!-- Exercise -->
-  <div class="bg-light-bg dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-    <h3 class="text-2xl font-heading font-semibold mb-4">Exercise</h3>
-    <div id="exerciseContainer">
-      <div class="exercise-block grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-        <select name="activity_type" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 dark:text-white transition shadow-sm">
-          <option value="">Select Activity</option>
-          {% for activity in ['Running', 'Cycling', 'Swimming', 'Yoga', 'Walking'] %}
-            <option value="{{ activity }}">{{ activity }}</option>
-          {% endfor %}
-        </select>
-        <input type="number" name="duration" placeholder="Duration (min)" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm">
-        <input type="number" name="calories_burned" placeholder="Calories Burned" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm">
-        <select name="emotion" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 dark:text-white transition shadow-sm">
-          <option value="">Emotion</option>
-          {% for mood in ['happy', 'tired', 'stressed', 'relaxed'] %}
-            <option value="{{ mood }}">{{ mood.capitalize() }}</option>
-          {% endfor %}
-        </select>
+      <!-- Motivational Quote -->
+      <blockquote class="text-center text-lg italic leading-relaxed tracking-wide px-4">
+        <span class="text-3xl font-serif text-blue-500 align-top">“</span>
+        <span class="inline-block max-w-prose font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">
+          Discipline is choosing between what you want now and what you want most.
+        </span>
+        <span class="text-3xl font-serif text-blue-500 align-bottom">”</span>
+        </blockquote>
+
+      
+      <!-- Daily Summary Card -->
+      <div class="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow ring-1 ring-primary/10 w-full">
+        <div class="text-lg font-semibold text-primary">📅 {{ default_date }}</div>
+        <ul class="mt-3 space-y-1 text-sm text-left">
+          <li><span class="text-green-500">✔</span> Basic Info</li>
+          <li><span class="text-yellow-500">✘</span> Exercise</li>
+          <li><span class="text-green-500">✔</span> Food Intake</li>
+        </ul>
+      </div>
+
+      <!-- Welcome Banner -->
+      <div class="mt-6 text-center">
+        <h2 class="text-xl font-bold text-blue-500">Welcome, {{ current_user.username }}!</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Let’s log your progress today 💪</p>
       </div>
     </div>
-    <button type="button" id="addExerciseBtn" class="bg-primary text-white px-4 py-2 rounded-full shadow-interactive hover:bg-primary-dark transition duration-fast">+ Add Exercise</button>
-  </div>
 
-<!-- Food (support multiple items, e.g. 3 sets) -->
-<div class="bg-light-bg dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-  <h3 class="text-2xl font-heading font-semibold mb-4">Food Intake</h3>
-  {% for i in range(3) %}
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-    <input type="text" name="food_name" placeholder="Food Name" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm" />
-    <input type="number" name="food_quantity" placeholder="Quantity" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm" />
-    <input type="number" name="food_calories" placeholder="Calories" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 transition shadow-sm" />
-    <select name="meal_type" class="border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 dark:text-white transition shadow-sm">
-      <option value="">Meal Type</option>
-      {% for meal in ['breakfast', 'lunch', 'dinner', 'snack'] %}
-        <option value="{{ meal }}">{{ meal.capitalize() }}</option>
-      {% endfor %}
-    </select>
-    
+    <!-- Main Form -->
+    <div class="md:col-span-2">
+      <h2 class="text-3xl font-heading font-bold mb-6 text-primary">Upload Your Daily Fitness Data</h2>
+
+      <form id="uploadForm" method="POST" action="{{ url_for('upload.api_upload') }}" class="space-y-10 text-gray-600 dark:text-gray-300">
+
+        <!-- Basic Info -->
+        <div class="bg-light-bg dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+          <h3 class="text-2xl font-heading font-semibold mb-4">Basic Information</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <input type="date" name="date" value="{{ default_date }}" class="w-full border border-neutral-300 dark:border-neutral-600 rounded-lg px-4 py-2 bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light transition shadow-sm" required>
+            <input type="time" name="time" value="{{ default_time }}" class="w-full border border-neutral-300 dark:border-neutral-600 rounded-lg px-4 py-2 bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light transition shadow-sm" required>
+            <input type="text" name="gender" placeholder="Gender" value="{{ user_info.gender if user_info else '' }}" class="w-full border border-neutral-300 dark:border-neutral-600 rounded-lg px-4 py-2 bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light transition shadow-sm" required>
+            <input type="number" name="age" placeholder="Age" value="{{ user_info.age if user_info else '' }}" class="w-full border border-neutral-300 dark:border-neutral-600 rounded-lg px-4 py-2 bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light transition shadow-sm" required>
+            <input type="number" name="height" placeholder="Height (cm)" value="{{ user_info.height if user_info else '' }}" class="w-full border border-neutral-300 dark:border-neutral-600 rounded-lg px-4 py-2 bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light transition shadow-sm" required>
+            <input type="number" name="weight" placeholder="Weight (kg)" value="{{ user_info.weight if user_info else '' }}" class="w-full border border-neutral-300 dark:border-neutral-600 rounded-lg px-4 py-2 bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light transition shadow-sm" required>
+          </div>
+        </div>
+
+        <!-- Exercise -->
+        <div class="bg-light-bg dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+          <h3 class="text-2xl font-heading font-semibold mb-4">Exercise</h3>
+          <div id="exerciseContainer">
+            <div class="exercise-block grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+              <select name="activity_type" class="w-full border border-neutral-300 dark:border-neutral-600 rounded-lg px-4 py-2 bg-white dark:bg-neutral-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light transition shadow-sm">
+                <option value="">Select Activity</option>
+                {% for activity in ['Running', 'Cycling', 'Swimming', 'Yoga', 'Walking'] %}
+                  <option value="{{ activity }}">{{ activity }}</option>
+                {% endfor %}
+              </select>
+              <input type="number" name="duration" placeholder="Duration (min)" class="w-full border border-neutral-300 dark:border-neutral-600 rounded-lg px-4 py-2 bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light transition shadow-sm">
+              <input type="number" name="calories_burned" placeholder="Calories Burned" class="w-full border border-neutral-300 dark:border-neutral-600 rounded-lg px-4 py-2 bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light transition shadow-sm">
+              <select name="emotion" class="w-full border border-neutral-300 dark:border-neutral-600 rounded-lg px-4 py-2 bg-white dark:bg-neutral-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light transition shadow-sm">
+                <option value="">Emotion</option>
+                {% for mood in ['happy', 'tired', 'stressed', 'relaxed'] %}
+                  <option value="{{ mood }}">{{ mood.capitalize() }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <button type="button" id="addExerciseBtn" class="bg-primary text-white px-4 py-2 rounded-full shadow-interactive hover:bg-primary-dark transition duration-fast">+ Add Exercise</button>
+        </div>
+
+        <!-- Food Intake -->
+        <div class="bg-light-bg dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+          <h3 class="text-2xl font-heading font-semibold mb-4">Food Intake</h3>
+          {% for i in range(3) %}
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+            <input type="text" name="food_name" placeholder="Food Name" class="w-full border border-neutral-300 dark:border-neutral-600 rounded-lg px-4 py-2 bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light transition shadow-sm" />
+            <input type="number" name="food_quantity" placeholder="Quantity" class="w-full border border-neutral-300 dark:border-neutral-600 rounded-lg px-4 py-2 bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light transition shadow-sm" />
+            <input type="number" name="food_calories" placeholder="Calories" class="w-full border border-neutral-300 dark:border-neutral-600 rounded-lg px-4 py-2 bg-white dark:bg-neutral-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light transition shadow-sm" />
+            <select name="meal_type" class="w-full border border-neutral-300 dark:border-neutral-600 rounded-lg px-4 py-2 bg-white dark:bg-neutral-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light transition shadow-sm">
+              <option value="">Meal Type</option>
+              {% for meal in ['breakfast', 'lunch', 'dinner', 'snack'] %}
+                <option value="{{ meal }}">{{ meal.capitalize() }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Submit -->
+        <div class="text-right">
+          <button type="submit" class="bg-primary text-white px-6 py-3 rounded-full shadow-lg hover:bg-primary-dark transition duration-fast font-semibold">Submit</button>
+        </div>
+      </form>
+    </div>
   </div>
-  {% endfor %}
 </div>
-
-
-
-  <div class="text-right">
-    <button type="submit" class="bg-primary text-white px-6 py-3 rounded-full shadow-lg hover:bg-primary-dark transition duration-fast font-semibold">Submit</button>
-  </div>
-</form>
 
 <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 {% endblock %}
