@@ -210,7 +210,12 @@ class HomepageTestCase(unittest.TestCase):
         # Check if it redirects to the login page
         self.assertIn(b'Login', response.data)
 
+    def test_terms_and_conditions_modal(self):
+        # Simulate visiting the registration page
+        response = self.client.get('/register')
 
+        # Check if the modal for Terms and Conditions is present in the response
+        self.assertIn(b'Terms and Conditions', response.data)
 
 
 if __name__ == '__main__':
