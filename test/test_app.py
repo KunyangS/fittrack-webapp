@@ -110,6 +110,10 @@ class HomepageTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Visualise', response.data)  # Adjust if your visualise page shows a different keyword
 
+    def test_upload_avatar_requires_login(self):
+        response = self.client.post('/upload_avatar', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Login', response.data) # Adjust to your login page keyword
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
