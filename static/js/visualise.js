@@ -107,14 +107,16 @@ function updateDashboard() {
   const calorieGap = totalIntake - totalCalories;
 
   // ---------- Update Summary Card ----------
-  summaryCard.innerHTML = `
-    <h3 class="text-xl font-semibold mb-4">Summary</h3>
+const summaryContentDiv = document.getElementById('summary-content');
+if (summaryContentDiv) {
+  summaryContentDiv.innerHTML = `
     <p>Workouts: <strong>${totalWorkouts}</strong></p>
     <p>Total Duration: <strong>${totalTime} min</strong></p>
     <p>Calories Burned: <strong>${totalCalories}</strong></p>
     <p>Calories Intake: <strong>${totalIntake}</strong></p>
     <p>Gap: <strong style="color:${calorieGap > 0 ? 'green' : 'red'}">${calorieGap}</strong></p>
   `;
+}
 
   // ---------- Encouragement Popup ----------
   if (Math.abs(calorieGap) >= 500) {
