@@ -173,5 +173,16 @@ class HomepageTestCase(unittest.TestCase):
         # Check if the redirect happened (to login page)
         self.assertIn(b'Login', response.data)
 
+    def test_invalid_reset_password_code(self):
+        # Simulate the forgotten password process
+        self.client.post('/forgot-password', data={'email': 'test@example.com'}, follow_redirects=True)
+
+        # Simulate using an invalid or expired reset password code
+        response = self.client.post('/verify-code', data={'code': 'invalidcode'}, follow_redirects=True)
+
+        # Check if the flash message for invalid code appears
+        self.assertIn(b'Invalid verification code.', response.data)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
