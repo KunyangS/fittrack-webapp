@@ -172,17 +172,19 @@
 
   <!-- Chart.js and custom logic -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Pass data directly to JavaScript variables -->
   <script>
-    // Debug data
-    console.log('Fitness data from server:');
-    console.log({{ fitness_data|tojson|safe }});
-    console.log('Food data from server:');
-    console.log({{ food_data|tojson|safe }});
-    
-    // Directly assign the data
+    // Avoid using JSON.parse, directly use Flask's tojson filter
     window.rawData = {{ fitness_data|tojson|safe }};
     window.foodData = {{ food_data|tojson|safe }};
-  </script>  
+    
+    // Add debug output
+    console.log('Data loaded successfully!');
+    console.log('Fitness data count:', window.rawData ? window.rawData.length : 0);
+    console.log('Food data count:', window.foodData ? window.foodData.length : 0);
+    console.log('First fitness entry:', window.rawData && window.rawData.length > 0 ? window.rawData[0] : 'No data');
+  </script>
 
-  <script src="{{ url_for('static', filename='js/visualise.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/visualise.js') }}?v={{ now }}"></script>
 {% endblock %} 
