@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 
 from app import app, db, login_manager
-from flask import render_template, request, session, redirect, url_for, flash
+from flask import render_template, request, session, redirect, url_for, flash, jsonify
 import random
 from urllib.parse import urlencode
 from app.models import User, UserInfo, ShareEntry, FitnessEntry, FoodEntry
@@ -452,3 +452,153 @@ def terms_of_service():
 @app.context_processor
 def inject_current_year():
     return {'current_year': datetime.now().year}
+
+# API endpoint for fitness ranking data
+@app.route('/api/visualisation/ranking')
+@login_required
+def fitness_ranking():
+    try:
+        # Get the time range parameter (default to 'week')
+        time_range = request.args.get('time_range', 'week')
+        
+        # Calculate the start date based on the time range
+        today = datetime.today().date()
+        if time_range == 'week':
+            start_date = today - timedelta(days=7)
+        elif time_range == 'month':
+            start_date = today - timedelta(days=30)
+        elif time_range == 'year':
+            start_date = today - timedelta(days=365)
+        else:
+            # Default to one week
+            start_date = today - timedelta(days=7)
+
+        # Query for fitness entries within the date range
+        fitness_entries = db.session.query(
+            User.username,
+            db.func.sum(FitnessEntry.calories_burned).label('total_calories'),
+            db.func.sum(FitnessEntry.duration).label('total_duration')
+        ).join(
+            FitnessEntry, User.id == FitnessEntry.user_id
+        ).filter(
+            FitnessEntry.date >= start_date
+        ).group_by(
+            User.username
+        ).order_by(
+            db.func.sum(FitnessEntry.calories_burned).desc()
+        ).all()
+
+        # Prepare the ranking data
+        ranking_data = []
+        for i, (username, total_calories, total_duration) in enumerate(fitness_entries, 1):
+            ranking_data.append({
+                'rank': i,
+                'username': username,
+                'total_calories_burned': round(total_calories, 2) if total_calories else 0,
+                'total_duration': round(total_duration, 2) if total_duration else 0
+            })
+
+        # Highlight the current user in the rankings
+        for entry in ranking_data:
+            entry['is_current_user'] = (entry['username'] == current_user.username)
+
+        return jsonify({'ranking': ranking_data, 'time_range': time_range})
+    
+    except Exception as e:
+        app.logger.error(f"Error in fitness ranking API: {str(e)}")
+        return jsonify({'error': 'Failed to retrieve ranking data', 'details': str(e)}), 500
+
+# API endpoint for fitness visualization data
+@app.route('/api/visualisation/fitness')
+@login_required
+def fitness_visualization():
+    try:
+        # Get the user ID
+        user_id = current_user.id
+        
+        # Get time range parameters (optional)
+        days = request.args.get('days', default=30, type=int)
+        
+        # Calculate the start date
+        end_date = datetime.today().date()
+        start_date = end_date - timedelta(days=days)
+        
+        # Query fitness entries for the user within the time range
+        fitness_entries = FitnessEntry.query.filter(
+            FitnessEntry.user_id == user_id,
+            FitnessEntry.date >= start_date,
+            FitnessEntry.date <= end_date
+        ).order_by(FitnessEntry.date).all()
+        
+        # Query food entries for the user within the time range
+        food_entries = FoodEntry.query.filter(
+            FoodEntry.user_id == user_id,
+            FoodEntry.date >= start_date,
+            FoodEntry.date <= end_date
+        ).order_by(FoodEntry.date).all()
+        
+        # Prepare the fitness data for visualization
+        fitness_data = []
+        for entry in fitness_entries:
+            fitness_data.append({
+                'date': entry.date.isoformat(),
+                'activity_type': entry.activity_type,
+                'duration': entry.duration,
+                'calories_burned': entry.calories_burned,
+                'emotion': entry.emotion
+            })
+        
+        # Prepare the food data for visualization
+        food_data = []
+        for entry in food_entries:
+            food_data.append({
+                'date': entry.date.isoformat(),
+                'food_name': entry.food_name,
+                'quantity': entry.quantity,
+                'calories': entry.calories,
+                'meal_type': entry.meal_type
+            })
+        
+        # Prepare summary statistics
+        total_calories_burned = sum(entry.calories_burned for entry in fitness_entries if entry.calories_burned)
+        total_workout_minutes = sum(entry.duration for entry in fitness_entries if entry.duration)
+        total_calories_consumed = sum(entry.calories for entry in food_entries if entry.calories)
+        
+        avg_daily_calories_burned = total_calories_burned / days if days > 0 else 0
+        avg_daily_workout_minutes = total_workout_minutes / days if days > 0 else 0
+        avg_daily_calories_consumed = total_calories_consumed / days if days > 0 else 0
+        
+        # Group activities by type
+        activity_types = {}
+        for entry in fitness_entries:
+            if entry.activity_type:
+                activity_types[entry.activity_type] = activity_types.get(entry.activity_type, 0) + 1
+        
+        # Sort activities by frequency
+        sorted_activities = sorted(activity_types.items(), key=lambda x: x[1], reverse=True)
+        top_activities = [{'type': k, 'count': v} for k, v in sorted_activities[:5]]
+        
+        # Return the compiled data
+        return jsonify({
+            'fitness_entries': fitness_data,
+            'food_entries': food_data,
+            'summary': {
+                'total_calories_burned': round(total_calories_burned, 2),
+                'total_workout_minutes': round(total_workout_minutes, 2),
+                'total_calories_consumed': round(total_calories_consumed, 2),
+                'avg_daily_calories_burned': round(avg_daily_calories_burned, 2),
+                'avg_daily_workout_minutes': round(avg_daily_workout_minutes, 2),
+                'avg_daily_calories_consumed': round(avg_daily_calories_consumed, 2),
+                'calorie_balance': round(total_calories_consumed - total_calories_burned, 2),
+                'top_activities': top_activities
+            },
+            'time_range': {
+                'start_date': start_date.isoformat(),
+                'end_date': end_date.isoformat(),
+                'days': days
+            }
+        })
+    
+    except Exception as e:
+        app.logger.error(f"Error in fitness visualization API: {str(e)}")
+        return jsonify({'error': 'Failed to retrieve visualization data', 'details': str(e)}), 500
