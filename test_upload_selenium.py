@@ -14,46 +14,50 @@ class UploadSystemTests(unittest.TestCase):
         # Set up Flask app context
         cls.app = app
         cls.app_context = cls.app.app_context()
-        cls.app_context.push()
+        cls.app_context.push()  # Push the app context to ensure DB operations work
 
+        # Initialize Flask test client
+        cls.client = app.test_client()
+        
+        # Create database tables and insert test data
         db.create_all()
         cls._add_test_user()
 
-        # Start Flask server in a separate thread
+        # Start Flask server in a separate thread (instead of multiprocessing)
         cls.server_thread = threading.Thread(target=cls.app.run, kwargs={"use_reloader": False, "debug": False})
-        cls.server_thread.daemon = True
         cls.server_thread.start()
         time.sleep(2)  # Give server time to start
 
         # Start Selenium WebDriver
         options = Options()
-        options.add_argument("--headless")
+        options.add_argument("--headless")  # For headless mode (no UI)
         cls.driver = webdriver.Chrome(options=options)
-
-        # Login for session-based tests
-        cls._login_user()
+        cls.driver.get("http://127.0.0.1:5000")  # Corrected URL
 
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
         db.session.remove()
         db.drop_all()
-        cls.app_context.pop()
+        cls.app_context.pop()  # Pop the app context
+        # Terminate Flask server thread
         cls.server_thread.join()
 
     @classmethod
     def _add_test_user(cls):
-        existing = User.query.filter_by(email="test@example.com").first()
-        if existing:
-            UserInfo.query.filter_by(user_id=existing.id).delete()
-            db.session.delete(existing)
+        # Check if user exists and delete if needed
+        existing_user = User.query.filter_by(email='test@example.com').first()
+        if existing_user:
+            db.session.delete(existing_user)
             db.session.commit()
 
+        # Add new test user
         user = User(username='testuser', email='test@example.com')
         user.set_password('testpass')
         db.session.add(user)
         db.session.commit()
 
+        # Add UserInfo for new user
         user_info = UserInfo(
             user_id=user.id,
             date=datetime.now().date(),
@@ -66,13 +70,10 @@ class UploadSystemTests(unittest.TestCase):
         db.session.add(user_info)
         db.session.commit()
 
-    @classmethod
-    def _login_user(cls):
-        cls.driver.get("http://127.0.0.1:5000/login")
-        cls.driver.find_element(By.NAME, "email").send_keys("test@example.com")
-        cls.driver.find_element(By.NAME, "password").send_keys("testpass")
-        cls.driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
-        time.sleep(1)  # wait for redirect
+    def test_upload_page(self):
+        # Test upload page accessibility
+        response = self.client.get('/upload')
+        self.assertEqual(response.status_code, 200)
 
     def test_home_page_title(self):
         self.driver.get("http://127.0.0.1:5000")
@@ -88,8 +89,24 @@ class UploadSystemTests(unittest.TestCase):
         self.assertIn("Register", self.driver.page_source)
 
     def test_upload_page_accessible(self):
+    # First, log in via Selenium
+        self.driver.get("http://127.0.0.1:5000/login")
+        self.driver.find_element(By.NAME, "email").send_keys("test@example.com")
+        self.driver.find_element(By.NAME, "password").send_keys("testpass")
+        self.driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+
+        # Wait for the login process to complete
+        time.sleep(2)
+
+        # Now check if the user has been redirected to the upload page
+        current_url = self.driver.current_url
+        self.assertIn("/upload", current_url, "User was not redirected to the upload page.")
+
+        # Access the upload page directly
         self.driver.get("http://127.0.0.1:5000/upload")
         self.assertIn("Upload", self.driver.page_source)
+
+
 
     def test_dark_mode_toggle_script(self):
         self.driver.get("http://127.0.0.1:5000")
@@ -126,8 +143,10 @@ class UploadSystemTests(unittest.TestCase):
         self.driver.find_element(By.NAME, "height").send_keys("165")
         self.driver.find_element(By.NAME, "weight").send_keys("55")
         self.driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
-        time.sleep(1)  # optional, for flash messages
-        self.assertIn("Upload", self.driver.page_source)  # simple validation
+        time.sleep(1)  # wait for alert
+        alert = self.driver.switch_to.alert
+        self.assertIn("Upload successful", alert.text)
+        alert.accept()
 
 if __name__ == '__main__':
     unittest.main()
