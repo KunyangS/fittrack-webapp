@@ -1,93 +1,101 @@
+// upload.js
+
 document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('uploadForm');
   const exerciseContainer = document.getElementById('exerciseContainer');
   const addExerciseBtn = document.getElementById('addExerciseBtn');
 
-  // Generate a sport block
-  function createExerciseForm() {
-    const div = document.createElement('div');
-    div.className = "exercise-block grid grid-cols-1 md:grid-cols-2 gap-4 mb-4";
+  const foodContainer = document.getElementById('foodContainer');
+  const addFoodBtn = document.getElementById('addFoodBtn');
 
-    div.innerHTML = `
-      <select name="activity_type" class="input" required>
-        <option value="">Select Activity Type</option>
-        <option value="Running">Running</option>
-        <option value="Walking">Walking</option>
-        <option value="Cycling">Cycling</option>
-        <option value="Swimming">Swimming</option>
-        <option value="Yoga">Yoga</option>
-        <option value="Strength Training">Strength Training</option>
-        <option value="HIIT">HIIT</option>
-        <option value="Pilates">Pilates</option>
-        <option value="Hiking">Hiking</option>
-      </select>
+  const todoList = document.getElementById('todoListNotebook');
+  const addPlanBtn = document.getElementById('addPlanBtn');
+  const saveTodoBtn = document.getElementById('saveTodoBtn');
+  const uploadForm = document.getElementById('uploadForm');
 
-      <input type="number" name="duration" placeholder="Duration (minutes)" class="input" required>
-      <input type="number" name="calories_burned" placeholder="Calories Burned" class="input" required>
+  // Remove initial static list item for consistency
+  todoList.innerHTML = '';
 
-      <select name="emotion" class="input">
-        <option value="">Emotion during exercise</option>
-        <option value="happy">Happy</option>
-        <option value="tired">Tired</option>
-        <option value="stressed">Stressed</option>
-        <option value="relaxed">Relaxed</option>
-      </select>
-    `;
-    return div;
-  }
+  // Load cached todos
+  const savedTodos = JSON.parse(localStorage.getItem('todos') || '[]');
+  savedTodos.forEach(text => addTodoItem(text));
 
-  // Add the first sport
-  if (exerciseContainer.children.length === 0) {
-    exerciseContainer.appendChild(createExerciseForm());
-  }
-
-  //Click to add a sport
+  // Clone and append new exercise block
   addExerciseBtn.addEventListener('click', () => {
-    exerciseContainer.appendChild(createExerciseForm());
-  });
+    const blocks = exerciseContainer.getElementsByClassName('exercise-block');
+    const lastBlock = blocks[blocks.length - 1];
+    const clone = lastBlock.cloneNode(true);
 
-  // form submission
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-
-    const formData = new FormData(form);
-
-    const activities = [];
-    const blocks = exerciseContainer.querySelectorAll('.exercise-block');
-    blocks.forEach(block => {
-      activities.push({
-        activity_type: block.querySelector('[name="activity_type"]').value,
-        duration: block.querySelector('[name="duration"]').value,
-        calories_burned: block.querySelector('[name="calories_burned"]').value,
-        emotion: block.querySelector('[name="emotion"]').value
-      });
+    [...clone.querySelectorAll('input, select')].forEach(input => {
+      input.value = '';
     });
 
-    const payload = {
-      date: formData.get('date'),
-      time: formData.get('time'),
-      gender: formData.get('gender'),
-      age: formData.get('age'),
-      height: formData.get('height'),
-      weight: formData.get('weight'),
-      food_name: formData.get('food_name'),
-      food_quantity: formData.get('food_quantity'),
-      food_calories: formData.get('food_calories'),
-      meal_type: formData.get('meal_type'),
-      activities: activities
-    };
+    exerciseContainer.appendChild(clone);
+  });
 
-    const res = await fetch('/api/upload', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+  // Clone and append new food block
+  addFoodBtn.addEventListener('click', () => {
+    const lastBlock = foodContainer.lastElementChild;
+    const clone = lastBlock.cloneNode(true);
+
+    [...clone.querySelectorAll('input, select')].forEach(input => {
+      input.value = '';
     });
 
-    const result = await res.json();
-    alert(result.message);
-    if (result.success) {
-      exerciseContainer.innerHTML = '';
-      exerciseContainer.appendChild(createExerciseForm());
-    }
+    foodContainer.appendChild(clone);
   });
+
+  // Add To-Do item (blank)
+  addPlanBtn.addEventListener('click', () => {
+    addTodoItem('');
+  });
+
+  // Save To-Do items to localStorage
+  saveTodoBtn.addEventListener('click', () => {
+    const inputs = todoList.querySelectorAll('input[type="text"]');
+    const values = [...inputs].map(input => input.value.trim()).filter(text => text !== '');
+    localStorage.setItem('todos', JSON.stringify(values));
+    alert('✅ To-Do list saved locally!');
+  });
+
+  // Submit confirmation
+  uploadForm.addEventListener('submit', (e) => {
+    e.preventDefault();  
+    alert('✅ Submit successfully!');
+    setTimeout(() => {
+      uploadForm.submit();  
+    }, 200); 
+  });
+  
+
+  function addTodoItem(text = '') {
+    const li = document.createElement('li');
+    const checkbox = document.createElement('input');
+    const input = document.createElement('input');
+
+    checkbox.type = 'checkbox';
+    checkbox.className = 'mr-2';
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) {
+        li.remove();
+        updateCache();
+      }
+    });
+
+    input.type = 'text';
+    input.placeholder = "Write your plan";
+    input.value = text;
+    input.className = 'bg-transparent border-b-2 border-dashed focus:outline-none w-full';
+    input.addEventListener('input', updateCache);
+
+    li.appendChild(checkbox);
+    li.appendChild(input);
+    li.className = 'flex items-center gap-2';
+    todoList.appendChild(li);
+  }
+
+  function updateCache() {
+    const inputs = todoList.querySelectorAll('input[type="text"]');
+    const values = [...inputs].map(input => input.value.trim()).filter(text => text !== '');
+    localStorage.setItem('todos', JSON.stringify(values));
+  }
 });
