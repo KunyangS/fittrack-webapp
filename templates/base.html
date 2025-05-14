@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }} - Fitness Tracker</title>
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Link to custom CSS -->
@@ -30,7 +34,33 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#3490dc', // Example primary color
+                        primary: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        },
+                        neutral: {
+                            50: '#f9fafb',
+                            100: '#f3f4f6',
+                            200: '#e5e7eb',
+                            300: '#d1d5db',
+                            400: '#9ca3af',
+                            500: '#6b7280',
+                            600: '#4b5563',
+                            700: '#374151',
+                            800: '#1f2937',
+                            900: '#111827',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
                     }
                 }
             }
@@ -43,82 +73,83 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans flex flex-col min-h-screen">
+<body class="bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 font-sans flex flex-col min-h-screen transition-colors duration-300">
     {# This area immediately inside body should be clear of unstyled flash message rendering loops #}
 
-    <!-- Floating Header -->
-    <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
+    <!-- Floating Header with Glass Effect -->
+    <header class="navbar-fancy sticky top-0 z-50 border-b border-neutral-200/70 dark:border-neutral-700/70">
         {# This area at the start of the header should be clear of unstyled flash message rendering loops #}
         <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
             <!-- Logo/Brand Name -->
-            <a href="{{ url_for('index') }}" class="text-xl font-bold text-primary dark:text-blue-400">
-                <i class="fa-solid fa-person-running"></i>  FitTrack
+            <a href="{{ url_for('index') }}" class="text-xl font-bold text-primary-600 dark:text-primary-400 flex items-center gap-2 transition-all duration-300 hover:scale-105">
+                <i class="fa-solid fa-person-running"></i>  
+                <span>FitTrack</span>
             </a>
 
             <ul class="flex space-x-2 items-center">
-                {% set active_class = "bg-teal-100 dark:bg-neutral-700 text-teal-700 dark:text-teal-300 font-semibold border-teal-500 dark:border-teal-400" %}
-                {% set inactive_class = "text-neutral-700 dark:text-neutral-200 hover:bg-teal-50 dark:hover:bg-neutral-700 hover:text-teal-600 dark:hover:text-teal-400 border-slate-300 dark:border-slate-500" %}
+                {% set active_class = "bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 font-semibold border-primary-500 dark:border-primary-400" %}
+                {% set inactive_class = "text-neutral-700 dark:text-neutral-200 hover:bg-primary-50 dark:hover:bg-neutral-700 hover:text-primary-600 dark:hover:text-primary-400 border-neutral-300 dark:border-neutral-500" %}
 
 
-                <li><a href="{{ url_for('index') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'index' else inactive_class }}">Home</a></li>
-                <li><a href="{{ url_for('upload.upload_page') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'upload.upload_page' else inactive_class }}">Upload</a></li>
-                <li><a href="{{ url_for('visualise') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'visualise' else inactive_class }}">Visualise</a></li>
-                <li><a href="{{ url_for('share') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'share' else inactive_class }}">Share</a></li>
+                <li><a href="{{ url_for('index') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'index' else inactive_class }}">Home</a></li>
+                <li><a href="{{ url_for('upload.upload_page') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'upload.upload_page' else inactive_class }}">Upload</a></li>
+                <li><a href="{{ url_for('visualise') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'visualise' else inactive_class }}">Visualise</a></li>
+                <li><a href="{{ url_for('share') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'share' else inactive_class }}">Share</a></li>
                 <!-- Dark Mode Toggle Button -->
                 <li>
                     <button id="darkModeToggle"
-                            class="w-9 h-9 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ inactive_class }} flex items-center justify-center">
-                        <i class="fas fa-moon text-base" style="display: none;"></i>
-                        <i class="fas fa-sun text-base"></i>
+                            class="w-9 h-9 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-75 transition-all duration-300 border {{ inactive_class }} flex items-center justify-center hover:rotate-12">
+                        <i class="fas fa-moon text-base dark:text-primary-300" id="darkIcon"></i>
+                        <i class="fas fa-sun text-base text-yellow-500" id="lightIcon"></i>
                     </button>
                 </li>
                 {% if current_user.is_authenticated %}
                     <!-- User Dropdown Menu -->
                     <li class="ml-4 relative user-dropdown">
-                        <button type="button" class="flex items-center gap-2 focus:outline-none px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition" id="userMenuButton">
+                        <button type="button" class="flex items-center gap-2 focus:outline-none px-3 py-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-all duration-300" id="userMenuButton">
                             {% if current_user.avatar_url %}
                                 <img src="{{ url_for('static', filename='avatars/' ~ current_user.avatar_url) }}"
                                     alt="Avatar"
-                                    class="w-9 h-9 rounded-full object-cover border-2 border-blue-400">
+                                    class="w-9 h-9 rounded-full object-cover border-2 border-primary-400">
                             {% else %}
-                                <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 text-white font-bold text-lg">
+                                <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-primary-500 to-blue-400 text-white font-bold text-lg">
                                     {{ current_user.username[0]|upper }}
                                 </span>
                             {% endif %}
-                            <span class="font-semibold text-primary dark:text-blue-300">{{ current_user.username }}</span>
-                            <i class="fas fa-chevron-down text-xs text-gray-500 ml-1"></i>
+                            <span class="font-semibold text-primary-600 dark:text-primary-300">{{ current_user.username }}</span>
+                            <i class="fas fa-chevron-down text-xs text-neutral-500 ml-1 transition-transform duration-300 group-hover:rotate-180"></i>
                         </button>
                         <!-- Dropdown -->
-                        <div id="userDropdownMenu" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 py-2">
-                            <div class="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700">
+                        <div id="userDropdownMenu" class="hidden absolute right-0 mt-2 w-60 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 z-50 py-2 animate-fadeIn">
+                            <div class="px-4 py-3 text-sm text-neutral-700 dark:text-neutral-200 border-b border-neutral-100 dark:border-neutral-700">
                                 <div class="font-semibold">{{ current_user.username }}</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">Already logged in</div>
+                                <div class="text-xs text-neutral-500 dark:text-neutral-400">Already logged in</div>
                             </div>
-                            <a href="{{ url_for('reset_password') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                                Change Password
+                            <a href="{{ url_for('reset_password') }}" class="block px-4 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors duration-200">
+                                <i class="fas fa-key mr-2 text-primary-500"></i> Change Password
                             </a>
                               <!-- Avatar Upload Form -->
-                            <form action="{{ url_for('upload_avatar') }}" method="post" enctype="multipart/form-data" class="px-4 py-2 space-y-2">
+                            <form action="{{ url_for('upload_avatar') }}" method="post" enctype="multipart/form-data" class="px-4 py-2 space-y-2 border-b border-neutral-100 dark:border-neutral-700">
                                 {% if csrf_token %}
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 {% endif %}
-                                <label for="avatar-upload" class="block text-sm text-gray-700 dark:text-gray-200 mb-1">
-                                    Update Profile Picture
+                                <label for="avatar-upload" class="block text-sm text-neutral-700 dark:text-neutral-200 mb-1">
+                                    <i class="fas fa-camera mr-2 text-primary-500"></i> Update Profile Picture
                                 </label>
                                 <input id="avatar-upload" type="file" name="avatar" accept="image/*"
-                                    class="block w-full text-sm mb-2"
+                                    class="block w-full text-sm mb-2 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:file:bg-primary-900 dark:file:text-primary-300"
                                     required>
                                 <button type="submit"
-                                        class="w-full px-2 py-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition">
-                                    Upload
+                                        class="w-full px-3 py-2 text-sm font-medium text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/40 rounded-lg transition-colors duration-200">
+                                    <i class="fas fa-upload mr-2"></i> Upload
                                 </button>
                             </form>
-                            <form action="{{ url_for('logout') }}" method="post">
+                            <form action="{{ url_for('logout') }}" method="post" class="mt-1">
                                 {% if csrf_token %}
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 {% endif %}
-                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                                    Logout
+                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
                                 </button>
                             </form>
                         </div>
@@ -127,15 +158,14 @@
                     <!-- Login/Register Buttons -->
                     <li class="ml-4">
                         <a href="{{ url_for('login') }}" 
-
-                        class="inline-block bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light text-white font-semibold py-2 px-5 rounded-full shadow-sm hover:shadow-md transition duration-200 ease-in-out text-sm">
-                            Login
+                        class="btn btn-primary btn-ripple inline-block font-semibold py-2 px-5 rounded-full shadow-sm hover:shadow-md transition-all duration-300 ease-in-out text-sm hover:-translate-y-1">
+                            <i class="fas fa-sign-in-alt mr-1"></i> Login
                         </a>
                     </li>
-                    <li>
+                    <li class="ml-2">
                         <a href="{{ url_for('register') }}" 
-                        class="inline-block bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400 text-white font-semibold py-2 px-5 rounded-full shadow-sm hover:shadow-md transition duration-200 ease-in-out text-sm">
-                            Register
+                        class="btn btn-ripple inline-block bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-400 text-white font-semibold py-2 px-5 rounded-full shadow-sm hover:shadow-md transition-all duration-300 ease-in-out text-sm hover:-translate-y-1">
+                            <i class="fas fa-user-plus mr-1"></i> Register
                         </a>
                     </li>
                 {% endif %}
@@ -144,28 +174,73 @@
         {# This area at the end of the header should be clear of unstyled flash message rendering loops #}
     </header>
 
+    <!-- Flash Messages -->
+    <div class="container mx-auto px-4 mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages space-y-2">
+                    {% for category, message in messages %}
+                        {% set alert_class = {
+                            'success': 'bg-emerald-100 border-emerald-500 text-emerald-700 dark:bg-emerald-900/30 dark:border-emerald-500 dark:text-emerald-300',
+                            'info': 'bg-blue-100 border-blue-500 text-blue-700 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-300',
+                            'warning': 'bg-yellow-100 border-yellow-500 text-yellow-700 dark:bg-yellow-900/30 dark:border-yellow-500 dark:text-yellow-300',
+                            'danger': 'bg-red-100 border-red-500 text-red-700 dark:bg-red-900/30 dark:border-red-500 dark:text-red-300'
+                        } %}
+                        <div class="p-4 mb-4 rounded-lg border-l-4 {{ alert_class.get(category, 'bg-neutral-100 dark:bg-neutral-800 border-neutral-500 text-neutral-700 dark:text-neutral-300') }} animate-fadeIn">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    {% if category == 'success' %}
+                                        <i class="fas fa-check-circle text-emerald-500"></i>
+                                    {% elif category == 'info' %}
+                                        <i class="fas fa-info-circle text-blue-500"></i>
+                                    {% elif category == 'warning' %}
+                                        <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+                                    {% elif category == 'danger' %}
+                                        <i class="fas fa-times-circle text-red-500"></i>
+                                    {% else %}
+                                        <i class="fas fa-info-circle text-neutral-500"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm">{{ message }}</p>
+                                </div>
+                                <button type="button" class="ml-auto -mx-1.5 -my-1.5 rounded-lg p-1.5 inline-flex h-8 w-8 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus:outline-none" onclick="this.parentElement.parentElement.remove()">
+                                    <span class="sr-only">Dismiss</span>
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
     <!-- Main Content Area -->
     <main class="container mx-auto px-4 py-8 flex-grow">
-        {# Ensure no general flash messages are looped here before the content block #}
         {% block content %}
         <p>This is the default content area.</p>
         {% endblock %}
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-center py-4 mt-auto">
+    <footer class="glass text-neutral-600 dark:text-neutral-400 text-center py-6 mt-auto border-t border-neutral-300/30 dark:border-neutral-700/30">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-center items-center gap-4">
-                <a href="{{ url_for('privacy_policy') }}" class="hover:underline text-sm">Privacy Policy</a>
+                <a href="{{ url_for('privacy_policy') }}" class="hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors duration-200 hover:underline">
+                    <i class="fas fa-lock mr-1"></i> Privacy Policy
+                </a>
                 <span class="hidden md:inline">|</span>
-                <a href="{{ url_for('terms_of_service') }}" class="hover:underline text-sm">Terms of Service</a>
+                <a href="{{ url_for('terms_of_service') }}" class="hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors duration-200 hover:underline">
+                    <i class="fas fa-gavel mr-1"></i> Terms of Service
+                </a>
             </div>
             <div class="mt-2 text-xs">&copy; {{ current_year }} FitTrack. All rights reserved.</div>
         </div>
     </footer>
 
-    <!-- Back to Top Button -->
-    <button id="backToTop" onclick="scrollToTop()" class="back-to-top">
+    <!-- Back to Top Button with Animation -->
+    <button id="backToTop" onclick="scrollToTop()" class="back-to-top animate-pulse">
         <i class="fas fa-arrow-up"></i>
     </button>
 
@@ -178,18 +253,115 @@
     <!-- User Dropdown JS (no Alpine.js needed) -->
     <script>
         $(function() {
+            // Setup dark mode toggle
+            const darkModeToggle = $('#darkModeToggle');
+            const darkIcon = $('#darkIcon');
+            const lightIcon = $('#lightIcon');
+            
+            // Check current theme and update icons
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            updateIcons(isDarkMode);
+            
+            darkModeToggle.on('click', function() {
+                const isCurrentlyDark = document.documentElement.classList.contains('dark');
+                document.documentElement.classList.toggle('dark');
+                
+                // Save preference to localStorage
+                if (isCurrentlyDark) {
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    localStorage.setItem('theme', 'dark');
+                }
+                
+                // Update icons
+                updateIcons(!isCurrentlyDark);
+            });
+            
+            function updateIcons(isDark) {
+                if (isDark) {
+                    darkIcon.show();
+                    lightIcon.hide();
+                } else {
+                    darkIcon.hide();
+                    lightIcon.show();
+                }
+            }
+            
             // Toggle user dropdown
             $('#userMenuButton').on('click', function(e) {
                 e.stopPropagation();
                 $('#userDropdownMenu').toggleClass('hidden');
+                // Toggle rotation of the chevron
+                $(this).find('.fa-chevron-down').toggleClass('rotate-180');
             });
+            
             // Hide dropdown when clicking outside
             $(document).on('click', function(e) {
                 if (!$(e.target).closest('.user-dropdown').length) {
                     $('#userDropdownMenu').addClass('hidden');
+                    $('.user-dropdown .fa-chevron-down').removeClass('rotate-180');
                 }
             });
+            
+            // Initialize any tooltips
+            $('[data-tooltip]').each(function() {
+                $(this).attr('title', $(this).data('tooltip'));
+            });
+            
+            // Add smooth fade-in effect for sections
+            const sections = $('section');
+            if (sections.length) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('fade-in-up');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.1
+                });
+                
+                sections.each(function() {
+                    observer.observe(this);
+                });
+            }
+            
+            // Auto-dismiss flash messages after 5 seconds
+            setTimeout(function() {
+                $('.flash-messages > div').fadeOut(500, function() {
+                    $(this).remove();
+                });
+            }, 5000);
+            
+            // Add button ripple effect
+            $('.btn-ripple').on('mousedown', function(e) {
+                const $this = $(this);
+                const offset = $this.offset();
+                const x = e.pageX - offset.left;
+                const y = e.pageY - offset.top;
+                
+                const $ripple = $('<span class="ripple"></span>');
+                $ripple.css({
+                    top: y + 'px',
+                    left: x + 'px'
+                });
+                
+                $this.append($ripple);
+                
+                setTimeout(function() {
+                    $ripple.remove();
+                }, 800);
+            });
         });
+        
+        // Scroll to top function
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
     </script>
 </body>
 </html>
