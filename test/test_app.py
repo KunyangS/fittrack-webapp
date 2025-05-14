@@ -13,13 +13,17 @@ class HomepageTestCase(unittest.TestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Welcome', response.data)  # Adjust this if your homepage text is different
-        
+
     def test_login_page_loads(self):
         response = self.client.get('/login')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Login', response.data)  # Adjust to actual text from your login page
 
-    
+    def test_register_page_loads(self):
+        response = self.client.get('/register')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Register', response.data)  # Adjust text if your page uses something like 'Sign Up'
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
