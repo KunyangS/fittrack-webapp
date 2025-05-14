@@ -183,6 +183,27 @@ class HomepageTestCase(unittest.TestCase):
         # Check if the flash message for invalid code appears
         self.assertIn(b'Invalid verification code.', response.data)
 
+    def test_logout_redirect(self):
+        # Register and log in the user
+        self.client.post('/register', data={
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'Test@1234',
+            'confirm_password': 'Test@1234'
+        }, follow_redirects=True)
+
+        self.client.post('/login', data={
+            'email': 'test@example.com',
+            'password': 'Test@1234'
+        }, follow_redirects=True)
+
+        # Log out the user
+        response = self.client.post('/logout', follow_redirects=True)
+
+        # Check if it redirects to the homepage
+        self.assertIn(b'Home', response.data)
+
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

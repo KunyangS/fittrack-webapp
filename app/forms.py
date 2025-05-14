@@ -22,6 +22,8 @@ class RegistrationForm(FlaskForm):
         DataRequired(),
         EqualTo('password', message='Passwords must match.')
     ])
+
+    
     submit = SubmitField('Register')
 
     def validate_password(self, field):

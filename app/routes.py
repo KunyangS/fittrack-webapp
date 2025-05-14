@@ -118,7 +118,7 @@ def register():
                 for error in errors:
                     flash(f"❌ {error}", "danger")
             return redirect('/register')
-
+        
         username = form.username.data
         email = form.email.data
         password = form.password.data
