@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Debug data loading
+  console.log("DOM Content Loaded");
+  console.log("Raw data available:", window.rawData);
+  console.log("Food data available:", window.foodData);
+  
   // Fetch and display fitness ranking data
   fetchRankingData();
 
@@ -428,8 +433,31 @@ document.addEventListener('DOMContentLoaded', () => {
       window.intensityChartInstance.destroy();
     }
     
+    // Check if we have valid data
+    if (!fitnessData || !Array.isArray(fitnessData) || fitnessData.length === 0) {
+      console.warn("No fitness data available for intensity chart");
+      // Display a message on the canvas
+      const ctx = canvas.getContext('2d');
+      ctx.font = '16px Arial';
+      ctx.fillStyle = '#666';
+      ctx.textAlign = 'center';
+      ctx.fillText('No fitness data available for intensity analysis', canvas.width / 2, canvas.height / 2);
+      return;
+    }
+    
     // Process data for chart - calculate calories burned per minute as intensity
     const activityTypes = [...new Set(fitnessData.map(entry => entry.activity_type).filter(Boolean))];
+    
+    // If no activity types with valid data, show a message
+    if (activityTypes.length === 0) {
+      console.warn("No activity types found in fitness data");
+      const ctx = canvas.getContext('2d');
+      ctx.font = '16px Arial';
+      ctx.fillStyle = '#666';
+      ctx.textAlign = 'center';
+      ctx.fillText('No activity type data available', canvas.width / 2, canvas.height / 2);
+      return;
+    }
     
     const intensityData = {};
     activityTypes.forEach(type => {
@@ -456,7 +484,18 @@ document.addEventListener('DOMContentLoaded', () => {
       intensityData[b].intensity - intensityData[a].intensity);
     
     // Select top activities for better visualization
-    const topActivities = sortedActivities.slice(0, 7);
+    const topActivities = sortedActivities.slice(0, Math.min(7, sortedActivities.length));
+    
+    // If no activities to show, display a message
+    if (topActivities.length === 0) {
+      console.warn("No activities with intensity data");
+      const ctx = canvas.getContext('2d');
+      ctx.font = '16px Arial';
+      ctx.fillStyle = '#666';
+      ctx.textAlign = 'center';
+      ctx.fillText('No activity intensity data available', canvas.width / 2, canvas.height / 2);
+      return;
+    }
     
     // Colors array
     const colorScale = [
@@ -539,6 +578,18 @@ document.addEventListener('DOMContentLoaded', () => {
       window.performanceRadarChartInstance.destroy();
     }
     
+    // Check if we have valid data
+    if (!fitnessData || !Array.isArray(fitnessData) || fitnessData.length === 0) {
+      console.warn("No fitness data available for performance radar chart");
+      // Display a message on the canvas
+      const ctx = canvas.getContext('2d');
+      ctx.font = '16px Arial';
+      ctx.fillStyle = '#666';
+      ctx.textAlign = 'center';
+      ctx.fillText('No fitness data available for performance analysis', canvas.width / 2, canvas.height / 2);
+      return;
+    }
+    
     // Extract activity types and compute metrics for each
     const activityTypes = [...new Set(fitnessData.map(entry => entry.activity_type).filter(Boolean))];
     
@@ -552,10 +603,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Calculate performance metrics
     const metrics = {
-      'Consistency': 100, // Base value, will be adjusted
+      'Consistency': calculateConsistency(fitnessData),
       'Duration': calculateAverageDuration(fitnessData),
       'Intensity': calculateAverageIntensity(fitnessData),
-      'Frequency': Object.keys(activityCounts).length,
+      'Frequency': Math.min(activityTypes.length, 10), // Cap at 10
       'Diversity': calculateDiversityScore(fitnessData)
     };
     
@@ -594,11 +645,62 @@ document.addEventListener('DOMContentLoaded', () => {
               display: true
             },
             suggestedMin: 0,
-            suggestedMax: 100
+            suggestedMax: 100,
+            ticks: {
+              display: false
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const metricName = context.label;
+                const score = context.raw;
+                const originalValue = metrics[metricName];
+                let unit = '';
+                
+                switch(metricName) {
+                  case 'Duration':
+                    unit = ' mins';
+                    break;
+                  case 'Intensity':
+                    unit = ' cal/min';
+                    break;
+                  case 'Frequency':
+                  case 'Diversity':
+                    unit = ' types';
+                    break;
+                  default:
+                    unit = '';
+                }
+                
+                return [`Score: ${score.toFixed(0)}/100`, `Value: ${originalValue.toFixed(1)}${unit}`];
+              }
+            }
           }
         }
       }
     });
+  }
+  
+  // Helper function to calculate consistency (% of days with activity)
+  function calculateConsistency(fitnessData) {
+    if (fitnessData.length === 0) return 0;
+    
+    // Get unique dates
+    const uniqueDates = new Set(fitnessData.map(entry => entry.date));
+    
+    // Get date range
+    const dates = [...uniqueDates].sort();
+    if (dates.length <= 1) return 100; // Only one day of data
+    
+    const firstDate = new Date(dates[0]);
+    const lastDate = new Date(dates[dates.length - 1]);
+    const daysDiff = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24)) + 1;
+    
+    // Calculate consistency as percentage of days with activity
+    return (uniqueDates.size / daysDiff) * 100;
   }
   
   // Helper function to calculate average duration
@@ -727,6 +829,24 @@ document.addEventListener('DOMContentLoaded', () => {
       window.goalProgressChartInstance.destroy();
     }
     
+    // Check if we have valid data
+    if (!fitnessData || !Array.isArray(fitnessData) || fitnessData.length === 0) {
+      console.warn("No fitness data available for goal progress chart");
+      // Display a message on the canvas
+      const ctx = canvas.getContext('2d');
+      ctx.font = '16px Arial';
+      ctx.fillStyle = '#666';
+      ctx.textAlign = 'center';
+      ctx.fillText('No fitness data available to track goals', canvas.width / 2, canvas.height / 2);
+      return;
+    }
+    
+    // Ensure summary data exists
+    const summary = summaryData || {
+      total_calories_burned: 0,
+      total_workout_minutes: 0
+    };
+    
     // Define some typical fitness goals
     const goals = {
       'Weekly Activity': {
@@ -741,7 +861,7 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       'Calorie Burn': {
         target: 2000, // 2000 calories per week
-        current: summaryData.total_calories_burned || 0,
+        current: summary.total_calories_burned || 0,
         unit: 'calories'
       },
       'Activity Diversity': {
@@ -754,7 +874,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Calculate percentage of goal achievement for each goal
     const goalPercentages = {};
     Object.keys(goals).forEach(goal => {
-      const percentage = Math.min(100, (goals[goal].current / goals[goal].target) * 100);
+      const percentage = Math.min(100, ((goals[goal].current || 0) / goals[goal].target) * 100);
       goalPercentages[goal] = Math.round(percentage);
     });
     
@@ -802,7 +922,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const goal = goals[goalName];
                 return [
                   `Achievement: ${percentage}%`,
-                  `Current: ${goal.current} ${goal.unit}`,
+                  `Current: ${goal.current.toFixed(1)} ${goal.unit}`,
                   `Target: ${goal.target} ${goal.unit}`
                 ];
               }
@@ -953,17 +1073,48 @@ document.addEventListener('DOMContentLoaded', () => {
       window.nutritionChartInstance.destroy();
     }
     
-    // Group meals by type
+    // Check if we have valid food data
+    if (!foodData || !Array.isArray(foodData) || foodData.length === 0) {
+      console.warn("No food data available for nutrition chart");
+      // Display a message on the canvas
+      const ctx = canvas.getContext('2d');
+      ctx.font = '16px Arial';
+      ctx.fillStyle = '#666';
+      ctx.textAlign = 'center';
+      ctx.fillText('No nutrition data available', canvas.width / 2, canvas.height / 2);
+      return;
+    }
+    
+    // Group meals by type with default handling
     const mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
     const mealData = {};
     
+    // Initialize all meal types with zero values
     mealTypes.forEach(type => {
-      const meals = foodData.filter(entry => entry.meal_type === type);
       mealData[type] = {
-        count: meals.length,
-        calories: meals.reduce((sum, entry) => sum + (entry.calories || 0), 0)
+        count: 0,
+        calories: 0
       };
     });
+    
+    // Process food data
+    foodData.forEach(entry => {
+      // Handle missing meal_type with a default value
+      const mealType = entry.meal_type || 'Snack';
+      
+      // If this meal type is not in our predefined types, add it to Snack
+      const type = mealTypes.includes(mealType) ? mealType : 'Snack';
+      
+      if (!mealData[type]) {
+        mealData[type] = { count: 0, calories: 0 };
+      }
+      
+      mealData[type].count += 1;
+      mealData[type].calories += (entry.calories || 0);
+    });
+    
+    // Calculate total calories for percentage
+    const totalCalories = Object.values(mealData).reduce((sum, data) => sum + data.calories, 0);
     
     // Create chart
     window.nutritionChartInstance = new Chart(canvas, {
@@ -996,7 +1147,7 @@ document.addEventListener('DOMContentLoaded', () => {
               label: function(context) {
                 const mealType = context.label;
                 const calories = context.raw;
-                const percentage = Math.round((calories / foodData.reduce((sum, entry) => sum + (entry.calories || 0), 0)) * 100);
+                const percentage = totalCalories > 0 ? Math.round((calories / totalCalories) * 100) : 0;
                 return `${mealType}: ${calories} cal (${percentage}%)`;
               }
             }
@@ -1005,5 +1156,4 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-});
 });

@@ -53,11 +53,14 @@ def visualise():
         # Connect to the SQLite database (adjust path if necessary)
         conn = sqlite3.connect("instance/fitness.db")
 
-        # Read fitness and food entry data using pandas
+        # Read fitness and food entry data using pandas with more complete fields
         fitness_df = pd.read_sql_query(
-            "SELECT date, activity_type, duration, calories_burned FROM fitness_entries", conn)
+            "SELECT id, user_id, date, activity_type, duration, calories_burned, emotion, notes FROM fitness_entries WHERE user_id = ?", 
+            conn, params=(current_user.id,))
+        
         food_df = pd.read_sql_query(
-            "SELECT date, food_name, calories FROM food_entries", conn)
+            "SELECT id, user_id, date, food_name, calories, meal_type, quantity, notes FROM food_entries WHERE user_id = ?", 
+            conn, params=(current_user.id,))
 
         # Convert DataFrames to list of dictionaries for rendering in the template
         fitness_data = fitness_df.to_dict(orient='records')
@@ -65,6 +68,8 @@ def visualise():
 
         # Close the database connection
         conn.close()
+
+        print(f"Fetched {len(fitness_data)} fitness entries and {len(food_data)} food entries for user {current_user.username}")
 
     except Exception as e:
         print(f"Error fetching data: {e}")

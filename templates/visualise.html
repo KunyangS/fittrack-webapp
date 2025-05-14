@@ -167,8 +167,15 @@
   <!-- Chart.js and custom logic -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    window.rawData = JSON.parse('{{ fitness_data|tojson|safe }}');
-    window.foodData = JSON.parse('{{ food_data|tojson|safe }}');
+    // Debug data
+    console.log('Fitness data from server:');
+    console.log({{ fitness_data|tojson|safe }});
+    console.log('Food data from server:');
+    console.log({{ food_data|tojson|safe }});
+    
+    // Directly assign the data
+    window.rawData = {{ fitness_data|tojson|safe }};
+    window.foodData = {{ food_data|tojson|safe }};
   </script>  
 
   <script src="{{ url_for('static', filename='js/visualise.js') }}"></script>
