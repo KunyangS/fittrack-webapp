@@ -96,6 +96,20 @@ class HomepageTestCase(unittest.TestCase):
         protected = self.client.get('/visualise', follow_redirects=True)
         self.assertIn(b'Login', protected.data)
 
+    def test_visualise_access_after_login(self):
+        email = self.register_user()
+
+        # Log in
+        self.client.post('/login', data={
+            'email': email,
+            'password': 'Test@1234'
+        }, follow_redirects=True)
+
+        # Access the protected route
+        response = self.client.get('/visualise', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Visualise', response.data)  # Adjust if your visualise page shows a different keyword
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
