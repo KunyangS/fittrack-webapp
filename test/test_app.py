@@ -32,6 +32,12 @@ class HomepageTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Invalid', response.data)  # Adjust based on the actual error message in your app
 
+    def test_protected_visualise_requires_login(self):
+        response = self.client.get('/visualise', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Login', response.data)  # Adjust based on what your login page shows
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
 
