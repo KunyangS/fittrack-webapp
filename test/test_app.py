@@ -203,6 +203,14 @@ class HomepageTestCase(unittest.TestCase):
         # Check if it redirects to the homepage
         self.assertIn(b'Home', response.data)
 
+    def test_upload_page_requires_login(self):
+        # Try to access the upload page without being logged in
+        response = self.client.get('/upload', follow_redirects=True)
+
+        # Check if it redirects to the login page
+        self.assertIn(b'Login', response.data)
+
+
 
 
 if __name__ == '__main__':
