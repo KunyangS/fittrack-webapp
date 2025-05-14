@@ -235,14 +235,14 @@ def reset_password():
             if user:
                 db_reset_password(user, new_pass)
                 flash("✅ Password successfully reset!", "success")
-                session['reset_success'] = True
-                return redirect(url_for('reset_password'))
+                session['reset_success'] = True  # Make sure this line is added
+                return redirect(url_for('reset_password'))  # Redirect to show the success message
             else:
                 flash("❌ User not found.", "danger")
         else:
             flash("❌ Passwords do not match.", "danger")
 
-    reset_success = session.pop('reset_success', False)
+    reset_success = session.pop('reset_success', False)  # Pop it from the session
     return render_template('reset_password.html', title='Reset Password', reset_success=reset_success)
 
 
