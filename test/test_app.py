@@ -120,5 +120,10 @@ class HomepageTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Forgot Password', response.data)  # Adjust if needed
 
+    def test_verify_code_requires_forgot_password_flow(self):
+        response = self.client.get('/verify-code', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Forgot Password', response.data)  # Adjust if your template shows something else
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
