@@ -363,5 +363,10 @@
             });
         }
     </script>
+    
+    {% if enhancement_js is defined and enhancement_js %}
+    <!-- 增强脚本，不修改原始HTML -->
+    <script src="{{ url_for('static', filename='js/enhancement.js') }}"></script>
+    {% endif %}
 </body>
 </html>
