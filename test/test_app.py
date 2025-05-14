@@ -24,6 +24,13 @@ class HomepageTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Register', response.data)  # Adjust text if your page uses something like 'Sign Up'
 
+    def test_invalid_login(self):
+        response = self.client.post('/login', data={
+            'email': 'wrong@example.com',
+            'password': 'wrongpass'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Invalid', response.data)  # Adjust based on the actual error message in your app
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
