@@ -128,14 +128,14 @@
 
     <!-- Calories Burned -->
     <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700">
-      <h3 class="text-xl font-heading font-semibold mb-4 text-center text-neutral-700 dark:text-neutral-200">Calories Burned Trend</h3>
-      <canvas id="caloriesChart"></canvas>
+      <h3 class="text-xl font-heading font-semibold mb-4 text-center text-neutral-700 dark:text-neutral-200">Activity Intensity Analysis</h3>
+      <canvas id="intensityChart"></canvas>
     </div>
 
-    <!-- Stacked Types -->
+    <!-- Performance Radar Chart -->
     <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700">
-      <h3 class="text-xl font-heading font-semibold mb-4 text-center text-neutral-700 dark:text-neutral-200">Exercise Types (Stacked)</h3>
-      <canvas id="stackedChart"></canvas>
+      <h3 class="text-xl font-heading font-semibold mb-4 text-center text-neutral-700 dark:text-neutral-200">Workout Performance Metrics</h3>
+      <canvas id="performanceRadarChart"></canvas>
     </div>
 
     <!-- Pie Breakdown -->
@@ -144,10 +144,23 @@
       <canvas id="activityPieChart"></canvas>
     </div>
 
-    <!-- Calorie Gap Chart -->
+    <!-- Goal Progress Chart -->
     <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700 col-span-1 md:col-span-2">
-      <h3 class="text-xl font-heading font-semibold mb-4 text-center text-neutral-700 dark:text-neutral-200">Calorie Gap (Intake - Burned)</h3>
-      <canvas id="gapChart"></canvas>
+      <h3 class="text-xl font-heading font-semibold mb-4 text-center text-neutral-700 dark:text-neutral-200">Goal Progress Tracker</h3>
+      <canvas id="goalProgressChart"></canvas>
+    </div>
+    
+    <!-- Calorie Analysis Dashboard -->
+    <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700 col-span-1 md:col-span-2">
+      <h3 class="text-xl font-heading font-semibold mb-4 text-center text-neutral-700 dark:text-neutral-200">Nutrition & Calories Dashboard</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <canvas id="calorieBalanceChart"></canvas>
+        </div>
+        <div>
+          <canvas id="nutritionChart"></canvas>
+        </div>
+      </div>
     </div>
   </div>
 

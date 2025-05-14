@@ -347,10 +347,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function initializeCharts(data) {
     // Initialize charts if they exist
     initDurationChart(data.fitness_entries);
-    initCaloriesChart(data.fitness_entries);
+    initIntensityChart(data.fitness_entries);
+    initPerformanceRadarChart(data.fitness_entries);
     initActivityPieChart(data.fitness_entries);
-    initStackedChart(data.fitness_entries);
-    initGapChart(data.fitness_entries, data.food_entries);
+    initGoalProgressChart(data.fitness_entries, data.summary);
+    initCaloriesDashboard(data.fitness_entries, data.food_entries, data.summary);
   }
   
   // Initialize Duration Chart
@@ -391,6 +392,136 @@ document.addEventListener('DOMContentLoaded', () => {
         responsive: true,
         scales: {
           y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Minutes'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Date'
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return `Duration: ${context.parsed.y} mins`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+  
+  // Initialize Intensity Chart (replacing Calories Chart)
+  function initIntensityChart(fitnessData) {
+    const canvas = document.getElementById('intensityChart');
+    if (!canvas) return;
+    
+    // Destroy existing chart if it exists
+    if (window.intensityChartInstance) {
+      window.intensityChartInstance.destroy();
+    }
+    
+    // Process data for chart - calculate calories burned per minute as intensity
+    const activityTypes = [...new Set(fitnessData.map(entry => entry.activity_type).filter(Boolean))];
+    
+    const intensityData = {};
+    activityTypes.forEach(type => {
+      const activities = fitnessData.filter(entry => entry.activity_type === type);
+      let totalCalories = 0;
+      let totalDuration = 0;
+      
+      activities.forEach(activity => {
+        totalCalories += (activity.calories_burned || 0);
+        totalDuration += (activity.duration || 0);
+      });
+      
+      // Calculate average calories burned per minute (intensity)
+      const intensity = totalDuration > 0 ? (totalCalories / totalDuration).toFixed(2) : 0;
+      intensityData[type] = {
+        intensity: parseFloat(intensity),
+        count: activities.length,
+        totalCalories: totalCalories
+      };
+    });
+    
+    // Sort activities by intensity
+    const sortedActivities = Object.keys(intensityData).sort((a, b) => 
+      intensityData[b].intensity - intensityData[a].intensity);
+    
+    // Select top activities for better visualization
+    const topActivities = sortedActivities.slice(0, 7);
+    
+    // Colors array
+    const colorScale = [
+      'rgba(255, 99, 132, 0.8)',   // High intensity - red
+      'rgba(255, 159, 64, 0.8)',   // Orange
+      'rgba(255, 205, 86, 0.8)',   // Yellow
+      'rgba(75, 192, 192, 0.8)',   // Green
+      'rgba(54, 162, 235, 0.8)',   // Blue
+      'rgba(153, 102, 255, 0.8)',  // Purple
+      'rgba(201, 203, 207, 0.8)'   // Low intensity - gray
+    ];
+    
+    // Create dataset with bubble size representing activity count
+    const dataset = {
+      label: 'Activity Intensity',
+      data: topActivities.map((activity, index) => ({
+        x: intensityData[activity].intensity,
+        y: intensityData[activity].totalCalories,
+        r: Math.max(5, Math.min(20, intensityData[activity].count * 3))
+      })),
+      backgroundColor: topActivities.map((_, i) => colorScale[i % colorScale.length])
+    };
+    
+    // Create chart
+    window.intensityChartInstance = new Chart(canvas, {
+      type: 'bubble',
+      data: {
+        datasets: [dataset]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const activityName = topActivities[context.dataIndex];
+                const intensity = intensityData[activityName].intensity;
+                const totalCals = intensityData[activityName].totalCalories;
+                const count = intensityData[activityName].count;
+                return [
+                  `Activity: ${activityName}`,
+                  `Intensity: ${intensity} cal/min`,
+                  `Total Calories: ${totalCals}`,
+                  `Sessions: ${count}`
+                ];
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Calories Burned Per Minute (Intensity)'
+            },
+            suggestedMin: 0
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Total Calories Burned'
+            },
             beginAtZero: true
           }
         }
@@ -398,48 +529,121 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-  // Initialize Calories Chart
-  function initCaloriesChart(fitnessData) {
-    const canvas = document.getElementById('caloriesChart');
+  // Initialize Performance Radar Chart (new visualization)
+  function initPerformanceRadarChart(fitnessData) {
+    const canvas = document.getElementById('performanceRadarChart');
     if (!canvas) return;
     
     // Destroy existing chart if it exists
-    if (window.caloriesChartInstance) {
-      window.caloriesChartInstance.destroy();
+    if (window.performanceRadarChartInstance) {
+      window.performanceRadarChartInstance.destroy();
     }
     
-    // Process data for chart
-    const dates = [...new Set(fitnessData.map(entry => entry.date))].sort();
-    const caloriesByDate = {};
+    // Extract activity types and compute metrics for each
+    const activityTypes = [...new Set(fitnessData.map(entry => entry.activity_type).filter(Boolean))];
     
-    dates.forEach(date => {
-      caloriesByDate[date] = fitnessData
-        .filter(entry => entry.date === date)
-        .reduce((sum, entry) => sum + (entry.calories_burned || 0), 0);
+    // Take only top 5 activities by frequency for radar
+    const activityCounts = {};
+    fitnessData.forEach(entry => {
+      if (entry.activity_type) {
+        activityCounts[entry.activity_type] = (activityCounts[entry.activity_type] || 0) + 1;
+      }
     });
     
+    // Calculate performance metrics
+    const metrics = {
+      'Consistency': 100, // Base value, will be adjusted
+      'Duration': calculateAverageDuration(fitnessData),
+      'Intensity': calculateAverageIntensity(fitnessData),
+      'Frequency': Object.keys(activityCounts).length,
+      'Diversity': calculateDiversityScore(fitnessData)
+    };
+    
+    // Normalize metrics to 0-100 scale
+    const normalizedMetrics = normalizeMetrics(metrics);
+    
+    // Create chart data
+    const radarData = {
+      labels: Object.keys(normalizedMetrics),
+      datasets: [{
+        label: 'Your Performance',
+        data: Object.values(normalizedMetrics),
+        fill: true,
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgb(54, 162, 235)',
+        pointBackgroundColor: 'rgb(54, 162, 235)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgb(54, 162, 235)'
+      }]
+    };
+    
     // Create chart
-    window.caloriesChartInstance = new Chart(canvas, {
-      type: 'bar',
-      data: {
-        labels: dates,
-        datasets: [{
-          label: 'Calories Burned',
-          data: dates.map(date => caloriesByDate[date]),
-          backgroundColor: 'rgba(255, 99, 132, 0.7)',
-          borderColor: 'rgb(255, 99, 132)',
-          borderWidth: 1
-        }]
-      },
+    window.performanceRadarChartInstance = new Chart(canvas, {
+      type: 'radar',
+      data: radarData,
       options: {
-        responsive: true,
+        elements: {
+          line: {
+            borderWidth: 3
+          }
+        },
         scales: {
-          y: {
-            beginAtZero: true
+          r: {
+            angleLines: {
+              display: true
+            },
+            suggestedMin: 0,
+            suggestedMax: 100
           }
         }
       }
     });
+  }
+  
+  // Helper function to calculate average duration
+  function calculateAverageDuration(fitnessData) {
+    if (fitnessData.length === 0) return 0;
+    const totalDuration = fitnessData.reduce((sum, entry) => sum + (entry.duration || 0), 0);
+    return totalDuration / fitnessData.length;
+  }
+  
+  // Helper function to calculate average intensity
+  function calculateAverageIntensity(fitnessData) {
+    if (fitnessData.length === 0) return 0;
+    let totalCalories = 0;
+    let totalDuration = 0;
+    
+    fitnessData.forEach(entry => {
+      totalCalories += (entry.calories_burned || 0);
+      totalDuration += (entry.duration || 0);
+    });
+    
+    return totalDuration > 0 ? (totalCalories / totalDuration) : 0;
+  }
+  
+  // Helper function to calculate diversity score
+  function calculateDiversityScore(fitnessData) {
+    const uniqueActivities = new Set(fitnessData.map(entry => entry.activity_type).filter(Boolean));
+    return uniqueActivities.size;
+  }
+  
+  // Helper function to normalize metrics to 0-100 scale
+  function normalizeMetrics(metrics) {
+    const normalizedMetrics = {};
+    const maxValues = {
+      'Consistency': 100,
+      'Duration': 120, // A 2-hour workout is considered excellent
+      'Intensity': 15, // 15 calories per minute is high intensity
+      'Frequency': 10, // 10 different activities is diverse
+      'Diversity': 10  // 10 different activity types is very diverse
+    };
+    
+    Object.keys(metrics).forEach(key => {
+      normalizedMetrics[key] = Math.min(100, (metrics[key] / maxValues[key]) * 100);
+    });
+    
+    return normalizedMetrics;
   }
   
   // Initialize Activity Pie Chart
@@ -460,107 +664,221 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
     
-    const activities = Object.keys(activityCounts);
+    // Sort activities by count
+    const sortedActivities = Object.entries(activityCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6); // Top 6 activities
+    
+    const activities = sortedActivities.map(entry => entry[0]);
+    const counts = sortedActivities.map(entry => entry[1]);
+    
+    // Generate dynamic colors
+    const colorPalette = [
+      'rgba(255, 99, 132, 0.8)',
+      'rgba(54, 162, 235, 0.8)',
+      'rgba(255, 206, 86, 0.8)',
+      'rgba(75, 192, 192, 0.8)',
+      'rgba(153, 102, 255, 0.8)',
+      'rgba(255, 159, 64, 0.8)'
+    ];
     
     // Create chart
     window.activityPieChartInstance = new Chart(canvas, {
-      type: 'pie',
+      type: 'doughnut',
       data: {
         labels: activities,
         datasets: [{
-          data: activities.map(activity => activityCounts[activity]),
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.7)',
-            'rgba(54, 162, 235, 0.7)',
-            'rgba(255, 206, 86, 0.7)',
-            'rgba(75, 192, 192, 0.7)',
-            'rgba(153, 102, 255, 0.7)',
-            'rgba(255, 159, 64, 0.7)'
-          ]
+          data: counts,
+          backgroundColor: colorPalette.slice(0, activities.length),
+          borderColor: 'white',
+          borderWidth: 2
         }]
       },
       options: {
-        responsive: true
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'right',
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.raw;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = Math.round((value / total) * 100);
+                return `${label}: ${value} sessions (${percentage}%)`;
+              }
+            }
+          }
+        },
+        cutout: '60%'
       }
     });
   }
   
-  // Initialize Stacked Chart
-  function initStackedChart(fitnessData) {
-    const canvas = document.getElementById('stackedChart');
+  // Initialize Goal Progress Chart (new visualization)
+  function initGoalProgressChart(fitnessData, summaryData) {
+    const canvas = document.getElementById('goalProgressChart');
     if (!canvas) return;
     
     // Destroy existing chart if it exists
-    if (window.stackedChartInstance) {
-      window.stackedChartInstance.destroy();
+    if (window.goalProgressChartInstance) {
+      window.goalProgressChartInstance.destroy();
     }
     
-    // Process data for chart
-    const dates = [...new Set(fitnessData.map(entry => entry.date))].sort();
-    const activityTypes = [...new Set(fitnessData.map(entry => entry.activity_type).filter(Boolean))];
+    // Define some typical fitness goals
+    const goals = {
+      'Weekly Activity': {
+        target: 5, // 5 sessions per week
+        current: calculateWeeklySessions(fitnessData),
+        unit: 'sessions'
+      },
+      'Daily Movement': {
+        target: 30, // 30 minutes average per day
+        current: calculateAverageDailyMovement(fitnessData),
+        unit: 'minutes'
+      },
+      'Calorie Burn': {
+        target: 2000, // 2000 calories per week
+        current: summaryData.total_calories_burned || 0,
+        unit: 'calories'
+      },
+      'Activity Diversity': {
+        target: 3, // 3 different types of activities
+        current: calculateDiversityScore(fitnessData),
+        unit: 'types'
+      }
+    };
     
-    const datasets = activityTypes.map((activity, index) => {
-      const data = dates.map(date => {
-        return fitnessData
-          .filter(entry => entry.date === date && entry.activity_type === activity)
-          .reduce((sum, entry) => sum + (entry.duration || 0), 0);
-      });
-      
-      const colors = [
-        'rgba(255, 99, 132, 0.7)',
-        'rgba(54, 162, 235, 0.7)',
-        'rgba(255, 206, 86, 0.7)',
-        'rgba(75, 192, 192, 0.7)',
-        'rgba(153, 102, 255, 0.7)',
-        'rgba(255, 159, 64, 0.7)'
-      ];
-      
-      return {
-        label: activity,
-        data: data,
-        backgroundColor: colors[index % colors.length]
-      };
+    // Calculate percentage of goal achievement for each goal
+    const goalPercentages = {};
+    Object.keys(goals).forEach(goal => {
+      const percentage = Math.min(100, (goals[goal].current / goals[goal].target) * 100);
+      goalPercentages[goal] = Math.round(percentage);
     });
     
+    // Create datasets
+    const datasets = [
+      {
+        label: 'Goal Achievement',
+        data: Object.values(goalPercentages),
+        backgroundColor: Object.values(goalPercentages).map(percentage => 
+          percentage >= 100 ? 'rgba(75, 192, 92, 0.8)' :
+          percentage >= 70 ? 'rgba(255, 206, 86, 0.8)' :
+          'rgba(255, 99, 132, 0.8)'
+        ),
+        borderColor: 'white',
+        borderWidth: 2,
+        borderRadius: 5
+      }
+    ];
+    
     // Create chart
-    window.stackedChartInstance = new Chart(canvas, {
+    window.goalProgressChartInstance = new Chart(canvas, {
       type: 'bar',
       data: {
-        labels: dates,
+        labels: Object.keys(goals),
         datasets: datasets
       },
       options: {
         responsive: true,
         scales: {
-          x: {
-            stacked: true,
-          },
           y: {
-            stacked: true,
-            beginAtZero: true
+            beginAtZero: true,
+            suggestedMax: 100,
+            title: {
+              display: true,
+              text: 'Goal Achievement (%)'
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const goalName = context.label;
+                const percentage = context.raw;
+                const goal = goals[goalName];
+                return [
+                  `Achievement: ${percentage}%`,
+                  `Current: ${goal.current} ${goal.unit}`,
+                  `Target: ${goal.target} ${goal.unit}`
+                ];
+              }
+            }
           }
         }
       }
     });
   }
   
-  // Initialize Calorie Gap Chart
-  function initGapChart(fitnessData, foodData) {
-    const canvas = document.getElementById('gapChart');
+  // Helper function to calculate weekly sessions
+  function calculateWeeklySessions(fitnessData) {
+    // Group entries by week
+    const weekMap = {};
+    fitnessData.forEach(entry => {
+      const date = new Date(entry.date);
+      const weekKey = `${date.getFullYear()}-${Math.floor(date.getTime() / (7 * 24 * 60 * 60 * 1000))}`;
+      if (!weekMap[weekKey]) {
+        weekMap[weekKey] = new Set();
+      }
+      weekMap[weekKey].add(entry.date);
+    });
+    
+    // Calculate average sessions per week
+    const weeks = Object.keys(weekMap);
+    if (weeks.length === 0) return 0;
+    
+    const totalSessions = weeks.reduce((sum, week) => sum + weekMap[week].size, 0);
+    return totalSessions / weeks.length;
+  }
+  
+  // Helper function to calculate average daily movement
+  function calculateAverageDailyMovement(fitnessData) {
+    // Group entries by day
+    const dayMap = {};
+    fitnessData.forEach(entry => {
+      if (!dayMap[entry.date]) {
+        dayMap[entry.date] = 0;
+      }
+      dayMap[entry.date] += (entry.duration || 0);
+    });
+    
+    // Calculate average minutes per day
+    const days = Object.keys(dayMap);
+    if (days.length === 0) return 0;
+    
+    const totalMinutes = days.reduce((sum, day) => sum + dayMap[day], 0);
+    return Math.round(totalMinutes / days.length);
+  }
+  
+  // Initialize Calories Dashboard (combines previous charts)
+  function initCaloriesDashboard(fitnessData, foodData, summaryData) {
+    initCalorieBalanceChart(fitnessData, foodData);
+    initNutritionChart(foodData);
+  }
+  
+  // Initialize Calorie Balance Chart
+  function initCalorieBalanceChart(fitnessData, foodData) {
+    const canvas = document.getElementById('calorieBalanceChart');
     if (!canvas) return;
     
     // Destroy existing chart if it exists
-    if (window.gapChartInstance) {
-      window.gapChartInstance.destroy();
+    if (window.calorieBalanceChartInstance) {
+      window.calorieBalanceChartInstance.destroy();
     }
     
     // Process data for chart
     const dates = [...new Set([...fitnessData.map(entry => entry.date), ...foodData.map(entry => entry.date)])].sort();
     
+    // Only use the last 7 days for clarity
+    const recentDates = dates.slice(-7);
+    
     const caloriesBurnedByDate = {};
     const caloriesConsumedByDate = {};
     
-    dates.forEach(date => {
+    recentDates.forEach(date => {
       caloriesBurnedByDate[date] = fitnessData
         .filter(entry => entry.date === date)
         .reduce((sum, entry) => sum + (entry.calories_burned || 0), 0);
@@ -570,40 +888,122 @@ document.addEventListener('DOMContentLoaded', () => {
         .reduce((sum, entry) => sum + (entry.calories || 0), 0);
     });
     
-    const calorieGap = dates.map(date => caloriesConsumedByDate[date] - caloriesBurnedByDate[date]);
-    
     // Create chart
-    window.gapChartInstance = new Chart(canvas, {
-      type: 'line',
+    window.calorieBalanceChartInstance = new Chart(canvas, {
+      type: 'bar',
       data: {
-        labels: dates,
-        datasets: [{
-          label: 'Calorie Gap (+ means surplus)',
-          data: calorieGap,
-          borderColor: 'rgb(255, 99, 132)',
-          backgroundColor: 'rgba(255, 99, 132, 0.2)',
-          fill: true,
-          tension: 0.1
-        }]
+        labels: recentDates,
+        datasets: [
+          {
+            label: 'Calories Consumed',
+            data: recentDates.map(date => caloriesConsumedByDate[date] || 0),
+            backgroundColor: 'rgba(255, 99, 132, 0.7)',
+            borderColor: 'rgb(255, 99, 132)',
+            borderWidth: 1
+          },
+          {
+            label: 'Calories Burned',
+            data: recentDates.map(date => caloriesBurnedByDate[date] || 0),
+            backgroundColor: 'rgba(75, 192, 192, 0.7)',
+            borderColor: 'rgb(75, 192, 192)',
+            borderWidth: 1
+          }
+        ]
       },
       options: {
         responsive: true,
-        scales: {
-          y: {
-            beginAtZero: false
+        plugins: {
+          title: {
+            display: true,
+            text: 'Calorie Balance'
+          },
+          tooltip: {
+            callbacks: {
+              afterBody: function(tooltipItems) {
+                const index = tooltipItems[0].dataIndex;
+                const date = recentDates[index];
+                const consumed = caloriesConsumedByDate[date] || 0;
+                const burned = caloriesBurnedByDate[date] || 0;
+                const balance = consumed - burned;
+                return `Net Balance: ${balance.toFixed(0)} cal`;
+              }
+            }
           }
         },
-        elements: {
-          point: {
-            backgroundColor: (context) => {
-              const value = context.dataset.data[context.dataIndex];
-              return value > 0 ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)';
-            },
-            radius: 4,
-            hoverRadius: 6
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Calories'
+            }
           }
         }
       }
     });
   }
+  
+  // Initialize Nutrition Chart
+  function initNutritionChart(foodData) {
+    const canvas = document.getElementById('nutritionChart');
+    if (!canvas) return;
+    
+    // Destroy existing chart if it exists
+    if (window.nutritionChartInstance) {
+      window.nutritionChartInstance.destroy();
+    }
+    
+    // Group meals by type
+    const mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
+    const mealData = {};
+    
+    mealTypes.forEach(type => {
+      const meals = foodData.filter(entry => entry.meal_type === type);
+      mealData[type] = {
+        count: meals.length,
+        calories: meals.reduce((sum, entry) => sum + (entry.calories || 0), 0)
+      };
+    });
+    
+    // Create chart
+    window.nutritionChartInstance = new Chart(canvas, {
+      type: 'polarArea',
+      data: {
+        labels: mealTypes,
+        datasets: [{
+          data: mealTypes.map(type => mealData[type].calories),
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(75, 192, 192, 0.7)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Calorie Distribution by Meal'
+          },
+          legend: {
+            position: 'bottom'
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const mealType = context.label;
+                const calories = context.raw;
+                const percentage = Math.round((calories / foodData.reduce((sum, entry) => sum + (entry.calories || 0), 0)) * 100);
+                return `${mealType}: ${calories} cal (${percentage}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+});
 });
