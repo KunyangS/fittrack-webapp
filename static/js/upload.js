@@ -90,4 +90,19 @@ document.addEventListener('DOMContentLoaded', () => {
       exerciseContainer.appendChild(createExerciseForm());
     }
   });
+  const addPlanBtn = document.getElementById('addPlanBtn');
+  const todoListNotebook = document.getElementById('todoListNotebook');
+
+  if (addPlanBtn && todoListNotebook) {
+    addPlanBtn.addEventListener('click', () => {
+      const li = document.createElement('li');
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = "Write your today's plan";
+      input.className = "w-full bg-transparent border-b-2 border-dashed focus:outline-none";
+      li.appendChild(input);
+      todoListNotebook.appendChild(li);
+    });
+  }
+  
 });

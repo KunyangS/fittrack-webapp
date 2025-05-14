@@ -22,16 +22,19 @@
         <span class="text-3xl font-serif text-blue-500 align-bottom">”</span>
         </blockquote>
 
-      
-      <!-- Daily Summary Card -->
-      <div class="bg-white dark:bg-neutral-800 p-4 rounded-xl shadow ring-1 ring-primary/10 w-full">
-        <div class="text-lg font-semibold text-primary">📅 {{ default_date }}</div>
-        <ul class="mt-3 space-y-1 text-sm text-left">
-          <li><span class="text-green-500">✔</span> Basic Info</li>
-          <li><span class="text-yellow-500">✘</span> Exercise</li>
-          <li><span class="text-green-500">✔</span> Food Intake</li>
-        </ul>
+      <!-- To-Do Notebook Style -->
+      <div class="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow ring-1 ring-primary/10 w-full text-left font-[Caveat]">
+        <div class="flex justify-between items-center mb-4">
+          <div class="text-2xl text-primary font-bold tracking-wide">📝 To Do List</div>
+          <button id="addPlanBtn" class="text-sm text-blue-500 hover:underline font-sans">+ Add</button>
+        </div>
+        <ol id="todoListNotebook" class="list-decimal pl-6 space-y-4 text-xl leading-loose text-gray-800 dark:text-gray-100">
+          <li>
+            <input type="text" placeholder="Write your today's plan" class="w-full bg-transparent border-b-2 border-dashed focus:outline-none"/>
+          </li>
+        </ol>
       </div>
+
 
       <!-- Welcome Banner -->
       <div class="mt-6 text-center">
