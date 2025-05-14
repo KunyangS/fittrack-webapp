@@ -165,19 +165,93 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Fetch visualization data
-  fetch("/api/visualisation/fitness")
-    .then(res => res.json())
-    .then(data => {
-      console.log("Fitness data:", data);
-      
-      // Update summary content
-      updateSummary(data.summary);
-      
-      // Initialize charts with the data
-      initializeCharts(data);
-    })
-    .catch(error => console.error("Error fetching fitness data:", error));
+  // Fetch visualization data with adjustment for last active week
+  fetchFitnessDataForLastActiveWeek();
+  
+  // Function to fetch fitness data focusing on the last active week
+  function fetchFitnessDataForLastActiveWeek() {
+    // First get all fitness data to find the last active date
+    fetch("/api/visualisation/fitness?days=90")  // Get last 90 days of data to find last activity
+      .then(res => res.json())
+      .then(data => {
+        // Find the last date with activity
+        let lastActiveDate = findLastActiveDate(data.fitness_entries);
+        if (!lastActiveDate) {
+          // If no activity found, use current date
+          console.log("No recent activity found, using current date");
+          return fetch("/api/visualisation/fitness?days=7");
+        } else {
+          console.log("Last active date found:", lastActiveDate);
+          // Now fetch one week of data ending on the last active date
+          const endDate = new Date(lastActiveDate);
+          const startDate = new Date(endDate);
+          startDate.setDate(startDate.getDate() - 6); // 7 days including the last active day
+          
+          // Format dates for API
+          const formattedEndDate = formatDateForAPI(endDate);
+          const formattedStartDate = formatDateForAPI(startDate);
+          
+          // Update date inputs in the UI
+          updateDateInputs(formattedStartDate, formattedEndDate);
+          
+          return fetch(`/api/visualisation/fitness?days=7&start_date=${formattedStartDate}&end_date=${formattedEndDate}`);
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("Fitness data for last active week:", data);
+        
+        // Update summary content
+        updateSummary(data.summary);
+        
+        // Initialize charts with the data
+        initializeCharts(data);
+      })
+      .catch(error => {
+        console.error("Error fetching fitness data:", error);
+        // Fallback to regular data fetch
+        fetch("/api/visualisation/fitness")
+          .then(res => res.json())
+          .then(data => {
+            updateSummary(data.summary);
+            initializeCharts(data);
+          });
+      });
+  }
+  
+  // Function to find the last date with activity data
+  function findLastActiveDate(fitnessEntries) {
+    if (!fitnessEntries || fitnessEntries.length === 0) {
+      return null;
+    }
+    
+    // Sort entries by date in descending order
+    const sortedEntries = [...fitnessEntries].sort((a, b) => {
+      return new Date(b.date) - new Date(a.date);
+    });
+    
+    // Return the most recent date
+    return sortedEntries[0].date;
+  }
+  
+  // Function to format date for API
+  function formatDateForAPI(date) {
+    return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+  }
+  
+  // Function to update date inputs in the UI
+  function updateDateInputs(startDate, endDate) {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    
+    if (startDateInput) {
+      startDateInput.value = startDate;
+    }
+    
+    if (endDateInput) {
+      endDateInput.value = endDate;
+    }
+  }
   
   // Add event listener for date filter button
   const applyFilterButton = document.getElementById('applyFilter');
