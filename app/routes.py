@@ -245,7 +245,6 @@ def reset_password():
     reset_success = session.pop('reset_success', False)  # Pop it from the session
     return render_template('reset_password.html', title='Reset Password', reset_success=reset_success)
 
-
 @app.route('/resend_code', methods=['POST'])
 def resend_code():
     import random

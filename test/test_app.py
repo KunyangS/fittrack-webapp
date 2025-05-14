@@ -8,7 +8,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from app import app
 from app.models import db, User
-from app.routes import verification_codes
+from app.routes import verification_codes, temp_users
+from flask import url_for
+
 
 class HomepageTestCase(unittest.TestCase):
 
@@ -156,6 +158,20 @@ class HomepageTestCase(unittest.TestCase):
         }, follow_redirects=True)
 
         self.assertIn(b'Visualise', login_response.data)
+    
+    def test_user_registration_successful(self):
+        # Simulate registering a user
+        response = self.client.post('/register', data={
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'Test@1234',
+            'confirm_password': 'Test@1234'
+        }, follow_redirects=True)
+
+        # Check if the flash message is displayed
+        self.assertIn(b'A verification link has been sent to your email (Check Console).', response.data)
+        # Check if the redirect happened (to login page)
+        self.assertIn(b'Login', response.data)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
