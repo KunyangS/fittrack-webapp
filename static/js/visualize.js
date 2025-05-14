@@ -9,10 +9,26 @@ document.addEventListener('DOMContentLoaded', () => {
       fetchRankingData(rankingTimePeriodSelect.value);
     });
   }
+  
+  // Add event listener for ranking sort option change
+  const rankingSortBySelect = document.getElementById('rankingSortBy');
+  if (rankingSortBySelect) {
+    rankingSortBySelect.addEventListener('change', () => {
+      fetchRankingData(rankingTimePeriodSelect.value, rankingSortBySelect.value);
+    });
+  }
+  
+  // Add event listener for export button
+  const exportRankingButton = document.getElementById('exportRanking');
+  if (exportRankingButton) {
+    exportRankingButton.addEventListener('click', () => {
+      exportRankingData();
+    });
+  }
 
   // Function to fetch ranking data from API
-  function fetchRankingData(timeRange = 'week') {
-    fetch(`/api/visualisation/ranking?time_range=${timeRange}`)
+  function fetchRankingData(timeRange = 'week', sortBy = 'calories') {
+    fetch(`/api/visualisation/ranking?time_range=${timeRange}&sort_by=${sortBy}`)
       .then(res => {
         if (!res.ok) {
           throw new Error(`HTTP error! Status: ${res.status}`);
@@ -22,12 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(data => {
         console.log("Ranking data:", data);
         displayRankingData(data.ranking);
+        // Store the data for export functionality
+        window.currentRankingData = data;
       })
       .catch(error => {
         console.error("Error fetching ranking data:", error);
         document.getElementById('rankingTableBody').innerHTML = `
           <tr>
-            <td colspan="4" class="px-6 py-4 text-center text-red-500">
+            <td colspan="5" class="px-6 py-4 text-center text-red-500">
               Failed to load ranking data. Please try again later.
             </td>
           </tr>
@@ -47,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!rankingData || rankingData.length === 0) {
       tableBody.innerHTML = `
         <tr>
-          <td colspan="4" class="px-6 py-4 text-center text-neutral-500 dark:text-neutral-400">
+          <td colspan="5" class="px-6 py-4 text-center text-neutral-500 dark:text-neutral-400">
             No ranking data available for this time period
           </td>
         </tr>
@@ -96,10 +114,45 @@ document.addEventListener('DOMContentLoaded', () => {
             ${entry.total_duration.toLocaleString()} mins
           </span>
         </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span class="text-sm text-neutral-900 dark:text-neutral-100">
+            ${entry.activity_count.toLocaleString()}
+          </span>
+        </td>
       `;
 
       tableBody.appendChild(row);
     });
+  }
+  
+  // Function to export ranking data as CSV
+  function exportRankingData() {
+    if (!window.currentRankingData || !window.currentRankingData.ranking) {
+      alert('No ranking data available to export');
+      return;
+    }
+    
+    const rankingData = window.currentRankingData.ranking;
+    const timeRange = window.currentRankingData.time_range;
+    const sortBy = window.currentRankingData.sort_by;
+    
+    // Create CSV content
+    let csvContent = 'Rank,Username,Calories Burned,Duration (mins),Activity Count\n';
+    
+    rankingData.forEach(entry => {
+      csvContent += `${entry.rank},"${entry.username}",${entry.total_calories_burned},${entry.total_duration},${entry.activity_count}\n`;
+    });
+    
+    // Create a download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `fitness_ranking_${timeRange}_${sortBy}_${new Date().toISOString().slice(0,10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   // Helper function to get medal emoji for top 3 ranks
@@ -125,6 +178,68 @@ document.addEventListener('DOMContentLoaded', () => {
       initializeCharts(data);
     })
     .catch(error => console.error("Error fetching fitness data:", error));
+  
+  // Add event listener for date filter button
+  const applyFilterButton = document.getElementById('applyFilter');
+  if (applyFilterButton) {
+    applyFilterButton.addEventListener('click', () => {
+      applyDateFilter();
+    });
+  }
+  
+  // Function to apply date filters and fetch new data
+  function applyDateFilter() {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const timePeriodSelect = document.getElementById('timePeriod');
+    
+    let queryParams = '';
+    
+    if (startDateInput && startDateInput.value) {
+      const startDate = new Date(startDateInput.value);
+      const endDate = endDateInput && endDateInput.value ? new Date(endDateInput.value) : new Date();
+      
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        alert('Please enter valid dates');
+        return;
+      }
+      
+      if (startDate > endDate) {
+        alert('Start date cannot be after end date');
+        return;
+      }
+      
+      // Calculate days between dates
+      const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+      queryParams = `?days=${daysDiff}&start_date=${startDateInput.value}`;
+      
+      if (endDateInput && endDateInput.value) {
+        queryParams += `&end_date=${endDateInput.value}`;
+      }
+    } else if (timePeriodSelect && timePeriodSelect.value) {
+      // If no date range selected, use time period dropdown
+      const daysMap = {
+        'day': 1,
+        'week': 7,
+        'month': 30
+      };
+      queryParams = `?days=${daysMap[timePeriodSelect.value] || 30}`;
+    }
+    
+    // Fetch data with the new filters
+    fetch(`/api/visualisation/fitness${queryParams}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log("Filtered fitness data:", data);
+        
+        // Update summary content
+        updateSummary(data.summary);
+        
+        // Initialize charts with the new data
+        initializeCharts(data);
+      })
+      .catch(error => console.error("Error fetching filtered fitness data:", error));
+  }
     
   // Function to update the summary section with data
   function updateSummary(summaryData) {
@@ -169,6 +284,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('durationChart');
     if (!canvas) return;
     
+    // Destroy existing chart if it exists
+    if (window.durationChartInstance) {
+      window.durationChartInstance.destroy();
+    }
+    
     // Process data for chart
     const dates = [...new Set(fitnessData.map(entry => entry.date))].sort();
     const durationByDate = {};
@@ -180,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Create chart
-    new Chart(canvas, {
+    window.durationChartInstance = new Chart(canvas, {
       type: 'line',
       data: {
         labels: dates,
@@ -209,6 +329,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('caloriesChart');
     if (!canvas) return;
     
+    // Destroy existing chart if it exists
+    if (window.caloriesChartInstance) {
+      window.caloriesChartInstance.destroy();
+    }
+    
     // Process data for chart
     const dates = [...new Set(fitnessData.map(entry => entry.date))].sort();
     const caloriesByDate = {};
@@ -220,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Create chart
-    new Chart(canvas, {
+    window.caloriesChartInstance = new Chart(canvas, {
       type: 'bar',
       data: {
         labels: dates,
@@ -248,6 +373,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('activityPieChart');
     if (!canvas) return;
     
+    // Destroy existing chart if it exists
+    if (window.activityPieChartInstance) {
+      window.activityPieChartInstance.destroy();
+    }
+    
     // Process data for chart
     const activityCounts = {};
     fitnessData.forEach(entry => {
@@ -259,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const activities = Object.keys(activityCounts);
     
     // Create chart
-    new Chart(canvas, {
+    window.activityPieChartInstance = new Chart(canvas, {
       type: 'pie',
       data: {
         labels: activities,
@@ -285,6 +415,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function initStackedChart(fitnessData) {
     const canvas = document.getElementById('stackedChart');
     if (!canvas) return;
+    
+    // Destroy existing chart if it exists
+    if (window.stackedChartInstance) {
+      window.stackedChartInstance.destroy();
+    }
     
     // Process data for chart
     const dates = [...new Set(fitnessData.map(entry => entry.date))].sort();
@@ -314,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Create chart
-    new Chart(canvas, {
+    window.stackedChartInstance = new Chart(canvas, {
       type: 'bar',
       data: {
         labels: dates,
@@ -340,6 +475,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('gapChart');
     if (!canvas) return;
     
+    // Destroy existing chart if it exists
+    if (window.gapChartInstance) {
+      window.gapChartInstance.destroy();
+    }
+    
     // Process data for chart
     const dates = [...new Set([...fitnessData.map(entry => entry.date), ...foodData.map(entry => entry.date)])].sort();
     
@@ -359,16 +499,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const calorieGap = dates.map(date => caloriesConsumedByDate[date] - caloriesBurnedByDate[date]);
     
     // Create chart
-    new Chart(canvas, {
+    window.gapChartInstance = new Chart(canvas, {
       type: 'line',
       data: {
         labels: dates,
         datasets: [{
           label: 'Calorie Gap (+ means surplus)',
           data: calorieGap,
-          borderColor: calorieGap.map(value => value > 0 ? 'rgb(255, 99, 132)' : 'rgb(75, 192, 192)'),
-          backgroundColor: calorieGap.map(value => value > 0 ? 'rgba(255, 99, 132, 0.2)' : 'rgba(75, 192, 192, 0.2)'),
-          fill: false,
+          borderColor: 'rgb(255, 99, 132)',
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          fill: true,
           tension: 0.1
         }]
       },
@@ -377,6 +517,16 @@ document.addEventListener('DOMContentLoaded', () => {
         scales: {
           y: {
             beginAtZero: false
+          }
+        },
+        elements: {
+          point: {
+            backgroundColor: (context) => {
+              const value = context.dataset.data[context.dataIndex];
+              return value > 0 ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)';
+            },
+            radius: 4,
+            hoverRadius: 6
           }
         }
       }
