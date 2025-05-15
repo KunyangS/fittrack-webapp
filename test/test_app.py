@@ -267,5 +267,8 @@ class HomepageTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Privacy', response.data)
 
+    def test_api_fitness_requires_login(self):
+        response = self.client.get('/api/visualisation/fitness', follow_redirects=True)
+        self.assertIn(b'Login', response.data)  # Should redirect to login
 if __name__ == '__main__':
     unittest.main(verbosity=2)
