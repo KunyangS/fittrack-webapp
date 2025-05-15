@@ -270,5 +270,12 @@ class HomepageTestCase(unittest.TestCase):
     def test_api_fitness_requires_login(self):
         response = self.client.get('/api/visualisation/fitness', follow_redirects=True)
         self.assertIn(b'Login', response.data)  # Should redirect to login
+
+    def test_api_fitness_returns_json_after_login(self):
+        email = self.register_user()
+        self.client.post('/login', data={'email': email, 'password': 'Test@1234'}, follow_redirects=True)
+        response = self.client.get('/api/visualisation/fitness')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content_type, 'application/json')
 if __name__ == '__main__':
     unittest.main(verbosity=2)
