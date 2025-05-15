@@ -507,6 +507,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
     }
+
+    // Goal Progress Chart
+    if (ctxGoal) {
+      initGoalProgressChart(filteredFitness);
+    }
   }
 
   // ---------- Initial Render with Defaults ----------
@@ -729,5 +734,145 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const uniqueActivities = new Set(fitnessData.map(entry => entry.activity_type).filter(Boolean));
     return uniqueActivities.size;
+  }
+
+  // Goal Progress Tracker functions
+  function initGoalProgressChart(filteredFitness) {
+    const ctxGoal = document.getElementById('goalProgressChart')?.getContext('2d');
+    if (!ctxGoal) return;
+    
+    // Check if we have valid data
+    if (!filteredFitness || !Array.isArray(filteredFitness) || filteredFitness.length === 0) {
+      console.warn("No fitness data available for goal progress chart");
+      return;
+    }
+    
+    // Calculate weekly sessions
+    function calculateWeeklySessions(fitnessData) {
+      // Group entries by week
+      const weekMap = {};
+      fitnessData.forEach(entry => {
+        const date = new Date(entry.date);
+        const weekKey = `${date.getFullYear()}-${Math.floor(date.getTime() / (7 * 24 * 60 * 60 * 1000))}`;
+        if (!weekMap[weekKey]) {
+          weekMap[weekKey] = new Set();
+        }
+        weekMap[weekKey].add(entry.date);
+      });
+      
+      // Calculate average sessions per week
+      const weeks = Object.keys(weekMap);
+      if (weeks.length === 0) return 0;
+      
+      const totalSessions = weeks.reduce((sum, week) => sum + weekMap[week].size, 0);
+      return totalSessions / weeks.length;
+    }
+    
+    // Calculate average daily movement
+    function calculateAverageDailyMovement(fitnessData) {
+      // Group entries by day
+      const dayMap = {};
+      fitnessData.forEach(entry => {
+        if (!dayMap[entry.date]) {
+          dayMap[entry.date] = 0;
+        }
+        dayMap[entry.date] += (entry.duration || 0);
+      });
+      
+      // Calculate average minutes per day
+      const days = Object.keys(dayMap);
+      if (days.length === 0) return 0;
+      
+      const totalMinutes = days.reduce((sum, day) => sum + dayMap[day], 0);
+      return totalMinutes / days.length;
+    }
+
+    // Define some typical fitness goals
+    const goals = {
+      'Weekly Activity': {
+        target: 5, // 5 sessions per week
+        current: calculateWeeklySessions(filteredFitness),
+        unit: 'sessions'
+      },
+      'Daily Movement': {
+        target: 30, // 30 minutes average per day
+        current: calculateAverageDailyMovement(filteredFitness),
+        unit: 'minutes'
+      },
+      'Calorie Burn': {
+        target: 2000, // 2000 calories per week
+        current: filteredFitness.reduce((sum, entry) => sum + (entry.calories_burned || 0), 0),
+        unit: 'calories'
+      },
+      'Activity Diversity': {
+        target: 3, // 3 different types of activities
+        current: calculateDiversityScore(filteredFitness),
+        unit: 'types'
+      }
+    };
+    
+    // Calculate percentage of goal achievement for each goal
+    const goalPercentages = {};
+    Object.keys(goals).forEach(goal => {
+      const percentage = Math.min(100, ((goals[goal].current || 0) / goals[goal].target) * 100);
+      goalPercentages[goal] = Math.round(percentage);
+    });
+    
+    // Create datasets
+    const datasets = [
+      {
+        label: 'Goal Achievement',
+        data: Object.values(goalPercentages),
+        backgroundColor: Object.values(goalPercentages).map(percentage => 
+          percentage >= 100 ? 'rgba(75, 192, 92, 0.8)' :
+          percentage >= 70 ? 'rgba(255, 206, 86, 0.8)' :
+          'rgba(255, 99, 132, 0.8)'
+        ),
+        borderColor: 'white',
+        borderWidth: 2,
+        borderRadius: 5
+      }
+    ];
+
+    // Destroy previous chart if exists
+    goalChart?.destroy();
+    
+    // Create chart
+    goalChart = new Chart(ctxGoal, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(goals),
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            suggestedMax: 100,
+            title: {
+              display: true,
+              text: 'Goal Achievement (%)'
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const goalName = context.label;
+                const percentage = context.raw;
+                const goal = goals[goalName];
+                return [
+                  `Achievement: ${percentage}%`,
+                  `Current: ${goal.current.toFixed(1)} ${goal.unit}`,
+                  `Target: ${goal.target} ${goal.unit}`
+                ];
+              }
+            }
+          }
+        }
+      }
+    });
   }
 });
