@@ -13,17 +13,16 @@
 <!-- Main Content Container with improved semantic structure -->
 <div class="container mx-auto px-4 py-8">
 
-  <!-- Page Header: Title and introductory paragraph -->
-  <h1 class="text-3xl lg:text-4xl font-heading font-bold mb-4 text-center text-neutral-800 dark:text-neutral-100">
-    Welcome to <span class="text-primary dark:text-primary-light">FitTrack</span>
-  </h1>
-  <p class="text-center text-neutral-600 dark:text-neutral-400 mb-10 max-w-2xl mx-auto font-sans">
-    Your personal companion to track exercise habits, visualize your progress, and share your achievements with friends. Stay motivated and reach your fitness goals with our intuitive tracking tools.
-  </p>
-
-  <!-- Hero Section -->
-  <section id="hero" class="text-center py-12" aria-labelledby="hero-heading">
-    <div class="flex flex-wrap gap-4 justify-center">
+  <!-- Page Header with integrated buttons: Combines title, intro text, and CTA buttons -->
+  <div class="max-w-4xl mx-auto mb-16 text-center">
+    <h1 class="text-3xl lg:text-4xl font-heading font-bold mb-4 text-neutral-800 dark:text-neutral-100">
+      Welcome to <span class="text-primary dark:text-primary-light">FitTrack</span>
+    </h1>
+    <p class="text-center text-neutral-600 dark:text-neutral-400 mb-8 max-w-2xl mx-auto font-sans">
+      Your personal companion to track exercise habits, visualize your progress, and share your achievements with friends. Stay motivated and reach your fitness goals with our intuitive tracking tools.
+    </p>
+    
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
       <a href="{{ url_for('register') }}"
          class="inline-block bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light text-white font-semibold py-3 px-8 rounded-full shadow-md hover:shadow-lg transition duration-200 ease-in-out transform hover:scale-105"
          aria-label="Create a new account">
@@ -35,7 +34,7 @@
          <i class="fas fa-sign-in-alt mr-2" aria-hidden="true"></i> Login
       </a>
     </div>
-  </section>
+  </div>
 
   <!-- Main Content Grid: Organizes content into responsive columns -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
