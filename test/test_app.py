@@ -277,5 +277,17 @@ class HomepageTestCase(unittest.TestCase):
         response = self.client.get('/api/visualisation/fitness')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content_type, 'application/json')
+
+    def test_registration_invalid_email_format(self):
+        response = self.client.post('/register', data={
+            'username': 'testuser2',
+            'email': 'invalid-email',
+            'password': 'Test@1234',
+            'confirm_password': 'Test@1234'
+        }, follow_redirects=True)
+
+        self.assertIn(b'Enter a valid email address.', response.data)
+
+    
 if __name__ == '__main__':
     unittest.main(verbosity=2)
