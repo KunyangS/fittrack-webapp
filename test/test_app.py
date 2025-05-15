@@ -256,8 +256,11 @@ class HomepageTestCase(unittest.TestCase):
         }, follow_redirects=True)
 
         self.assertIn(b'Passwords do not match', response.data)
-
-
+        
+    def test_terms_of_service_page_loads(self):
+        response = self.client.get('/terms-of-service')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Terms', response.data)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
