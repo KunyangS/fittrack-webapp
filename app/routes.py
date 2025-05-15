@@ -282,7 +282,7 @@ def register():
                 for error in errors:
                     flash(f"❌ {error}", "danger")
             return redirect('/register')
-        
+
         username = form.username.data
         email = form.email.data
         password = form.password.data
@@ -444,7 +444,9 @@ def upload_avatar():
         current_user.avatar_url = filename
         db.session.commit()
         flash('Avatar updated!', 'success')
-    return redirect(request.referrer or url_for('upload'))
+    return redirect(request.referrer or url_for('upload.upload_page'))
+
+
 
 @app.route('/privacy-policy')
 def privacy_policy():
