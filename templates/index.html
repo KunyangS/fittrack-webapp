@@ -13,15 +13,13 @@
 <!-- Main Content Container with improved semantic structure -->
 <div class="container mx-auto px-4 py-6">
 
-  <!-- Hero Section with enhanced accessibility and clearer CTA -->
-  <section id="hero" class="flex flex-col items-center justify-center py-12 md:py-20 px-4 text-center" 
-           aria-labelledby="hero-heading">
+  <!-- Hero Section -->
+  <section id="hero" class="text-center py-12 md:py-20" aria-labelledby="hero-heading">
     <h1 id="hero-heading" class="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-6 text-neutral-800 dark:text-neutral-100 tracking-tight">
       Welcome to <span class="text-primary dark:text-primary-light">FitTrack</span>
     </h1>
     <p class="text-lg md:text-xl text-neutral-600 dark:text-neutral-400 mb-8 max-w-3xl mx-auto leading-relaxed">
-      Your personal companion to track exercise habits, visualize your progress, and share your achievements with friends.
-      Stay motivated and reach your fitness goals with our intuitive tracking tools.
+      Your personal companion to track exercise habits, visualize your progress, and share your achievements with friends. Stay motivated and reach your fitness goals with our intuitive tracking tools.
     </p>
     <div class="flex flex-wrap gap-4 justify-center">
       <a href="{{ url_for('register') }}"
@@ -37,100 +35,98 @@
     </div>
   </section>
 
-  <!-- Feature Cards Section with improved visual hierarchy -->
+  <!-- Feature Cards Section -->
   <section id="features" class="py-16" aria-labelledby="features-heading">
     <h2 id="features-heading" class="sr-only">Key Features</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto px-4">
-      <!-- Card 1: Tracking -->
-      <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700 transition-all duration-300 hover:shadow-xl transform hover:scale-[1.01]">
-        <div class="flex items-center justify-center w-16 h-16 mx-auto mb-6 rounded-full bg-green-50 dark:bg-green-900/30 text-primary dark:text-primary-light">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+      <!-- Card 1: Effortless Tracking -->
+      <div class="bg-white dark:bg-neutral-800 p-8 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 flex flex-col items-center text-center transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-1">
+        <div class="flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-green-100 dark:bg-green-900/30 text-primary dark:text-primary-light">
           <i class="fas fa-pencil-alt text-3xl" aria-hidden="true"></i>
         </div>
-        <h3 class="text-xl font-heading font-semibold mb-4 text-center text-neutral-700 dark:text-neutral-200">
+        <h3 class="text-xl font-heading font-semibold mb-3 text-neutral-700 dark:text-neutral-200">
           Effortless Tracking
         </h3>
-        <p class="text-center text-neutral-600 dark:text-neutral-400">
+        <p class="text-neutral-600 dark:text-neutral-400 leading-relaxed">
           Log workouts, nutrition, and mood in seconds. Upload data or enter manually—your habits, your way.
         </p>
       </div>
       
-      <!-- Card 2: Visualizations -->
-      <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700 transition-all duration-300 hover:shadow-xl transform hover:scale-[1.01]">
-        <div class="flex items-center justify-center w-16 h-16 mx-auto mb-6 rounded-full bg-blue-50 dark:bg-blue-900/30 text-green-500">
+      <!-- Card 2: Insightful Visualizations -->
+      <div class="bg-white dark:bg-neutral-800 p-8 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 flex flex-col items-center text-center transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-1">
+        <div class="flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-green-500">
           <i class="fas fa-chart-line text-3xl" aria-hidden="true"></i>
         </div>
-        <h3 class="text-xl font-heading font-semibold mb-4 text-center text-neutral-700 dark:text-neutral-200">
+        <h3 class="text-xl font-heading font-semibold mb-3 text-neutral-700 dark:text-neutral-200">
           Insightful Visualizations
         </h3>
-        <p class="text-center text-neutral-600 dark:text-neutral-400">
+        <p class="text-neutral-600 dark:text-neutral-400 leading-relaxed">
           Instantly see trends and progress with beautiful charts. Stay motivated with clear, actionable insights.
         </p>
       </div>
       
-      <!-- Card 3: Sharing -->
-      <div class="bg-neutral-50 dark:bg-neutral-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700 transition-all duration-300 hover:shadow-xl transform hover:scale-[1.01]">
-        <div class="flex items-center justify-center w-16 h-16 mx-auto mb-6 rounded-full bg-pink-50 dark:bg-pink-900/30 text-red-500">
+      <!-- Card 3: Celebrate & Share -->
+      <div class="bg-white dark:bg-neutral-800 p-8 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 flex flex-col items-center text-center transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-1">
+        <div class="flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-pink-100 dark:bg-pink-900/30 text-red-500">
           <i class="fas fa-share-alt text-3xl" aria-hidden="true"></i>
         </div>
-        <h3 class="text-xl font-heading font-semibold mb-4 text-center text-neutral-700 dark:text-neutral-200">
+        <h3 class="text-xl font-heading font-semibold mb-3 text-neutral-700 dark:text-neutral-200">
           Celebrate & Share
         </h3>
-        <p class="text-center text-neutral-600 dark:text-neutral-400">
+        <p class="text-neutral-600 dark:text-neutral-400 leading-relaxed">
           Share milestones with friends or on social media. Compare progress and celebrate your achievements together.
         </p>
       </div>
     </div>
   </section>
 
-  <!-- About & How It Works Sections with improved layout -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-16 max-w-7xl mx-auto px-4 py-12">
-    <!-- About Section -->
-    <section id="about" class="flex flex-col gap-6" aria-labelledby="about-heading">
-      <div>
-        <h2 id="about-heading" class="text-2xl font-heading font-bold mb-4 text-primary-dark dark:text-primary-light">
+  <!-- About & How It Works Sections -->
+  <section class="py-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
+      <!-- About Section -->
+      <div id="about" class="bg-white dark:bg-neutral-800 p-8 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700" aria-labelledby="about-heading">
+        <h2 id="about-heading" class="text-2xl font-heading font-bold mb-6 text-neutral-800 dark:text-neutral-100">
           About FitTrack
         </h2>
         <p class="text-neutral-600 dark:text-neutral-400 mb-6 leading-relaxed">
           Discover what FitTrack is all about — a smart way to build healthy habits and track your daily progress effortlessly.
         </p>
-        <ul class="list-disc list-inside text-neutral-600 dark:text-neutral-400 space-y-4 ml-4">
+        <ul class="space-y-3 text-neutral-600 dark:text-neutral-400">
           <li class="flex items-start">
-            <span class="inline-block bg-green-100 dark:bg-green-800/30 p-1 rounded-full mr-2 mt-1">
-              <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
+            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 dark:bg-green-800/30 mr-3 mt-1 flex-shrink-0">
+              <i class="fas fa-check text-green-600 dark:text-green-400 text-sm"></i>
             </span>
-            Track your workouts, meals, and mood all in one place
+            <span>Track your workouts, meals, and mood all in one place</span>
           </li>
           <li class="flex items-start">
-            <span class="inline-block bg-green-100 dark:bg-green-800/30 p-1 rounded-full mr-2 mt-1">
-              <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
+            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 dark:bg-green-800/30 mr-3 mt-1 flex-shrink-0">
+              <i class="fas fa-check text-green-600 dark:text-green-400 text-sm"></i>
             </span>
-            Visualize your progress with interactive charts
+            <span>Visualize your progress with interactive charts</span>
           </li>
           <li class="flex items-start">
-            <span class="inline-block bg-green-100 dark:bg-green-800/30 p-1 rounded-full mr-2 mt-1">
-              <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
+            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 dark:bg-green-800/30 mr-3 mt-1 flex-shrink-0">
+              <i class="fas fa-check text-green-600 dark:text-green-400 text-sm"></i>
             </span>
-            Set goals and monitor your achievements
+            <span>Set goals and monitor your achievements</span>
           </li>
           <li class="flex items-start">
-            <span class="inline-block bg-green-100 dark:bg-green-800/30 p-1 rounded-full mr-2 mt-1">
-              <i class="fas fa-check text-green-600 dark:text-green-400 text-xs"></i>
+            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 dark:bg-green-800/30 mr-3 mt-1 flex-shrink-0">
+              <i class="fas fa-check text-green-600 dark:text-green-400 text-sm"></i>
             </span>
-            Share your journey with friends and family
+            <span>Share your journey with friends and family</span>
           </li>
         </ul>
+        <div class="mt-8 overflow-hidden rounded-lg shadow-md">
+          <img src="{{ url_for('static', filename='img/images.jpg') }}" 
+               alt="FitTrack dashboard showing fitness tracking features" 
+               class="w-full h-auto object-cover transition-transform duration-300 hover:scale-105">
+        </div>
       </div>
-      <div class="mt-6 overflow-hidden rounded-xl shadow-lg">
-        <img src="{{ url_for('static', filename='img/images.jpg') }}" 
-             alt="FitTrack dashboard showing fitness tracking features" 
-             class="w-full h-auto object-cover transition-transform duration-300 hover:scale-105">
-      </div>
-    </section>
 
-    <!-- How It Works Section -->
-    <section id="how-it-works" class="flex flex-col gap-6" aria-labelledby="how-heading">
-      <div>
-        <h2 id="how-heading" class="text-2xl font-heading font-bold mb-4 text-primary-dark dark:text-primary-light">
+      <!-- How It Works Section -->
+      <div id="how-it-works" class="bg-white dark:bg-neutral-800 p-8 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700" aria-labelledby="how-heading">
+        <h2 id="how-heading" class="text-2xl font-heading font-bold mb-6 text-neutral-800 dark:text-neutral-100">
           How It Works
         </h2>
         <p class="text-neutral-600 dark:text-neutral-400 mb-6 leading-relaxed">
@@ -156,27 +152,27 @@
             </li>
           </ol>
         </div>
+        <div class="mt-8 overflow-hidden rounded-lg shadow-md">
+          <img src="{{ url_for('static', filename='img/upload.jpg') }}" 
+               alt="FitTrack data entry interface" 
+               class="w-full h-auto object-cover transition-transform duration-300 hover:scale-105">
+        </div>
       </div>
-      <div class="mt-6 overflow-hidden rounded-xl shadow-lg">
-        <img src="{{ url_for('static', filename='img/upload.jpg') }}" 
-             alt="FitTrack data entry interface" 
-             class="w-full h-auto object-cover transition-transform duration-300 hover:scale-105">
-      </div>
-    </section>
-  </div>
+    </div>
+  </section>
 
-  <!-- Live Stats & Share Progress Sections with improved layout -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-16 max-w-7xl mx-auto px-4 py-12">
-    <!-- Live Stats Section -->
-    <section id="live-stats" class="flex flex-col gap-6" aria-labelledby="stats-heading">
-      <div>
-        <h2 id="stats-heading" class="text-2xl font-heading font-bold mb-4 text-primary-dark dark:text-primary-light">
+  <!-- Live Stats & Share Progress Sections -->
+  <section class="py-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start max-w-7xl mx-auto">
+      <!-- Live Stats Section -->
+      <div id="live-stats" class="bg-white dark:bg-neutral-800 p-8 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700" aria-labelledby="stats-heading">
+        <h2 id="stats-heading" class="text-2xl font-heading font-bold mb-6 text-neutral-800 dark:text-neutral-100">
           Live Stats & Analytics
         </h2>
         <p class="text-neutral-600 dark:text-neutral-400 mb-6 leading-relaxed">
           See real-time community stats — total workouts logged, calories tracked, and how many users are staying on track with their fitness goals.
         </p>
-        <div class="bg-neutral-50 dark:bg-neutral-800 p-6 rounded-xl shadow-lg">
+        <div class="bg-neutral-100 dark:bg-neutral-700/50 rounded-lg p-6">
           <ul class="space-y-3 text-neutral-600 dark:text-neutral-400">
             <li class="flex items-center">
               <i class="fas fa-chart-pie text-primary dark:text-primary-light mr-3"></i>
@@ -192,24 +188,22 @@
             </li>
           </ul>
         </div>
+        <div class="mt-8 overflow-hidden rounded-lg shadow-md">
+          <img src="{{ url_for('static', filename='img/visualize.jpg') }}" 
+               alt="Live statistics dashboard showing fitness analytics" 
+               class="w-full h-auto object-cover transition-transform duration-300 hover:scale-105">
+        </div>
       </div>
-      <div class="mt-6 overflow-hidden rounded-xl shadow-lg">
-        <img src="{{ url_for('static', filename='img/visualize.jpg') }}" 
-             alt="Live statistics dashboard showing fitness analytics" 
-             class="w-full h-auto object-cover transition-transform duration-300 hover:scale-105">
-      </div>
-    </section>
 
-    <!-- Share Progress Section -->
-    <section id="share-progress" class="flex flex-col gap-6" aria-labelledby="share-heading">
-      <div>
-        <h2 id="share-heading" class="text-2xl font-heading font-bold mb-4 text-primary-dark dark:text-primary-light">
+      <!-- Share Progress Section -->
+      <div id="share-progress" class="bg-white dark:bg-neutral-800 p-8 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700" aria-labelledby="share-heading">
+        <h2 id="share-heading" class="text-2xl font-heading font-bold mb-6 text-neutral-800 dark:text-neutral-100">
           Share Your Progress
         </h2>
         <p class="text-neutral-600 dark:text-neutral-400 mb-6 leading-relaxed">
           Celebrate your achievements and inspire others! Share your fitness milestones, workout summaries, or nutrition stats with friends.
         </p>
-        <div class="bg-neutral-50 dark:bg-neutral-800 p-6 rounded-xl shadow-lg">
+        <div class="bg-neutral-100 dark:bg-neutral-700/50 rounded-lg p-6">
           <ol class="list-decimal space-y-3 ml-5 text-neutral-600 dark:text-neutral-400">
             <li>Go to your dashboard and select data to share</li>
             <li>Click the <span class="font-semibold text-primary dark:text-primary-light">Share</span> button</li>
@@ -217,166 +211,180 @@
             <li>Control your privacy—share only what you want</li>
           </ol>
         </div>
+        <div class="mt-8 overflow-hidden rounded-lg shadow-md">
+          <img src="{{ url_for('static', filename='img/share.jpg') }}" 
+               alt="Share Progress Feature showing social sharing options" 
+               class="w-full h-auto object-cover transition-transform duration-300 hover:scale-105">
+        </div>
       </div>
-      <div class="mt-6 overflow-hidden rounded-xl shadow-lg">
-        <img src="{{ url_for('static', filename='img/share.jpg') }}" 
-             alt="Share Progress Feature showing social sharing options" 
-             class="w-full h-auto object-cover transition-transform duration-300 hover:scale-105">
-      </div>
-    </section>
-  </div>
+    </div>
+  </section>
 
-  <!-- Call to Action Section with improved visual appeal -->
-  <section id="cta" class="bg-gradient-to-r from-neutral-50 to-blue-50 dark:from-neutral-800 dark:to-blue-900/20 p-8 sm:p-12 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700 my-16 max-w-7xl mx-auto" aria-labelledby="cta-heading">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-      <div>
-        <h2 id="cta-heading" class="text-3xl font-heading font-bold mb-4 text-primary-dark dark:text-primary-light">
-          Ready to Take Control?
-        </h2>
-        <p class="text-neutral-600 dark:text-neutral-400 mb-6 leading-relaxed">
-          Register now to start uploading your fitness and nutrition data, visualize your progress, and share your achievements securely.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-4">
-          <a href="{{ url_for('register') }}" class="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg text-center hover:shadow-xl transition duration-200 transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400">
-            <i class="fas fa-user-plus mr-2" aria-hidden="true"></i> Get Started
+  <!-- Call to Action Section -->
+  <section id="cta" class="py-16" aria-labelledby="cta-heading">
+    <div class="max-w-5xl mx-auto bg-gradient-to-r from-primary to-teal-500 dark:from-primary-dark dark:to-teal-700 text-white p-10 sm:p-16 rounded-xl shadow-xl text-center">
+      <h2 id="cta-heading" class="text-3xl font-heading font-bold mb-6">
+        Ready to Take Control?
+      </h2>
+      <p class="text-lg mb-8 leading-relaxed max-w-3xl mx-auto">
+        Register now to start uploading your fitness and nutrition data, visualize your progress, and share your achievements securely.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <a href="{{ url_for('register') }}" class="inline-block bg-white hover:bg-neutral-100 text-primary dark:text-primary-dark font-semibold py-3 px-8 rounded-full shadow-md hover:shadow-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white">
+          <i class="fas fa-user-plus mr-2" aria-hidden="true"></i> Get Started
+        </a>
+        <div class="flex items-center text-neutral-100 dark:text-neutral-200 mt-4 sm:mt-0">
+          <span>Already have an account?</span>
+          <a href="{{ url_for('login') }}" class="ml-2 hover:underline font-medium">
+            Log in here
           </a>
-          <span class="flex items-center text-neutral-500 dark:text-neutral-400">
-            Already have an account?
-            <a href="{{ url_for('login') }}" class="ml-2 text-primary dark:text-primary-light hover:underline font-medium">
-              Log in here
-            </a>
-          </span>
         </div>
-      </div>
-      <div class="overflow-hidden rounded-xl shadow-lg">
-        <img src="{{ url_for('static', filename='img/login.jpg') }}" 
-             alt="Join FitTrack - Login screen" 
-             class="w-full h-auto object-cover transition-transform duration-300 hover:scale-105">
       </div>
     </div>
   </section>
 
-  <!-- Testimonials Section with better visual structure -->
-  <section id="testimonials" class="py-16 max-w-5xl mx-auto px-4" aria-labelledby="testimonials-heading">
-    <h2 id="testimonials-heading" class="text-2xl font-heading font-bold mb-6 text-center text-primary-dark dark:text-primary-light">
-      What Our Users Say
-    </h2>
-    <p class="text-center text-neutral-600 dark:text-neutral-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-      FitTrack is launching soon! Once we go live, this space will feature inspiring stories and feedback from real users.
-    </p>
+  <!-- Testimonials Section -->
+  <section id="testimonials" class="py-16" aria-labelledby="testimonials-heading">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 id="testimonials-heading" class="text-3xl font-heading font-bold mb-6 text-center text-neutral-800 dark:text-neutral-100">
+        What Our Users Say
+      </h2>
+      <p class="text-center text-neutral-600 dark:text-neutral-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+        FitTrack is launching soon! Once we go live, this space will feature inspiring stories and feedback from real users.
+      </p>
     
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Testimonial 1 -->
-      <div class="bg-neutral-50 dark:bg-neutral-800 p-6 rounded-2xl shadow-lg border border-dashed border-primary dark:border-primary-light/60 transform transition-all hover:translate-y-[-5px] hover:shadow-xl">
-        <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-neutral-100 dark:bg-neutral-700">
-          <i class="fas fa-user-astronaut text-2xl text-primary dark:text-primary-light" aria-hidden="true"></i>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Testimonial Card 1 -->
+        <div class="bg-white dark:bg-neutral-800 p-8 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 flex flex-col items-center text-center transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-1">
+          <div class="flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-neutral-100 dark:bg-neutral-900/30 text-primary dark:text-primary-light">
+            <i class="fas fa-user-astronaut text-3xl" aria-hidden="true"></i>
+          </div>
+          <p class="text-neutral-600 dark:text-neutral-400 italic mb-4 leading-relaxed flex-grow">
+            "Your success story could be the first one here. Join us after launch and inspire others!"
+          </p>
+          <p class="font-semibold text-neutral-700 dark:text-neutral-300 mt-auto">— Future FitTracker</p>
         </div>
-        <p class="text-neutral-500 dark:text-neutral-400 italic mb-4 text-center">
-          "Your success story could be the first one here. Join us after launch and inspire others!"
-        </p>
-        <p class="font-semibold text-center text-primary-dark dark:text-primary-light">— Future FitTracker</p>
-      </div>
-      
-      <!-- Testimonial 2 -->
-      <div class="bg-neutral-50 dark:bg-neutral-800 p-6 rounded-2xl shadow-lg border border-dashed border-primary dark:border-primary-light/60 transform transition-all hover:translate-y-[-5px] hover:shadow-xl">
-        <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-neutral-100 dark:bg-neutral-700">
-          <i class="fas fa-user-friends text-2xl text-primary dark:text-primary-light" aria-hidden="true"></i>
+        
+        <!-- Testimonial Card 2 -->
+        <div class="bg-white dark:bg-neutral-800 p-8 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 flex flex-col items-center text-center transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-1">
+          <div class="flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-neutral-100 dark:bg-neutral-900/30 text-primary dark:text-primary-light">
+            <i class="fas fa-user-friends text-3xl" aria-hidden="true"></i>
+          </div>
+          <p class="text-neutral-600 dark:text-neutral-400 italic mb-4 leading-relaxed flex-grow">
+            "We're excited to celebrate your milestones and progress here soon. Stay tuned!"
+          </p>
+          <p class="font-semibold text-neutral-700 dark:text-neutral-300 mt-auto">— The FitTrack Team</p>
         </div>
-        <p class="text-neutral-500 dark:text-neutral-400 italic mb-4 text-center">
-          "We're excited to celebrate your milestones and progress here soon. Stay tuned!"
-        </p>
-        <p class="font-semibold text-center text-primary-dark dark:text-primary-light">— The FitTrack Team</p>
-      </div>
-      
-      <!-- Testimonial 3 -->
-      <div class="bg-neutral-50 dark:bg-neutral-800 p-6 rounded-2xl shadow-lg border border-dashed border-primary dark:border-primary-light/60 transform transition-all hover:translate-y-[-5px] hover:shadow-xl">
-        <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-neutral-100 dark:bg-neutral-700">
-          <i class="fas fa-star text-2xl text-primary dark:text-primary-light" aria-hidden="true"></i>
+        
+        <!-- Testimonial Card 3 -->
+        <div class="bg-white dark:bg-neutral-800 p-8 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 flex flex-col items-center text-center transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-1">
+          <div class="flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-neutral-100 dark:bg-neutral-900/30 text-primary dark:text-primary-light">
+            <i class="fas fa-star text-3xl" aria-hidden="true"></i>
+          </div>
+          <p class="text-neutral-600 dark:text-neutral-400 italic mb-4 leading-relaxed flex-grow">
+            "Be among the first to share your FitTrack journey and motivate others to reach their goals."
+          </p>
+          <p class="font-semibold text-neutral-700 dark:text-neutral-300 mt-auto">— Future Community Member</p>
         </div>
-        <p class="text-neutral-500 dark:text-neutral-400 italic mb-4 text-center">
-          "Be among the first to share your FitTrack journey and motivate others to reach their goals."
-        </p>
-        <p class="font-semibold text-center text-primary-dark dark:text-primary-light">— Future Community Member</p>
       </div>
     </div>
   </section>
 
-  <!-- Why Choose FitTrack Section with better structure -->
-  <section id="why-choose" class="py-16 max-w-5xl mx-auto px-4 bg-neutral-50/50 dark:bg-neutral-800/20 rounded-3xl my-8" aria-labelledby="why-heading">
-    <h2 id="why-heading" class="text-2xl font-heading font-bold mb-8 text-center text-primary-dark dark:text-primary-light">
-      Why Choose FitTrack?
-    </h2>
-    
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Feature 1 -->
-      <div class="bg-neutral-50 dark:bg-neutral-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all">
-        <h3 class="text-lg font-semibold mb-3 text-neutral-700 dark:text-neutral-200 flex items-center">
-          <i class="fas fa-tasks text-primary dark:text-primary-light mr-2" aria-hidden="true"></i>
-          Comprehensive Tracking
-        </h3>
-        <p class="text-neutral-600 dark:text-neutral-400">Log workouts, nutrition, and mood in one place for a complete view of your health.</p>
-      </div>
+  <!-- Why Choose FitTrack Section -->
+  <section id="why-choose" class="py-16 bg-neutral-100 dark:bg-neutral-800/50 rounded-2xl my-16" aria-labelledby="why-heading">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 id="why-heading" class="text-3xl font-heading font-bold mb-12 text-center text-neutral-800 dark:text-neutral-100">
+        Why Choose FitTrack?
+      </h2>
       
-      <!-- Feature 2 -->
-      <div class="bg-neutral-50 dark:bg-neutral-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all">
-        <h3 class="text-lg font-semibold mb-3 text-neutral-700 dark:text-neutral-200 flex items-center">
-          <i class="fas fa-chart-bar text-primary dark:text-primary-light mr-2" aria-hidden="true"></i>
-          Insightful Visualizations
-        </h3>
-        <p class="text-neutral-600 dark:text-neutral-400">Interactive charts and stats help you spot trends and stay motivated.</p>
-      </div>
-      
-      <!-- Feature 3 -->
-      <div class="bg-neutral-50 dark:bg-neutral-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all">
-        <h3 class="text-lg font-semibold mb-3 text-neutral-700 dark:text-neutral-200 flex items-center">
-          <i class="fas fa-share text-primary dark:text-primary-light mr-2" aria-hidden="true"></i>
-          Easy Sharing
-        </h3>
-        <p class="text-neutral-600 dark:text-neutral-400">Share your progress securely with friends or on social media—your data, your choice.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div class="bg-white dark:bg-neutral-800 p-8 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 text-center transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-1">
+          <div class="flex justify-center mb-4">
+            <i class="fas fa-tasks text-3xl text-primary dark:text-primary-light" aria-hidden="true"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3 text-neutral-700 dark:text-neutral-200">
+            Comprehensive Tracking
+          </h3>
+          <p class="text-neutral-600 dark:text-neutral-400 leading-relaxed">Log workouts, nutrition, and mood in one place for a complete view of your health.</p>
+        </div>
+        
+        <!-- Feature 2 -->
+        <div class="bg-white dark:bg-neutral-800 p-8 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 text-center transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-1">
+          <div class="flex justify-center mb-4">
+            <i class="fas fa-chart-bar text-3xl text-primary dark:text-primary-light" aria-hidden="true"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3 text-neutral-700 dark:text-neutral-200">
+            Insightful Visualizations
+          </h3>
+          <p class="text-neutral-600 dark:text-neutral-400 leading-relaxed">Interactive charts and stats help you spot trends and stay motivated.</p>
+        </div>
+        
+        <!-- Feature 3 -->
+        <div class="bg-white dark:bg-neutral-800 p-8 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 text-center transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-1">
+          <div class="flex justify-center mb-4">
+            <i class="fas fa-share text-3xl text-primary dark:text-primary-light" aria-hidden="true"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3 text-neutral-700 dark:text-neutral-200">
+            Easy Sharing
+          </h3>
+          <p class="text-neutral-600 dark:text-neutral-400 leading-relaxed">Share your progress securely with friends or on social media—your data, your choice.</p>
+        </div>
       </div>
     </div>
   </section>
   
-  <!-- Contact Section with improved accessibility -->
-  <section id="contact" class="py-16 max-w-5xl mx-auto px-4" aria-labelledby="contact-heading">
-    <h2 id="contact-heading" class="text-2xl font-heading font-bold mb-6 text-center text-primary-dark dark:text-primary-light">
-      Contact Us
-    </h2>
-    <p class="text-center text-neutral-600 dark:text-neutral-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-      Need help or want to give feedback? Reach out to our team — we're here to support your fitness journey!
-    </p>
+  <!-- Contact Section -->
+  <section id="contact" class="py-16" aria-labelledby="contact-heading">
+    <div class="max-w-5xl mx-auto bg-white dark:bg-neutral-800 p-8 sm:p-12 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700">
+      <h2 id="contact-heading" class="text-3xl font-heading font-bold mb-6 text-center text-neutral-800 dark:text-neutral-100">
+        Contact Us
+      </h2>
+      <p class="text-center text-neutral-600 dark:text-neutral-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+        Need help or want to give feedback? Reach out to our team — we're here to support your fitness journey!
+      </p>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
-      <div class="bg-neutral-50 dark:bg-neutral-800 p-6 rounded-xl shadow-lg text-center transition-transform hover:transform hover:scale-105">
-        <h3 class="text-lg font-semibold mb-2 text-neutral-700 dark:text-neutral-200 flex justify-center items-center">
-          <i class="fas fa-envelope text-primary dark:text-primary-light mr-2" aria-hidden="true"></i>
-          Email
-        </h3>
-        <p class="text-neutral-600 dark:text-neutral-400">support@fittrack.com</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-12">
+        <!-- Contact Card 1: Email -->
+        <div class="bg-neutral-50 dark:bg-neutral-700/50 p-6 rounded-lg text-center transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 border border-neutral-200 dark:border-neutral-600">
+          <div class="flex justify-center mb-4">
+            <i class="fas fa-envelope text-3xl text-primary dark:text-primary-light" aria-hidden="true"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2 text-neutral-700 dark:text-neutral-200">
+            Email
+          </h3>
+          <a href="mailto:support@fittrack.com" class="text-primary dark:text-primary-light hover:underline">support@fittrack.com</a>
+        </div>
+        
+        <!-- Contact Card 2: Phone -->
+        <div class="bg-neutral-50 dark:bg-neutral-700/50 p-6 rounded-lg text-center transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 border border-neutral-200 dark:border-neutral-600">
+          <div class="flex justify-center mb-4">
+            <i class="fas fa-phone text-3xl text-primary dark:text-primary-light" aria-hidden="true"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2 text-neutral-700 dark:text-neutral-200">
+            Phone
+          </h3>
+          <p class="text-neutral-600 dark:text-neutral-400">+61 XXX XXX XXX</p>
+        </div>
+        
+        <!-- Contact Card 3: Address -->
+        <div class="bg-neutral-50 dark:bg-neutral-700/50 p-6 rounded-lg text-center transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 border border-neutral-200 dark:border-neutral-600">
+          <div class="flex justify-center mb-4">
+            <i class="fas fa-map-marker-alt text-3xl text-primary dark:text-primary-light" aria-hidden="true"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2 text-neutral-700 dark:text-neutral-200">
+            Address
+          </h3>
+          <p class="text-neutral-600 dark:text-neutral-400">Perth, WA, Australia</p>
+        </div>
       </div>
-      
-      <div class="bg-neutral-50 dark:bg-neutral-800 p-6 rounded-xl shadow-lg text-center transition-transform hover:transform hover:scale-105">
-        <h3 class="text-lg font-semibold mb-2 text-neutral-700 dark:text-neutral-200 flex justify-center items-center">
-          <i class="fas fa-phone text-primary dark:text-primary-light mr-2" aria-hidden="true"></i>
-          Phone
-        </h3>
-        <p class="text-neutral-600 dark:text-neutral-400">+61 XXX XXX XXX</p>
-      </div>
-      
-      <div class="bg-neutral-50 dark:bg-neutral-800 p-6 rounded-xl shadow-lg text-center transition-transform hover:transform hover:scale-105">
-        <h3 class="text-lg font-semibold mb-2 text-neutral-700 dark:text-neutral-200 flex justify-center items-center">
-          <i class="fas fa-map-marker-alt text-primary dark:text-primary-light mr-2" aria-hidden="true"></i>
-          Address
-        </h3>
-        <p class="text-neutral-600 dark:text-neutral-400">Perth, WA, Australia</p>
-      </div>
-    </div>
 
-    <div class="text-center mt-10">
-      <a href="mailto:support@fittrack.com" 
-         class="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition duration-200 transform hover:scale-[1.03]">
-        <i class="fas fa-paper-plane mr-2" aria-hidden="true"></i> Send us an Email
-      </a>
+      <div class="text-center">
+        <a href="mailto:support@fittrack.com" 
+           class="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition duration-200 transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light">
+          <i class="fas fa-paper-plane mr-2" aria-hidden="true"></i> Send us an Email
+        </a>
+      </div>
     </div>
   </section>
 </div>
@@ -399,12 +407,12 @@
         }
       });
     }, {
-      threshold: 0.15
+      threshold: 0.1 // Adjusted threshold for earlier trigger
     });
     
     sections.forEach(section => {
-      section.style.opacity = "0";
-      section.style.transform = "translateY(50px)";
+      section.style.opacity = "0"; // Start transparent
+      section.style.transform = "translateY(30px)"; // Start slightly lower
       observer.observe(section);
     });
     
@@ -415,7 +423,7 @@
         spinner.style.opacity = '0';
         setTimeout(() => {
           spinner.style.display = 'none';
-        }, 300);
+        }, 300); // Match transition duration
       }
     });
   });
