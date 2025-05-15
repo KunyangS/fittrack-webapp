@@ -288,6 +288,18 @@ class HomepageTestCase(unittest.TestCase):
 
         self.assertIn(b'Enter a valid email address.', response.data)
 
-    
+    def test_registration_short_password(self):
+        response = self.client.post('/register', data={
+            'username': 'shortpass',
+            'email': 'short@example.com',
+            'password': '123',
+            'confirm_password': '123'
+        }, follow_redirects=True)
+
+        self.assertIn(
+    b'Password must be at least 8 characters long and include at least one uppercase letter, one digit, and one special character.',
+    response.data
+)
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
