@@ -170,28 +170,28 @@
     </div>
   </div>
 
-  <!-- Call to Action Section -->
-  <section id="cta" class="py-16" aria-labelledby="cta-heading">
-    <div class="max-w-5xl mx-auto bg-gradient-to-r from-primary to-teal-500 dark:from-primary-dark dark:to-teal-700 text-white p-10 sm:p-16 rounded-2xl shadow-xl text-center">
-      <h2 id="cta-heading" class="text-3xl font-heading font-bold mb-6">
+  <!-- Call to Action Section - Updated to match card design style while preserving gradient background -->
+  <div class="grid grid-cols-1 gap-6 lg:gap-8 my-16">
+    <div class="bg-gradient-to-r from-primary to-teal-500 dark:from-primary-dark dark:to-teal-700 p-6 sm:p-8 rounded-2xl shadow-lg border border-primary/20 dark:border-primary-dark/30">
+      <h2 class="text-2xl font-heading font-semibold mb-6 text-white text-center">
         Ready to Take Control?
       </h2>
-      <p class="text-lg mb-8 lg:leading-relaxed leading-loose max-w-3xl mx-auto">
+      <p class="text-white/90 mb-8 lg:leading-relaxed leading-loose max-w-3xl mx-auto text-center font-sans">
         Register now to start uploading your fitness and nutrition data, visualize your progress, and share your achievements securely.
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
         <a href="{{ url_for('register') }}" class="inline-block bg-white hover:bg-neutral-100 text-primary dark:text-primary-dark font-semibold py-3 px-8 rounded-full shadow-md hover:shadow-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white">
           <i class="fas fa-user-plus mr-2" aria-hidden="true"></i> Get Started
         </a>
-        <div class="flex items-center text-neutral-100 dark:text-neutral-200 mt-4 sm:mt-0">
+        <div class="flex items-center text-white mt-4 sm:mt-0">
           <span>Already have an account?</span>
-          <a href="{{ url_for('login') }}" class="ml-2 hover:underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded-sm">
+          <a href="{{ url_for('login') }}" class="ml-2 text-white hover:underline font-medium focus:outline-none focus:ring-2 focus:ring-white rounded-sm">
             Log in here
           </a>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
   <!-- Testimonials Section -->
   <section id="testimonials" class="py-16" aria-labelledby="testimonials-heading">
