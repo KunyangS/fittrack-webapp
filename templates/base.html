@@ -4,13 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <meta name="description" content="FitTrack - Track your fitness journey, visualize progress, and share achievements">
-    <title>{{ title|default('Fitness Tracker') }} - FitTrack</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
-
+    <title>{{ title }} - Fitness Tracker</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -39,25 +33,7 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#3490dc', // Primary color
-                        'primary-dark': '#2779bd', // Darker shade
-                        'primary-light': '#63b3ed', // Lighter shade
-                        secondary: '#38b2ac', // Secondary color
-                        'secondary-dark': '#2c7a7b', // Darker shade
-                        'secondary-light': '#4fd1c5', // Lighter shade
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                        heading: ['Montserrat', 'sans-serif']
-                    },
-                    animation: {
-                        'fadeIn': 'fadeIn 0.5s ease-in-out',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: 0, transform: 'translateY(10px)' },
-                            '100%': { opacity: 1, transform: 'translateY(0)' },
-                        }
+                        primary: '#3490dc', // Example primary color
                     }
                 }
             }
@@ -91,111 +67,84 @@
     <!-- Additional head content -->
     {% block head %}{% endblock %}
 </head>
-
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans flex flex-col min-h-screen">
-    <!-- Skip to content link for accessibility -->
-    <a href="#main-content" 
-       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-[100] bg-white dark:bg-gray-800 p-3 rounded-md shadow-lg text-primary">
-       Skip to content
-    </a>
-    
+    {# This area immediately inside body should be clear of unstyled flash message rendering loops #}
+
     <!-- Floating Header -->
-    <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50" role="banner">
-        <!-- Navigation -->
-        <nav class="container mx-auto px-4 py-3 flex flex-wrap justify-between items-center" aria-label="Main navigation">
+    <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
+        {# This area at the start of the header should be clear of unstyled flash message rendering loops #}
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
             <!-- Logo/Brand Name -->
-            <a href="{{ url_for('index') }}" class="text-xl font-bold text-primary dark:text-blue-400 flex items-center" aria-label="FitTrack Home">
-                <i class="fa-solid fa-person-running mr-2" aria-hidden="true"></i>
-                <span>FitTrack</span>
+            <a href="{{ url_for('index') }}" class="text-xl font-bold text-primary dark:text-blue-400">
+                <i class="fa-solid fa-person-running"></i>  FitTrack
             </a>
 
-            <!-- Mobile Menu Button -->
-            <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary" aria-expanded="false" aria-controls="main-menu">
-                <span class="sr-only">Open main menu</span>
-                <i class="fas fa-bars" aria-hidden="true"></i>
-            </button>
-
-            <!-- Main Navigation Menu -->
-            <ul id="main-menu" class="hidden md:flex flex-col md:flex-row w-full md:w-auto pt-4 md:pt-0 mt-2 md:mt-0 md:space-x-2 items-center">
+            <ul class="flex space-x-2 items-center">
                 {% set active_class = "bg-teal-100 dark:bg-neutral-700 text-teal-700 dark:text-teal-300 font-semibold border-teal-500 dark:border-teal-400" %}
                 {% set inactive_class = "text-neutral-700 dark:text-neutral-200 hover:bg-teal-50 dark:hover:bg-neutral-700 hover:text-teal-600 dark:hover:text-teal-400 border-slate-300 dark:border-slate-500" %}
-                
-                <li class="w-full md:w-auto my-1 md:my-0"><a href="{{ url_for('index') }}" class="block px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'index' else inactive_class }}">Home</a></li>
-                
-                <li class="w-full md:w-auto my-1 md:my-0"><a href="{{ url_for('upload.upload_page') }}" class="block px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'upload.upload_page' else inactive_class }}">Upload</a></li>
-                
-                <li class="w-full md:w-auto my-1 md:my-0"><a href="{{ url_for('visualise') }}" class="block px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'visualise' else inactive_class }}">Visualise</a></li>
-                
-                <li class="w-full md:w-auto my-1 md:my-0"><a href="{{ url_for('share') }}" class="block px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'share' else inactive_class }}">Share</a></li>
-                
+
+
+                <li><a href="{{ url_for('index') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'index' else inactive_class }}">Home</a></li>
+                <li><a href="{{ url_for('upload.upload_page') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'upload.upload_page' else inactive_class }}">Upload</a></li>
+                <li><a href="{{ url_for('visualise') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'visualise' else inactive_class }}">Visualise</a></li>
+                <li><a href="{{ url_for('share') }}" class="px-5 py-2 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ active_class if request.endpoint == 'share' else inactive_class }}">Share</a></li>
                 <!-- Dark Mode Toggle Button -->
                 <li class="w-full md:w-auto my-1 md:my-0 flex justify-center">
                     <button id="darkModeToggle"
-                            class="w-9 h-9 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ inactive_class }} flex items-center justify-center"
-                            aria-label="Toggle dark mode">
-                        <i class="fas fa-moon text-base" style="display: none;" aria-hidden="true"></i>
-                        <i class="fas fa-sun text-base" aria-hidden="true"></i>
+                            class="w-9 h-9 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-opacity-75 transition-colors duration-200 border {{ inactive_class }} flex items-center justify-center">
+                        <i class="fas fa-moon text-base" style="display: none;"></i>
+                        <i class="fas fa-sun text-base"></i>
                     </button>
                 </li>
                 
                 {% if current_user.is_authenticated %}
                     <!-- User Dropdown Menu -->
-                    <li class="w-full md:w-auto my-1 md:my-0 md:ml-4 relative user-dropdown">
-                        <button type="button" 
-                                class="flex items-center gap-2 focus:outline-none px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition w-full md:w-auto justify-center md:justify-start"
-                                id="userMenuButton"
-                                aria-expanded="false"
-                                aria-haspopup="true">
+                    <li class="ml-4 relative user-dropdown">
+                        <button type="button" class="flex items-center gap-2 focus:outline-none px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition" id="userMenuButton">
                             {% if current_user.avatar_url %}
                                 <img src="{{ url_for('static', filename='avatars/' ~ current_user.avatar_url) }}"
-                                    alt="User avatar"
+                                    alt="Avatar"
                                     class="w-9 h-9 rounded-full object-cover border-2 border-blue-400">
                             {% else %}
-                                <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 text-white font-bold text-lg" aria-hidden="true">
+                                <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 text-white font-bold text-lg">
                                     {{ current_user.username[0]|upper }}
                                 </span>
                             {% endif %}
                             <span class="font-semibold text-primary dark:text-blue-300">{{ current_user.username }}</span>
-                            <i class="fas fa-chevron-down text-xs text-gray-500 ml-1" aria-hidden="true"></i>
+                            <i class="fas fa-chevron-down text-xs text-gray-500 ml-1"></i>
                         </button>
                         
                         <!-- Dropdown -->
-                        <div id="userDropdownMenu" 
-                             class="hidden absolute right-0 md:right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 py-2"
-                             aria-labelledby="userMenuButton">
+                        <div id="userDropdownMenu" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 py-2">
                             <div class="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 border-b border-gray-100 dark:border-gray-700">
                                 <div class="font-semibold">{{ current_user.username }}</div>
-                                <div class="text-xs text-neutral-500 dark:text-neutral-400">Already logged in</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">Already logged in</div>
                             </div>
-                            <a href="{{ url_for('reset_password') }}" 
-                               class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                            <a href="{{ url_for('reset_password') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                                 Change Password
                             </a>
-                            
-                            <!-- Avatar Upload Form -->
+                              <!-- Avatar Upload Form -->
                             <form action="{{ url_for('upload_avatar') }}" method="post" enctype="multipart/form-data" class="px-4 py-2 space-y-2">
                                 {% if csrf_token %}
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 {% endif %}
-                                <label for="avatar-upload" class="block text-sm text-neutral-700 dark:text-neutral-200 mb-1">
-                                    <i class="fas fa-camera mr-2 text-primary-500"></i> Update Profile Picture
+                                <label for="avatar-upload" class="block text-sm text-gray-700 dark:text-gray-200 mb-1">
+                                    Update Profile Picture
                                 </label>
                                 <input id="avatar-upload" type="file" name="avatar" accept="image/*"
-                                    class="block w-full text-sm mb-2 file:mr-4 file:py-2 file:px-4
-                                    file:rounded-full file:border-0 file:text-sm file:font-semibold
-                                    file:bg-primary file:text-white hover:file:bg-primary-dark"
+                                    class="block w-full text-sm mb-2"
                                     required>
                                 <button type="submit"
-                                        class="w-full px-3 py-2 text-sm font-medium text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/40 rounded-lg transition-colors duration-200">
-                                    <i class="fas fa-upload mr-2"></i> Upload
+                                        class="w-full px-2 py-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition">
+                                    Upload
                                 </button>
                             </form>
-                            <form action="{{ url_for('logout') }}" method="post" class="border-t border-gray-100 dark:border-gray-700 mt-1">
+                            <form action="{{ url_for('logout') }}" method="post">
                                 {% if csrf_token %}
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 {% endif %}
-                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200">
-                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                                    Logout
                                 </button>
                             </form>
                         </div>
@@ -204,121 +153,38 @@
                     <!-- Login/Register Buttons -->
                     <li class="w-full md:w-auto my-1 md:my-0">
                         <a href="{{ url_for('login') }}" 
-                           class="block w-full text-center md:inline-block md:w-auto bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light text-white font-semibold py-2 px-5 rounded-full shadow-sm hover:shadow-md transition duration-200 ease-in-out text-sm">
+
+                        class="inline-block bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light text-white font-semibold py-2 px-5 rounded-full shadow-sm hover:shadow-md transition duration-200 ease-in-out text-sm">
                             Login
                         </a>
                     </li>
-                    <li class="w-full md:w-auto my-1 md:my-0 mt-2 md:mt-0 md:ml-2">
+                    <li>
                         <a href="{{ url_for('register') }}" 
-                           class="block w-full text-center md:inline-block md:w-auto bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400 text-white font-semibold py-2 px-5 rounded-full shadow-sm hover:shadow-md transition duration-200 ease-in-out text-sm">
+                        class="inline-block bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400 text-white font-semibold py-2 px-5 rounded-full shadow-sm hover:shadow-md transition duration-200 ease-in-out text-sm">
                             Register
                         </a>
                     </li>
                 {% endif %}
             </ul>
         </nav>
-        
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="container mx-auto px-4 py-2" aria-live="polite">
-                    {% for category, message in messages %}
-                        <div class="p-3 my-2 rounded-lg text-white animate-fadeIn flex items-center justify-between
-                                  {% if category == 'danger' %}bg-red-600{% elif category == 'success' %}bg-green-600{% else %}bg-blue-600{% endif %}">
-                            <div>
-                                {% if category == 'danger' %}
-                                    <i class="fas fa-exclamation-circle mr-2" aria-hidden="true"></i>
-                                {% elif category == 'success' %}
-                                    <i class="fas fa-check-circle mr-2" aria-hidden="true"></i>
-                                {% else %}
-                                    <i class="fas fa-info-circle mr-2" aria-hidden="true"></i>
-                                {% endif %}
-                                {{ message }}
-                            </div>
-                            <button class="close-alert focus:outline-none focus:ring-1 focus:ring-white" aria-label="Close alert">
-                                <i class="fas fa-times" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
+        {# This area at the end of the header should be clear of unstyled flash message rendering loops #}
     </header>
 
-    <!-- Flash Messages -->
-    <div class="container mx-auto px-4 mt-4">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages space-y-2">
-                    {% for category, message in messages %}
-                        {% set alert_class = {
-                            'success': 'bg-emerald-100 border-emerald-500 text-emerald-700 dark:bg-emerald-900/30 dark:border-emerald-500 dark:text-emerald-300',
-                            'info': 'bg-blue-100 border-blue-500 text-blue-700 dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-300',
-                            'warning': 'bg-yellow-100 border-yellow-500 text-yellow-700 dark:bg-yellow-900/30 dark:border-yellow-500 dark:text-yellow-300',
-                            'danger': 'bg-red-100 border-red-500 text-red-700 dark:bg-red-900/30 dark:border-red-500 dark:text-red-300'
-                        } %}
-                        <div class="p-4 mb-4 rounded-lg border-l-4 {{ alert_class.get(category, 'bg-neutral-100 dark:bg-neutral-800 border-neutral-500 text-neutral-700 dark:text-neutral-300') }} animate-fadeIn">
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0">
-                                    {% if category == 'success' %}
-                                        <i class="fas fa-check-circle text-emerald-500"></i>
-                                    {% elif category == 'info' %}
-                                        <i class="fas fa-info-circle text-blue-500"></i>
-                                    {% elif category == 'warning' %}
-                                        <i class="fas fa-exclamation-triangle text-yellow-500"></i>
-                                    {% elif category == 'danger' %}
-                                        <i class="fas fa-times-circle text-red-500"></i>
-                                    {% else %}
-                                        <i class="fas fa-info-circle text-neutral-500"></i>
-                                    {% endif %}
-                                </div>
-                                <div class="ml-3">
-                                    <p class="text-sm">{{ message }}</p>
-                                </div>
-                                <button type="button" class="ml-auto -mx-1.5 -my-1.5 rounded-lg p-1.5 inline-flex h-8 w-8 hover:bg-neutral-200 dark:hover:bg-neutral-700 focus:outline-none" onclick="this.parentElement.parentElement.remove()">
-                                    <span class="sr-only">Dismiss</span>
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-    </div>
-
     <!-- Main Content Area -->
-    <main id="main-content" class="container mx-auto px-4 py-8 flex-grow" role="main">
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        {# Ensure no general flash messages are looped here before the content block #}
         {% block content %}
         <p>This is the default content area.</p>
         {% endblock %}
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-center py-6 mt-auto" role="contentinfo">
+    <footer class="bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-center py-4 mt-auto">
         <div class="container mx-auto px-4">
-            <!-- Footer Navigation -->
-            <nav aria-label="Footer Navigation">
-                <div class="flex flex-col md:flex-row justify-center items-center gap-4 mb-4">
-                    <a href="{{ url_for('privacy_policy') }}" class="hover:underline text-sm hover:text-primary dark:hover:text-primary-light transition-colors">Privacy Policy</a>
-                    <span class="hidden md:inline">|</span>
-                    <a href="{{ url_for('terms_of_service') }}" class="hover:underline text-sm hover:text-primary dark:hover:text-primary-light transition-colors">Terms of Service</a>
-                    <span class="hidden md:inline">|</span>
-                    <a href="#" class="hover:underline text-sm hover:text-primary dark:hover:text-primary-light transition-colors">Contact Us</a>
-                </div>
-            </nav>
-
-            <!-- Social Media Links -->
-            <div class="flex justify-center space-x-4 mb-4">
-                <a href="#" class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-colors" aria-label="Follow us on Facebook">
-                    <i class="fab fa-facebook-f" aria-hidden="true"></i>
-                </a>
-                <a href="#" class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-colors" aria-label="Follow us on Twitter">
-                    <i class="fab fa-twitter" aria-hidden="true"></i>
-                </a>
-                <a href="#" class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-primary hover:text-white transition-colors" aria-label="Follow us on Instagram">
-                    <i class="fab fa-instagram" aria-hidden="true"></i>
-                </a>
+            <div class="flex flex-col md:flex-row justify-center items-center gap-4">
+                <a href="{{ url_for('privacy_policy') }}" class="hover:underline text-sm">Privacy Policy</a>
+                <span class="hidden md:inline">|</span>
+                <a href="{{ url_for('terms_of_service') }}" class="hover:underline text-sm">Terms of Service</a>
             </div>
             
             <div class="mt-2 text-xs">&copy; {{ current_year }} FitTrack. All rights reserved.</div>
@@ -326,11 +192,8 @@
     </footer>
 
     <!-- Back to Top Button -->
-    <button id="backToTop" 
-            class="back-to-top" 
-            aria-label="Back to top of page"
-            title="Back to top">
-        <i class="fas fa-arrow-up" aria-hidden="true"></i>
+    <button id="backToTop" onclick="scrollToTop()" class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
     </button>
 
     <!-- Include jQuery -->
@@ -345,244 +208,18 @@
     <!-- Core scripts for base functionality -->
     <script>
         $(function() {
-            // Setup dark mode toggle
-            const darkModeToggle = $('#darkModeToggle');
-            const darkIcon = $('#darkIcon');
-            const lightIcon = $('#lightIcon');
-            
-            // Check current theme and update icons
-            const isDarkMode = document.documentElement.classList.contains('dark');
-            updateIcons(isDarkMode);
-            
-            darkModeToggle.on('click', function() {
-                const isCurrentlyDark = document.documentElement.classList.contains('dark');
-                document.documentElement.classList.toggle('dark');
-                
-                // Save preference to localStorage
-                if (isCurrentlyDark) {
-                    localStorage.setItem('theme', 'light');
-                } else {
-                    localStorage.setItem('theme', 'dark');
-                }
-                
-                // Update icons
-                updateIcons(!isCurrentlyDark);
-            });
-            
-            function updateIcons(isDark) {
-                if (isDark) {
-                    darkIcon.show();
-                    lightIcon.hide();
-                } else {
-                    darkIcon.hide();
-                    lightIcon.show();
-                }
-            }
-            
             // Toggle user dropdown
             $('#userMenuButton').on('click', function(e) {
                 e.stopPropagation();
                 $('#userDropdownMenu').toggleClass('hidden');
-                $(this).attr('aria-expanded', $('#userDropdownMenu').hasClass('hidden') ? 'false' : 'true');
             });
-            
             // Hide dropdown when clicking outside
             $(document).on('click', function(e) {
                 if (!$(e.target).closest('.user-dropdown').length) {
                     $('#userDropdownMenu').addClass('hidden');
-                    $('#userMenuButton').attr('aria-expanded', 'false');
                 }
-            });
-            
-            // Mobile menu toggle
-            $('#mobile-menu-button').on('click', function() {
-                $('#main-menu').toggleClass('hidden');
-                const isExpanded = $(this).attr('aria-expanded') === 'true';
-                $(this).attr('aria-expanded', !isExpanded);
-                $(this).html(isExpanded ? 
-                    '<span class="sr-only">Open main menu</span><i class="fas fa-bars" aria-hidden="true"></i>' : 
-                    '<span class="sr-only">Close main menu</span><i class="fas fa-times" aria-hidden="true"></i>');
-            });
-            
-            // Close alert messages
-            $('.close-alert').on('click', function() {
-                $(this).closest('div').fadeOut(300, function() {
-                    $(this).remove();
-                });
-            });
-            
-            // Back to top button functionality
-            const backToTopButton = $('#backToTop');
-            
-            $(window).on('scroll', function() {
-                if ($(window).scrollTop() > 300) {
-                    backToTopButton.css({
-                        'bottom': '30px',
-                        'opacity': '1'
-                    });
-                } else {
-                    backToTopButton.css({
-                        'bottom': '-60px',
-                        'opacity': '0'
-                    });
-                }
-            });
-            
-            backToTopButton.on('click', function() {
-                $('html, body').animate({scrollTop: 0}, 800);
-                return false;
-            });
-            
-            // Form validation enhancement
-            $('form').on('submit', function(e) {
-                const requiredFields = $(this).find('[required]');
-                let isValid = true;
-                
-                requiredFields.each(function() {
-                    if (!$(this).val()) {
-                        isValid = false;
-                        $(this).addClass('border-red-500').removeClass('border-gray-300');
-                        
-                        // Add error message if not exists
-                        if (!$(this).next('.error-message').length) {
-                            $('<p class="text-red-500 text-xs mt-1 error-message">This field is required</p>').insertAfter($(this));
-                        }
-                    } else {
-                        $(this).removeClass('border-red-500').addClass('border-gray-300');
-                        $(this).next('.error-message').remove();
-                    }
-                });
-                
-                if (!isValid) {
-                    e.preventDefault();
-                    // Scroll to first error
-                    $('html, body').animate({
-                        scrollTop: $(requiredFields.filter(function() {
-                            return !$(this).val();
-                        }).first()).offset().top - 100
-                    }, 500);
-                }
-            });
-            
-            // Input fields validation on blur
-            $(document).on('blur', 'input, textarea, select', function() {
-                if ($(this).attr('required') && !$(this).val()) {
-                    $(this).addClass('border-red-500').removeClass('border-gray-300');
-                    if (!$(this).next('.error-message').length) {
-                        $('<p class="text-red-500 text-xs mt-1 error-message">This field is required</p>').insertAfter($(this));
-                    }
-                } else {
-                    $(this).removeClass('border-red-500').addClass('border-gray-300');
-                    $(this).next('.error-message').remove();
-                }
-            });
-            
-            // Auto-hide flash messages after 5 seconds
-            setTimeout(function() {
-                $('.animate-fadeIn').fadeOut(500, function() {
-                    $(this).remove();
-                });
-            }, 5000);
-            
-            // Handle file input styling and validation
-            $('input[type="file"]').on('change', function() {
-                const file = this.files[0];
-                const fileType = file ? file.type : '';
-                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-                
-                if (file) {
-                    if ($(this).attr('accept').includes('image/*') && !validTypes.includes(fileType)) {
-                        $(this).val('');
-                        alert('Please select a valid image file (JPEG, PNG or GIF)');
-                    } else if (file.size > 5 * 1024 * 1024) { // 5MB limit
-                        $(this).val('');
-                        alert('File size should be less than 5MB');
-                    }
-                }
-            });
-            
-            // Initialize any tooltips
-            $('[data-tooltip]').each(function() {
-                $(this).attr('title', $(this).data('tooltip'));
-            });
-            
-            // Add smooth fade-in effect for sections
-            const sections = $('section');
-            if (sections.length) {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('fade-in-up');
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, {
-                    threshold: 0.1
-                });
-                
-                sections.each(function() {
-                    observer.observe(this);
-                });
-            }
-            
-            // Auto-dismiss flash messages after 5 seconds
-            setTimeout(function() {
-                $('.flash-messages > div').fadeOut(500, function() {
-                    $(this).remove();
-                });
-            }, 5000);
-            
-            // Add button ripple effect
-            $('.btn-ripple').on('mousedown', function(e) {
-                const $this = $(this);
-                const offset = $this.offset();
-                const x = e.pageX - offset.left;
-                const y = e.pageY - offset.top;
-                
-                const $ripple = $('<span class="ripple"></span>');
-                $ripple.css({
-                    top: y + 'px',
-                    left: x + 'px'
-                });
-                
-                $this.append($ripple);
-                
-                setTimeout(function() {
-                    $ripple.remove();
-                }, 800);
             });
         });
-        
-        // AJAX example function - can be used for dynamic content loading
-        function loadDynamicContent(url, targetElement) {
-            $.ajax({
-                url: url,
-                type: 'GET',
-                dataType: 'html',
-                beforeSend: function() {
-                    $(targetElement).html('<div class="flex justify-center"><div class="animate-spin rounded-full h-8 w-8 border-t-4 border-primary"></div></div>');
-                },
-                success: function(data) {
-                    $(targetElement).html(data);
-                },
-                error: function(xhr, status, error) {
-                    $(targetElement).html('<div class="p-4 text-red-500">Error loading content. Please try again.</div>');
-                    console.error("AJAX error: " + status + " - " + error);
-                }
-            });
-        }
-        
-        // Check for outdated browsers
-        function isIE() {
-            return navigator.userAgent.indexOf('MSIE') !== -1 || navigator.userAgent.indexOf('Trident/') !== -1;
-        }
-        
-        if (isIE()) {
-            alert('You are using an outdated browser. For the best experience, please update your browser.');
-        }
     </script>
-    
-    <!-- Page-specific scripts -->
-    {% block scripts %}{% endblock %}
 </body>
 </html>
