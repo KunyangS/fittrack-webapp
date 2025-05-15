@@ -241,6 +241,21 @@ class HomepageTestCase(unittest.TestCase):
         response = self.client.post('/upload', data=data, follow_redirects=True)
         self.assertIn(b'Upload successful', response.data)
 
+    def test_reset_password_mismatch(self):
+        email = self.register_user(email="test@example.com")
+        self.client.post('/forgot-password', data={'email': email}, follow_redirects=True)
+
+        with app.app_context():
+            code = verification_codes[email]['code']
+
+        self.client.post('/verify-code', data={'code': code}, follow_redirects=True)
+
+        response = self.client.post('/reset-password', data={
+            'new_password': 'NewPass1234',
+            'confirm_password': 'WrongPass999'
+        }, follow_redirects=True)
+
+        self.assertIn(b'Passwords do not match', response.data)
 
 
 

@@ -10,8 +10,6 @@ from flask_migrate import Migrate
 from flask_wtf import CSRFProtect
 from flask_login import LoginManager
 
-
-
 # Load the environment variable
 load_dotenv()
 
