@@ -85,6 +85,51 @@
         :focus:not(:focus-visible) {
             outline: none;
         }
+
+        /* Mobile menu optimization for centered items */
+        @media (max-width: 767px) {
+            #main-menu {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                text-align: center;
+                padding: 1rem 0;
+            }
+            
+            #main-menu li {
+                margin: 0.5rem 0;
+                width: 80%; /* Make buttons wider on mobile */
+                max-width: 250px;
+            }
+            
+            #main-menu a, #main-menu button {
+                width: 100%;
+                justify-content: center;
+                padding: 0.75rem 1rem;
+            }
+            
+            /* Add animation for menu items */
+            #main-menu.hidden {
+                display: none;
+            }
+            
+            #main-menu:not(.hidden) li {
+                animation: fadeInDown 0.3s ease forwards;
+            }
+            
+            @keyframes fadeInDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        }
     </style>
     
     <!-- Additional head content -->
