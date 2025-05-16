@@ -23,6 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const ctxCalorieBalance = document.getElementById('calorieBalanceChart')?.getContext('2d');
   const ctxNutrition = document.getElementById('nutritionChart')?.getContext('2d');
 
+  // Elements for Detailed Data Log
+  const dataEntriesLogContainer = document.getElementById('dataEntriesLog');
+  const dataEntriesPaginationContainer = document.getElementById('dataEntriesPagination');
+  let currentPage = 1;
+  const itemsPerPage = 10;
+  let combinedData = [];
+
   // ---------- Chart Instances ----------
   let durationChart, intensityChart, performanceChart, emotionChart, goalChart, caloriesBurnedChart, caloriesEfficiencyChart, calorieBalanceChart, nutritionChart;
 
@@ -87,6 +94,166 @@ document.addEventListener('DOMContentLoaded', () => {
     return result;
   }
 
+  // ---------- Detailed Data Log Functions ----------
+  function combineAndSortData(fitnessData, foodData) {
+    const mappedFitnessData = fitnessData.map(entry => ({ ...entry, type: 'Fitness', icon: 'fa-person-running' }));
+    const mappedFoodData = foodData.map(entry => ({ ...entry, type: 'Food', icon: 'fa-utensils' }));
+    return [...mappedFitnessData, ...mappedFoodData].sort((a, b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
+  }
+
+  function renderDataEntriesLog() {
+    if (!dataEntriesLogContainer) return;
+
+    dataEntriesLogContainer.innerHTML = ''; // Clear previous entries
+
+    if (combinedData.length === 0) {
+      dataEntriesLogContainer.innerHTML = '<p class="text-center text-sm text-neutral-500 dark:text-neutral-400 py-4">No data entries found for the selected period.</p>';
+      renderPaginationControls(0);
+      return;
+    }
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedEntries = combinedData.slice(startIndex, endIndex);
+
+    paginatedEntries.forEach(entry => {
+      const card = document.createElement('div');
+      card.className = 'bg-neutral-100 dark:bg-neutral-700/50 p-3 rounded-lg shadow-sm flex items-center space-x-3 transition-all duration-200 hover:shadow-md'; // Adjusted background and padding
+      
+      let entryDetails = '';
+      const commonTextClass = 'text-xs text-neutral-600 dark:text-neutral-400'; // Slightly lighter text for labels
+      const valueTextClass = 'font-medium text-neutral-800 dark:text-neutral-200'; // Values stand out more
+
+      if (entry.type === 'Fitness') {
+        entryDetails = `
+          <div class="flex-1 min-w-0">
+            <p class="${commonTextClass} truncate"><strong class="font-semibold">Activity:</strong> <span class="${valueTextClass}">${entry.activity_type || 'N/A'}</span></p>
+            <div class="flex space-x-2.5 mt-0.5"> <!-- Reduced spacing -->
+              <p class="${commonTextClass}"><strong class="font-semibold">Duration:</strong> <span class="${valueTextClass}">${entry.duration || 0}m</span></p>
+              <p class="${commonTextClass}"><strong class="font-semibold">Calories:</strong> <span class="${valueTextClass}">${entry.calories_burned || 0}kcal</span></p>
+            </div>
+          </div>
+        `;
+      } else if (entry.type === 'Food') {
+        entryDetails = `
+          <div class="flex-1 min-w-0">
+            <p class="${commonTextClass} truncate"><strong class="font-semibold">Item:</strong> <span class="${valueTextClass}">${entry.food_name || 'N/A'}</span> <span class="text-neutral-500 dark:text-neutral-400">(${entry.meal_type || 'N/A'})</span></p>
+            <div class="flex space-x-2.5 mt-0.5"> <!-- Reduced spacing -->
+              <p class="${commonTextClass}"><strong class="font-semibold">Qty:</strong> <span class="${valueTextClass}">${entry.quantity || 'N/A'}</span></p>
+              <p class="${commonTextClass}"><strong class="font-semibold">Calories:</strong> <span class="${valueTextClass}">${entry.calories || 0}kcal</span></p>
+            </div>
+          </div>
+        `;
+      }
+
+      card.innerHTML = `
+        <div class="flex-shrink-0">
+          <i class="fas ${entry.icon} text-primary dark:text-primary-light text-lg w-5 text-center"></i> <!-- Slightly smaller icon -->
+        </div>
+        <div class="flex-grow min-w-0">
+          <div class="flex justify-between items-center mb-0.5">
+            <h4 class="text-xs font-semibold text-neutral-700 dark:text-neutral-100 truncate" title="${entry.type} Entry - ${new Date(entry.date).toLocaleDateString()}">${entry.type} - ${new Date(entry.date).toLocaleDateString('en-CA')}</h4>
+          </div>
+          ${entryDetails}
+        </div>
+        <button class="delete-entry-btn flex-shrink-0 text-neutral-400 hover:text-red-600 dark:text-neutral-500 dark:hover:text-red-400 transition-colors p-1.5 rounded-full focus:outline-none focus:ring-1 focus:ring-red-500 focus:ring-opacity-50" data-id="${entry.id}" data-type="${entry.type.toLowerCase()}" aria-label="Delete entry">
+          <i class="fas fa-trash-alt text-xs"></i> <!-- Smaller delete icon -->
+        </button>
+      `;
+      dataEntriesLogContainer.appendChild(card);
+    });
+
+    // Add event listeners to delete buttons
+    document.querySelectorAll('.delete-entry-btn').forEach(button => {
+      button.addEventListener('click', handleDeleteEntry);
+    });
+    
+    renderPaginationControls(combinedData.length);
+  }
+
+  function renderPaginationControls(totalItems) {
+    if (!dataEntriesPaginationContainer) return;
+    dataEntriesPaginationContainer.innerHTML = ''; // Clear previous controls
+
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    if (totalPages <= 1) return;
+
+    // Previous Button
+    const prevButton = document.createElement('button');
+    prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    prevButton.className = 'px-3 py-1 rounded-md text-sm font-medium focus:outline-none transition-colors duration-200 ';
+    prevButton.className += currentPage === 1 ? 'bg-neutral-200 dark:bg-neutral-600 text-neutral-400 dark:text-neutral-500 cursor-not-allowed' : 'bg-primary hover:bg-primary-dark text-white';
+    prevButton.disabled = currentPage === 1;
+    prevButton.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderDataEntriesLog();
+      }
+    });
+    dataEntriesPaginationContainer.appendChild(prevButton);
+
+    // Page Info
+    const pageInfo = document.createElement('span');
+    pageInfo.className = 'text-sm text-neutral-700 dark:text-neutral-300';
+    pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    dataEntriesPaginationContainer.appendChild(pageInfo);
+    
+    // Next Button
+    const nextButton = document.createElement('button');
+    nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    nextButton.className = 'px-3 py-1 rounded-md text-sm font-medium focus:outline-none transition-colors duration-200 ';
+    nextButton.className += currentPage === totalPages ? 'bg-neutral-200 dark:bg-neutral-600 text-neutral-400 dark:text-neutral-500 cursor-not-allowed' : 'bg-primary hover:bg-primary-dark text-white';
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderDataEntriesLog();
+      }
+    });
+    dataEntriesPaginationContainer.appendChild(nextButton);
+  }
+
+  async function handleDeleteEntry(event) {
+    const button = event.currentTarget;
+    const entryId = button.dataset.id;
+    const entryType = button.dataset.type;
+
+    if (!confirm(`Are you sure you want to delete this ${entryType} entry?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/delete_entry/${entryType}/${entryId}`, {
+        method: 'DELETE',
+        headers: {
+          // Add any necessary headers, like CSRF token if applicable
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete entry');
+      }
+
+      // Remove entry from local data and re-render
+      if (entryType === 'fitness') {
+        window.rawData = window.rawData.filter(entry => entry.id !== parseInt(entryId));
+      } else if (entryType === 'food') {
+        window.foodData = window.foodData.filter(entry => entry.id !== parseInt(entryId));
+      }
+      
+      // Re-filter and update everything
+      updateDashboard(); 
+
+      alert('Entry deleted successfully!');
+
+    } catch (error) {
+      console.error('Error deleting entry:', error);
+      alert(`Error: ${error.message}`);
+    }
+  }
+
   // ---------- Main Dashboard Update Function ----------
   function updateDashboard() {
     const start = startDateInput.value || getNDaysAgo(6);
@@ -127,6 +294,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalCalories = calories.reduce((sum, c) => sum + c, 0);
     const totalIntake = intake.reduce((sum, c) => sum + c, 0);
     const calorieGap = totalIntake - totalCalories;
+
+    // Update combined data for the log
+    combinedData = combineAndSortData(filteredFitness, filteredFood);
+    currentPage = 1; // Reset to first page on filter change
+    renderDataEntriesLog();
 
     // ---------- Update Summary Card ----------
     const summaryContentDiv = document.getElementById('summary-content');

@@ -84,6 +84,41 @@ def visualise():
         food_data=food_data
     )
 
+@app.route('/api/delete_entry/<string:entry_type>/<int:entry_id>', methods=['DELETE'])
+@login_required
+def delete_entry(entry_type, entry_id):
+    conn = None  # Initialize conn to None
+    try:
+        conn = sqlite3.connect("instance/fitness.db")
+        cursor = conn.cursor()
+
+        if entry_type == 'fitness':
+            cursor.execute("DELETE FROM fitness_entries WHERE id = ? AND user_id = ?", (entry_id, current_user.id))
+        elif entry_type == 'food':
+            cursor.execute("DELETE FROM food_entries WHERE id = ? AND user_id = ?", (entry_id, current_user.id))
+        else:
+            return jsonify({'error': 'Invalid entry type'}), 400
+
+        conn.commit()
+
+        if cursor.rowcount > 0:
+            return jsonify({'message': 'Entry deleted successfully'}), 200
+        else:
+            # This case means the entry wasn't found or didn't belong to the user
+            return jsonify({'error': 'Entry not found or not authorized to delete'}), 404
+
+    except sqlite3.Error as e:
+        # Log the specific SQLite error for debugging
+        print(f"SQLite error during delete operation: {e}")
+        return jsonify({'error': 'Database error during deletion', 'details': str(e)}), 500
+    except Exception as e:
+        # Catch any other unexpected errors
+        print(f"Unexpected error during delete operation: {e}")
+        return jsonify({'error': 'An unexpected error occurred', 'details': str(e)}), 500
+    finally:
+        if conn:
+            conn.close()
+
 # Route for Data Sharing page
 @app.route('/share', methods=['GET', 'POST'])
 @login_required
