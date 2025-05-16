@@ -313,10 +313,13 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Sort by intensity
       intensityData.sort((a, b) => b.intensity - a.intensity);
+
+      // Slice to get top 10 records
+      const top10IntensityData = intensityData.slice(0, 10);
       
       // Create chart data
-      const labels = intensityData.map(item => item.type);
-      const data = intensityData.map(item => item.intensity);
+      const labels = top10IntensityData.map(item => item.type);
+      const data = top10IntensityData.map(item => item.intensity);
       const backgroundColors = [
         'rgba(255, 99, 132, 0.7)',
         'rgba(54, 162, 235, 0.7)',
@@ -355,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
               callbacks: {
                 afterLabel: function(context) {
                   const index = context.dataIndex;
-                  const item = intensityData[index];
+                  const item = top10IntensityData[index]; // Use top10IntensityData here
                   return [
                     `Total Calories: ${item.totalCalories.toFixed(0)}`,
                     `Sessions: ${item.count}`
