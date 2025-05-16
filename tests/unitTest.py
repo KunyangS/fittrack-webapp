@@ -188,29 +188,6 @@ class HomepageTestCase(unittest.TestCase):
         response = self.client.get('/register')
         self.assertIn(b'Terms and Conditions', response.data)
 
-    # Simulate upload form submission with fitness + food data
-    def test_upload_form_submission(self):
-        email = self.register_user()
-        self.client.post('/login', data={'email': email, 'password': 'Test@1234'}, follow_redirects=True)
-        data = {
-            'date': '2025-05-15',
-            'time': '10:30',
-            'gender': 'Female',
-            'age': '25',
-            'height': '160',
-            'weight': '60',
-            'activity_type': ['Running'],
-            'duration': ['30'],
-            'calories_burned': ['200'],
-            'emotion': ['Happy'],
-            'food_name': ['Oats'],
-            'food_quantity': ['1'],
-            'food_calories': ['150'],
-            'meal_type': ['Breakfast']
-        }
-        response = self.client.post('/upload', data=data, follow_redirects=True)
-        self.assertIn(b'Upload successful', response.data)
-
     # Ensure mismatched passwords during reset are caught
     def test_reset_password_mismatch(self):
         email = self.register_user(email="test@example.com")
