@@ -16,14 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const ctxDuration = document.getElementById('durationChart')?.getContext('2d');
   const ctxIntensity = document.getElementById('intensityChart')?.getContext('2d');
   const ctxPerformance = document.getElementById('performanceRadarChart')?.getContext('2d');
-  const ctxPie = document.getElementById('activityPieChart')?.getContext('2d');
   const ctxEmotion = document.getElementById('emotionChart')?.getContext('2d');
   const ctxGoal = document.getElementById('goalProgressChart')?.getContext('2d');
+  const ctxCaloriesBurned = document.getElementById('caloriesBurnedChart')?.getContext('2d'); 
   const ctxCalorieBalance = document.getElementById('calorieBalanceChart')?.getContext('2d');
   const ctxNutrition = document.getElementById('nutritionChart')?.getContext('2d');
 
   // ---------- Chart Instances ----------
-  let durationChart, intensityChart, performanceChart, pieChart, emotionChart, goalChart, calorieBalanceChart, nutritionChart;
+  let durationChart, intensityChart, performanceChart, emotionChart, goalChart, caloriesBurnedChart, calorieBalanceChart, nutritionChart;
 
   // ---------- Modal Setup (for Daily Breakdown) ----------
   const modal = document.createElement('div');
@@ -160,9 +160,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Destroy previous charts if they exist
     durationChart?.destroy();
+    caloriesBurnedChart?.destroy(); 
     intensityChart?.destroy();
     performanceChart?.destroy();
-    pieChart?.destroy();
     emotionChart?.destroy();
     goalChart?.destroy();
     calorieBalanceChart?.destroy();
@@ -203,7 +203,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
-    
+
+    // Line Chart: Calories Burned Trend
+    if (ctxCaloriesBurned) {
+      caloriesBurnedChart = new Chart(ctxCaloriesBurned, {
+        type: 'line',
+        data: {
+          labels: allDates,
+          datasets: [{
+            label: 'Calories Burned',
+            data: calories, // Use the 'calories' array
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Calories'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Date'
+              }
+            }
+          }
+        }
+      });
+    }
+
     // Intensity Chart (Activity Intensity Analysis)
     if (ctxIntensity) {
       // Calculate intensity (calories/minute) for each activity type
@@ -349,38 +385,6 @@ document.addEventListener('DOMContentLoaded', () => {
               ticks: {
                 display: false
               }
-            }
-          }
-        }
-      });
-    }
-
-    // Pie Chart: Activity distribution
-    if (ctxPie) {
-      const activityLabels = Object.keys(typeCounts);
-      const activityData = Object.values(typeCounts);
-      
-      pieChart = new Chart(ctxPie, {
-        type: 'pie',
-        data: {
-          labels: activityLabels,
-          datasets: [{
-            data: activityData,
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.8)',
-              'rgba(54, 162, 235, 0.8)',
-              'rgba(255, 206, 86, 0.8)',
-              'rgba(75, 192, 192, 0.8)',
-              'rgba(153, 102, 255, 0.8)',
-              'rgba(255, 159, 64, 0.8)'
-            ]
-          }]
-        },
-        options: { 
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'right',
             }
           }
         }
