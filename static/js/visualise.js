@@ -519,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
           maintainAspectRatio: false, // Added to respect container height
           plugins: {
             legend: {
-              position: 'bottom'
+              position: 'top'
             }
           }
         }
@@ -560,7 +560,7 @@ document.addEventListener('DOMContentLoaded', () => {
             maintainAspectRatio: false, // Ensure chart fills container
             plugins: {
               legend: {
-                position: 'bottom'
+                position: 'top'
               }
             }
           }
