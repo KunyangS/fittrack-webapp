@@ -531,22 +531,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Fetch and display fitness ranking data
   const rankingTableBody = document.getElementById('rankingTableBody');
+  const rankingTimePeriodSelect = document.getElementById('rankingTimePeriod'); // Get time period select
+  const rankingSortBySelect = document.getElementById('rankingSortBy'); // Get sort by select
+
   if (rankingTableBody) {
-    try {
-      fetchRankingData();
-    } catch (error) {
-      console.error("Error fetching ranking data:", error);
+    // Function to handle changes in ranking filters
+    function handleRankingFilterChange() {
+      const timeRange = rankingTimePeriodSelect ? rankingTimePeriodSelect.value : 'week';
+      const sortBy = rankingSortBySelect ? rankingSortBySelect.value : 'calories';
+      fetchRankingData(timeRange, sortBy);
     }
 
-    // Add event listener for ranking sort option change
-    const rankingSortBySelect = document.getElementById('rankingSortBy');
+    try {
+      // Initial fetch using default or selected values from HTML
+      handleRankingFilterChange(); 
+    } catch (error) {
+      console.error("Error fetching initial ranking data:", error);
+    }
+
+    // Add event listeners for ranking filter changes
+    if (rankingTimePeriodSelect) {
+      rankingTimePeriodSelect.addEventListener('change', handleRankingFilterChange);
+    }
     if (rankingSortBySelect) {
-      rankingSortBySelect.addEventListener('change', () => {
-        fetchRankingData(
-          'week',
-          rankingSortBySelect.value
-        );
-      });
+      rankingSortBySelect.addEventListener('change', handleRankingFilterChange);
     }
   }
 
@@ -585,7 +593,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function displayRankingData(rankingData) {
     if (!rankingTableBody) return;
 
-    if (!rankingData || rankingData.length === 0) {
+    const limitedData = rankingData.slice(0, 10); // Limit to top 10
+
+    if (!limitedData || limitedData.length === 0) {
       rankingTableBody.innerHTML = `
         <tr>
           <td colspan="5" class="px-6 py-4 text-center text-neutral-500 dark:text-neutral-400">
@@ -600,7 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
     rankingTableBody.innerHTML = '';
 
     // Add rows for each user in the ranking
-    rankingData.forEach(entry => {
+    limitedData.forEach(entry => {
       const row = document.createElement('tr');
       
       // Highlight the current user
@@ -656,39 +666,6 @@ document.addEventListener('DOMContentLoaded', () => {
       case 3: return '🥉';
       default: return '';
     }
-  }
-
-  // Add event listener for export button
-  const exportRankingButton = document.getElementById('exportRanking');
-  if (exportRankingButton) {
-    exportRankingButton.addEventListener('click', () => {
-      if (!window.currentRankingData || !window.currentRankingData.ranking) {
-        alert('No ranking data available to export');
-        return;
-      }
-      
-      const rankingData = window.currentRankingData.ranking;
-      const timeRange = window.currentRankingData.time_range;
-      const sortBy = window.currentRankingData.sort_by;
-      
-      // Create CSV content
-      let csvContent = 'Rank,Username,Calories Burned,Duration (mins),Activity Count\n';
-      
-      rankingData.forEach(entry => {
-        csvContent += `${entry.rank},"${entry.username}",${entry.total_calories_burned},${entry.total_duration},${entry.activity_count}\n`;
-      });
-      
-      // Create a download link
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute('download', `fitness_ranking_${timeRange}_${sortBy}_${new Date().toISOString().slice(0,10)}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    });
   }
   
   // Helper function: Calculate consistency (percentage of days with activity)
