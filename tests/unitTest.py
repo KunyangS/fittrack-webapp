@@ -283,6 +283,27 @@ class HomepageTestCase(unittest.TestCase):
         self.assertIn(email, temp_users)
         self.assertIn('code', temp_users[email])
 
+    # Valid email format
+    def test_valid_email_format(self):
+        response = self.client.post('/register', data={
+        'username': 'validuser',
+        'email': 'valid@example.com', # Valid email format
+        'password': 'Test@1234',
+        'confirm_password': 'Test@1234'
+        }, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Login', response.data)
+
+    #Password strength validation
+    def test_password_strength(self):
+        response = self.client.post('/register', data={
+        'username': 'weakpassuser',
+        'email': 'weakpass@example.com',
+        'password': '12345',
+        'confirm_password': '12345'
+        }, follow_redirects=True)
+        self.assertIn(b'Password must be at least 8 characters long and include at least one uppercase letter, one digit, and one special character.', response.data)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
