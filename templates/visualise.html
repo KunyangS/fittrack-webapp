@@ -12,11 +12,6 @@
       <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-6 font-sans">
         <input type="date" id="startDate" class="form-input px-4 py-2.5 border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 dark:text-white transition shadow-sm">
         <input type="date" id="endDate" class="form-input px-4 py-2.5 border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 dark:text-white transition shadow-sm">
-        <select id="timePeriod" class="form-select px-4 py-2.5 border-neutral-300 dark:border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white dark:bg-neutral-700 dark:text-white transition shadow-sm">
-          <option value="day">Daily</option>
-          <option value="week" selected>Weekly</option>
-          <option value="month">Monthly</option>
-        </select>
         <button id="applyFilter" class="inline-block bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-6 rounded-full shadow-md hover:shadow-lg transition duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-light">
           🎯 Apply Filter
         </button>
@@ -187,4 +182,4 @@
   </script>
 
   <script src="{{ url_for('static', filename='js/visualise.js') }}?v={{ now }}"></script>
-{% endblock %} 
+{% endblock %}
