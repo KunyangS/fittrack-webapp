@@ -367,14 +367,10 @@ document.addEventListener('DOMContentLoaded', () => {
             <p class="text-3xl font-bold text-emerald-800 dark:text-emerald-100 mt-1">${totalTime.toLocaleString()} mins</p>
           </div>
 
-          <!-- Calorie Balance Card -->
           <div class="flex flex-col items-center justify-center p-6 ${calorieGap <= 0 ? 'bg-teal-100 dark:bg-teal-700' : 'bg-rose-100 dark:bg-rose-700'} rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
             <p class="text-sm font-medium ${calorieGap <= 0 ? 'text-teal-600 dark:text-teal-300' : 'text-rose-600 dark:text-rose-300'} uppercase tracking-wider">Calorie Balance</p>
             <p class="text-3xl font-bold ${calorieGap <= 0 ? 'text-teal-800 dark:text-teal-100' : 'text-rose-800 dark:text-rose-100'} mt-1">${calorieGap.toLocaleString()} kcal</p>
           </div>
-        </div>
-        <div class="mt-4 text-center">
-          <p class="text-neutral-600 dark:text-neutral-300"><span class="font-semibold">Top Activities:</span> ${Object.keys(typeCounts).slice(0, 3).join(', ') || 'N/A'}</p>
         </div>
       `;
     }
