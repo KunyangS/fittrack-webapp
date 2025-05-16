@@ -417,6 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
         type: 'radar',
         data: radarData,
         options: {
+          maintainAspectRatio: false, // Ensure chart fills container
           elements: {
             line: {
               borderWidth: 3
@@ -556,6 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
           },
           options: { 
             responsive: true,
+            maintainAspectRatio: false, // Ensure chart fills container
             plugins: {
               legend: {
                 position: 'bottom'
