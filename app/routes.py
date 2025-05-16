@@ -127,6 +127,10 @@ def share():
         'basic_profile': 'Basic Profile',
         'fitness_log': 'Activity Log',
         'food_log': 'Meal Log',
+        'activity_summary': 'Activity Summary',
+        'daily_nutrition': 'Daily Nutrition Summary',
+        'mood_entries': 'Mood Entries',
+        'fitness_ranking': 'Fitness Ranking' # Added for leaderboard sharing
         # Add other mappings as they appear in your form/models
     }
     time_map = {
@@ -518,18 +522,31 @@ def fitness_ranking():
             # Default to one week
             start_date = today - timedelta(days=7)
 
-        # Query for fitness entries within the date range
+        # Get IDs of users who have shared 'fitness_ranking' with the current user
+        sharer_ids_who_shared_ranking = db.session.query(ShareEntry.sharer_user_id)\
+            .filter(ShareEntry.sharee_user_id == current_user.id)\
+            .filter(ShareEntry.is_active == True)\
+            .filter(ShareEntry.data_categories.contains('fitness_ranking'))\
+            .distinct().all()
+
+        allowed_sharer_ids = [item[0] for item in sharer_ids_who_shared_ranking]
+        user_ids_for_ranking = list(set([current_user.id] + allowed_sharer_ids))
+
+        # Query for fitness entries within the date range for allowed users
         fitness_entries_query = db.session.query(
             User.username,
+            User.id.label('user_id'), # Added user_id for robust 'is_current_user' check
             db.func.sum(FitnessEntry.calories_burned).label('total_calories'),
             db.func.sum(FitnessEntry.duration).label('total_duration'),
             db.func.count(FitnessEntry.id).label('activity_count')
         ).join(
             FitnessEntry, User.id == FitnessEntry.user_id
         ).filter(
+            User.id.in_(user_ids_for_ranking) # Filter by allowed users
+        ).filter(
             FitnessEntry.date >= start_date
         ).group_by(
-            User.username
+            User.username, User.id # Group by user_id as well
         )
         
         # Apply ordering based on sort parameter
@@ -548,18 +565,15 @@ def fitness_ranking():
 
         # Prepare the ranking data
         ranking_data = []
-        for i, (username, total_calories, total_duration, activity_count) in enumerate(fitness_entries, 1):
+        for i, (username, user_id_in_ranking, total_calories, total_duration, activity_count) in enumerate(fitness_entries, 1):
             ranking_data.append({
                 'rank': i,
                 'username': username,
                 'total_calories_burned': round(total_calories, 2) if total_calories else 0,
                 'total_duration': round(total_duration, 2) if total_duration else 0,
-                'activity_count': activity_count
+                'activity_count': activity_count,
+                'is_current_user': (user_id_in_ranking == current_user.id) # Set based on user_id
             })
-
-        # Highlight the current user in the rankings
-        for entry in ranking_data:
-            entry['is_current_user'] = (entry['username'] == current_user.username)
 
         return jsonify({
             'ranking': ranking_data, 
