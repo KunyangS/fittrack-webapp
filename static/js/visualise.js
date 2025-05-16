@@ -19,11 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const ctxEmotion = document.getElementById('emotionChart')?.getContext('2d');
   const ctxGoal = document.getElementById('goalProgressChart')?.getContext('2d');
   const ctxCaloriesBurned = document.getElementById('caloriesBurnedChart')?.getContext('2d'); 
+  const ctxCaloriesEfficiency = document.getElementById('caloriesEfficiencyChart')?.getContext('2d'); // New chart
   const ctxCalorieBalance = document.getElementById('calorieBalanceChart')?.getContext('2d');
   const ctxNutrition = document.getElementById('nutritionChart')?.getContext('2d');
 
   // ---------- Chart Instances ----------
-  let durationChart, intensityChart, performanceChart, emotionChart, goalChart, caloriesBurnedChart, calorieBalanceChart, nutritionChart;
+  let durationChart, intensityChart, performanceChart, emotionChart, goalChart, caloriesBurnedChart, caloriesEfficiencyChart, calorieBalanceChart, nutritionChart;
 
   // ---------- Modal Setup (for Daily Breakdown) ----------
   const modal = document.createElement('div');
@@ -161,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Destroy previous charts if they exist
     durationChart?.destroy();
     caloriesBurnedChart?.destroy(); 
+    caloriesEfficiencyChart?.destroy(); // Destroy new chart instance
     intensityChart?.destroy();
     performanceChart?.destroy();
     emotionChart?.destroy();
@@ -227,6 +229,48 @@ document.addEventListener('DOMContentLoaded', () => {
               title: {
                 display: true,
                 text: 'Calories'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Date'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Line Chart: Calorie Burn Efficiency (Calories per Minute)
+    if (ctxCaloriesEfficiency) {
+      const efficiencyData = allDates.map(date => {
+        const duration = groupedDuration[date] || 0;
+        const calories = groupedBurned[date] || 0;
+        return duration > 0 ? calories / duration : 0; // Calculate calories per minute
+      });
+
+      caloriesEfficiencyChart = new Chart(ctxCaloriesEfficiency, {
+        type: 'line',
+        data: {
+          labels: allDates,
+          datasets: [{
+            label: 'Calories Burned per Minute',
+            data: efficiencyData,
+            borderColor: 'rgb(153, 102, 255)',
+            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Calories/Minute'
               }
             },
             x: {
