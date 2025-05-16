@@ -68,10 +68,15 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error("Food data not available! Please check data loading in HTML.");
     window.foodData = []; // Fallback to empty array
   }
-  
+
   // Debug data loading
   console.log("Raw fitness data:", window.rawData);
   console.log("Food data:", window.foodData);
+  console.log("Is viewing shared data:", window.isViewingSharedData);
+  console.log("Show activity log:", window.showActivityLog);
+  console.log("Show meal log:", window.showMealLog);
+  console.log("Effective start date:", window.effectiveStartDate);
+  console.log("Effective end date:", window.effectiveEndDate);
 
   // ---------- Utility Functions ----------
   function getToday() {
@@ -96,9 +101,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ---------- Detailed Data Log Functions ----------
   function combineAndSortData(fitnessData, foodData) {
-    const mappedFitnessData = fitnessData.map(entry => ({ ...entry, type: 'Fitness', icon: 'fa-person-running' }));
-    const mappedFoodData = foodData.map(entry => ({ ...entry, type: 'Food', icon: 'fa-utensils' }));
-    return [...mappedFitnessData, ...mappedFoodData].sort((a, b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
+    let combined = [];
+    if (window.isViewingSharedData) {
+        // In shared view, only show data based on permissions
+        if (window.showActivityLog) {
+            combined = combined.concat(fitnessData.map(entry => ({ ...entry, type: 'Fitness', icon: 'fa-person-running' })));
+        }
+        if (window.showMealLog) {
+            combined = combined.concat(foodData.map(entry => ({ ...entry, type: 'Food', icon: 'fa-utensils' })));
+        }
+    } else {
+        // Original behavior for non-shared view
+        combined = fitnessData.map(entry => ({ ...entry, type: 'Fitness', icon: 'fa-person-running' }))
+            .concat(foodData.map(entry => ({ ...entry, type: 'Food', icon: 'fa-utensils' })));
+    }
+
+    // Sort by date, most recent first
+    return combined.sort((a, b) => new Date(b.date) - new Date(a.date));
   }
 
   function renderDataEntriesLog() {
@@ -156,17 +175,20 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           ${entryDetails}
         </div>
-        <button class="delete-entry-btn flex-shrink-0 text-neutral-400 hover:text-red-600 dark:text-neutral-500 dark:hover:text-red-400 transition-colors p-1.5 rounded-full focus:outline-none focus:ring-1 focus:ring-red-500 focus:ring-opacity-50" data-id="${entry.id}" data-type="${entry.type.toLowerCase()}" aria-label="Delete entry">
+        ${!window.isViewingSharedData ? // Only show delete button if not viewing shared data
+        `<button class="delete-entry-btn flex-shrink-0 text-neutral-400 hover:text-red-600 dark:text-neutral-500 dark:hover:text-red-400 transition-colors p-1.5 rounded-full focus:outline-none focus:ring-1 focus:ring-red-500 focus:ring-opacity-50" data-id="${entry.id}" data-type="${entry.type.toLowerCase()}" aria-label="Delete entry">
           <i class="fas fa-trash-alt text-xs"></i> <!-- Smaller delete icon -->
-        </button>
+        </button>` : ''}
       `;
       dataEntriesLogContainer.appendChild(card);
     });
 
     // Add event listeners to delete buttons
-    document.querySelectorAll('.delete-entry-btn').forEach(button => {
-      button.addEventListener('click', handleDeleteEntry);
-    });
+    if (!window.isViewingSharedData) {
+        document.querySelectorAll('.delete-entry-btn').forEach(button => {
+            button.addEventListener('click', handleDeleteEntry);
+        });
+    }
     
     renderPaginationControls(combinedData.length);
   }
@@ -214,6 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function handleDeleteEntry(event) {
+    if (window.isViewingSharedData) {
+        alert('Deletion is not allowed when viewing shared data.');
+        return;
+    }
     const button = event.currentTarget;
     const entryId = button.dataset.id;
     const entryType = button.dataset.type;
@@ -256,8 +282,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ---------- Main Dashboard Update Function ----------
   function updateDashboard() {
-    const start = startDateInput.value || getNDaysAgo(6);
-    const end = endDateInput.value || getToday();
+    let start = startDateInput.value;
+    let end = endDateInput.value;
+
+    // Validate dates if viewing shared data
+    if (window.isViewingSharedData) {
+        if (window.effectiveStartDate && start < window.effectiveStartDate) {
+            alert(`You can only view data from ${window.effectiveStartDate} onwards for this shared view.`);
+            startDateInput.value = window.effectiveStartDate;
+            start = window.effectiveStartDate;
+        }
+        if (window.effectiveEndDate && end > window.effectiveEndDate) {
+            alert(`You can only view data up to ${window.effectiveEndDate} for this shared view.`);
+            endDateInput.value = window.effectiveEndDate;
+            end = window.effectiveEndDate;
+        }
+        // Also ensure start is not after end, and if so, reset appropriately
+        if (start > end) {
+            alert('Start date cannot be after end date. Adjusting start date.');
+            startDateInput.value = end; // Or set to effectiveStartDate if available
+            start = end;
+        }
+    }
+    
+    // If dates are still not set (e.g. initial load not shared), use defaults
+    if (!start) start = getNDaysAgo(6);
+    if (!end) end = getToday();
 
     // Filter records within the selected date range
     const filteredFitness = window.rawData.filter(row => row.date >= start && row.date <= end);
@@ -747,8 +797,20 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------- Initial Render with Defaults ----------
-  if (!startDateInput.value) startDateInput.value = getNDaysAgo(6);
-  if (!endDateInput.value) endDateInput.value = getToday();
+  if (!startDateInput.value) {
+    if (window.isViewingSharedData && window.effectiveStartDate) {
+        startDateInput.value = window.effectiveStartDate;
+    } else {
+        startDateInput.value = getNDaysAgo(6);
+    }
+  }
+  if (!endDateInput.value) {
+    if (window.isViewingSharedData && window.effectiveEndDate) {
+        endDateInput.value = window.effectiveEndDate;
+    } else {
+        endDateInput.value = getToday();
+    }
+  }
 
   // Apply button listener
   applyButton.addEventListener('click', updateDashboard);
@@ -761,7 +823,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const rankingTimePeriodSelect = document.getElementById('rankingTimePeriod'); // Get time period select
   const rankingSortBySelect = document.getElementById('rankingSortBy'); // Get sort by select
 
-  if (rankingTableBody) {
+  if (rankingTableBody && !window.isViewingSharedData) { // Only init if not viewing shared data
     // Function to handle changes in ranking filters
     function handleRankingFilterChange() {
       const timeRange = rankingTimePeriodSelect ? rankingTimePeriodSelect.value : 'week';
@@ -939,14 +1001,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Goal Progress Tracker functions
   function initGoalProgressChart(filteredFitness) {
-    const ctxGoal = document.getElementById('goalProgressChart')?.getContext('2d');
-    if (!ctxGoal) return;
-    
-    // Check if we have valid data
-    if (!filteredFitness || !Array.isArray(filteredFitness) || filteredFitness.length === 0) {
-      console.warn("No fitness data available for goal progress chart");
-      return;
-    }
+    if (!ctxGoal) return; // Ensure canvas context exists
     
     // Calculate weekly sessions
     function calculateWeeklySessions(fitnessData) {
