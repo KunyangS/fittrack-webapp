@@ -16,14 +16,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const ctxDuration = document.getElementById('durationChart')?.getContext('2d');
   const ctxIntensity = document.getElementById('intensityChart')?.getContext('2d');
   const ctxPerformance = document.getElementById('performanceRadarChart')?.getContext('2d');
-  const ctxPie = document.getElementById('activityPieChart')?.getContext('2d');
   const ctxEmotion = document.getElementById('emotionChart')?.getContext('2d');
   const ctxGoal = document.getElementById('goalProgressChart')?.getContext('2d');
+  const ctxCaloriesBurned = document.getElementById('caloriesBurnedChart')?.getContext('2d'); 
+  const ctxCaloriesEfficiency = document.getElementById('caloriesEfficiencyChart')?.getContext('2d'); // New chart
   const ctxCalorieBalance = document.getElementById('calorieBalanceChart')?.getContext('2d');
   const ctxNutrition = document.getElementById('nutritionChart')?.getContext('2d');
 
+  // Elements for Detailed Data Log
+  const dataEntriesLogContainer = document.getElementById('dataEntriesLog');
+  const dataEntriesPaginationContainer = document.getElementById('dataEntriesPagination');
+  let currentPage = 1;
+  const itemsPerPage = 10;
+  let combinedData = [];
+
   // ---------- Chart Instances ----------
-  let durationChart, intensityChart, performanceChart, pieChart, emotionChart, goalChart, calorieBalanceChart, nutritionChart;
+  let durationChart, intensityChart, performanceChart, emotionChart, goalChart, caloriesBurnedChart, caloriesEfficiencyChart, calorieBalanceChart, nutritionChart;
 
   // ---------- Modal Setup (for Daily Breakdown) ----------
   const modal = document.createElement('div');
@@ -60,10 +68,15 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error("Food data not available! Please check data loading in HTML.");
     window.foodData = []; // Fallback to empty array
   }
-  
+
   // Debug data loading
   console.log("Raw fitness data:", window.rawData);
   console.log("Food data:", window.foodData);
+  console.log("Is viewing shared data:", window.isViewingSharedData);
+  console.log("Show activity log:", window.showActivityLog);
+  console.log("Show meal log:", window.showMealLog);
+  console.log("Effective start date:", window.effectiveStartDate);
+  console.log("Effective end date:", window.effectiveEndDate);
 
   // ---------- Utility Functions ----------
   function getToday() {
@@ -86,10 +99,215 @@ document.addEventListener('DOMContentLoaded', () => {
     return result;
   }
 
+  // ---------- Detailed Data Log Functions ----------
+  function combineAndSortData(fitnessData, foodData) {
+    let combined = [];
+    if (window.isViewingSharedData) {
+        // In shared view, only show data based on permissions
+        if (window.showActivityLog) {
+            combined = combined.concat(fitnessData.map(entry => ({ ...entry, type: 'Fitness', icon: 'fa-person-running' })));
+        }
+        if (window.showMealLog) {
+            combined = combined.concat(foodData.map(entry => ({ ...entry, type: 'Food', icon: 'fa-utensils' })));
+        }
+    } else {
+        // Original behavior for non-shared view
+        combined = fitnessData.map(entry => ({ ...entry, type: 'Fitness', icon: 'fa-person-running' }))
+            .concat(foodData.map(entry => ({ ...entry, type: 'Food', icon: 'fa-utensils' })));
+    }
+
+    // Sort by date, most recent first
+    return combined.sort((a, b) => new Date(b.date) - new Date(a.date));
+  }
+
+  function renderDataEntriesLog() {
+    if (!dataEntriesLogContainer) return;
+
+    dataEntriesLogContainer.innerHTML = ''; // Clear previous entries
+
+    if (combinedData.length === 0) {
+      dataEntriesLogContainer.innerHTML = '<p class="text-center text-sm text-neutral-500 dark:text-neutral-400 py-4">No data entries found for the selected period.</p>';
+      renderPaginationControls(0);
+      return;
+    }
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedEntries = combinedData.slice(startIndex, endIndex);
+
+    paginatedEntries.forEach(entry => {
+      const card = document.createElement('div');
+      card.className = 'bg-neutral-100 dark:bg-neutral-700/50 p-3 rounded-lg shadow-sm flex items-center space-x-3 transition-all duration-200 hover:shadow-md'; // Adjusted background and padding
+      
+      let entryDetails = '';
+      const commonTextClass = 'text-xs text-neutral-600 dark:text-neutral-400'; // Slightly lighter text for labels
+      const valueTextClass = 'font-medium text-neutral-800 dark:text-neutral-200'; // Values stand out more
+
+      if (entry.type === 'Fitness') {
+        entryDetails = `
+          <div class="flex-1 min-w-0">
+            <p class="${commonTextClass} truncate"><strong class="font-semibold">Activity:</strong> <span class="${valueTextClass}">${entry.activity_type || 'N/A'}</span></p>
+            <div class="flex space-x-2.5 mt-0.5"> <!-- Reduced spacing -->
+              <p class="${commonTextClass}"><strong class="font-semibold">Duration:</strong> <span class="${valueTextClass}">${entry.duration || 0}m</span></p>
+              <p class="${commonTextClass}"><strong class="font-semibold">Calories:</strong> <span class="${valueTextClass}">${entry.calories_burned || 0}kcal</span></p>
+            </div>
+          </div>
+        `;
+      } else if (entry.type === 'Food') {
+        entryDetails = `
+          <div class="flex-1 min-w-0">
+            <p class="${commonTextClass} truncate"><strong class="font-semibold">Item:</strong> <span class="${valueTextClass}">${entry.food_name || 'N/A'}</span> <span class="text-neutral-500 dark:text-neutral-400">(${entry.meal_type || 'N/A'})</span></p>
+            <div class="flex space-x-2.5 mt-0.5"> <!-- Reduced spacing -->
+              <p class="${commonTextClass}"><strong class="font-semibold">Qty:</strong> <span class="${valueTextClass}">${entry.quantity || 'N/A'}</span></p>
+              <p class="${commonTextClass}"><strong class="font-semibold">Calories:</strong> <span class="${valueTextClass}">${entry.calories || 0}kcal</span></p>
+            </div>
+          </div>
+        `;
+      }
+
+      card.innerHTML = `
+        <div class="flex-shrink-0">
+          <i class="fas ${entry.icon} text-primary dark:text-primary-light text-lg w-5 text-center"></i> <!-- Slightly smaller icon -->
+        </div>
+        <div class="flex-grow min-w-0">
+          <div class="flex justify-between items-center mb-0.5">
+            <h4 class="text-xs font-semibold text-neutral-700 dark:text-neutral-100 truncate" title="${entry.type} Entry - ${new Date(entry.date).toLocaleDateString()}">${entry.type} - ${new Date(entry.date).toLocaleDateString('en-CA')}</h4>
+          </div>
+          ${entryDetails}
+        </div>
+        ${!window.isViewingSharedData ? // Only show delete button if not viewing shared data
+        `<button class="delete-entry-btn flex-shrink-0 text-neutral-400 hover:text-red-600 dark:text-neutral-500 dark:hover:text-red-400 transition-colors p-1.5 rounded-full focus:outline-none focus:ring-1 focus:ring-red-500 focus:ring-opacity-50" data-id="${entry.id}" data-type="${entry.type.toLowerCase()}" aria-label="Delete entry">
+          <i class="fas fa-trash-alt text-xs"></i> <!-- Smaller delete icon -->
+        </button>` : ''}
+      `;
+      dataEntriesLogContainer.appendChild(card);
+    });
+
+    // Add event listeners to delete buttons
+    if (!window.isViewingSharedData) {
+        document.querySelectorAll('.delete-entry-btn').forEach(button => {
+            button.addEventListener('click', handleDeleteEntry);
+        });
+    }
+    
+    renderPaginationControls(combinedData.length);
+  }
+
+  function renderPaginationControls(totalItems) {
+    if (!dataEntriesPaginationContainer) return;
+    dataEntriesPaginationContainer.innerHTML = ''; // Clear previous controls
+
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    if (totalPages <= 1) return;
+
+    // Previous Button
+    const prevButton = document.createElement('button');
+    prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    prevButton.className = 'px-3 py-1 rounded-md text-sm font-medium focus:outline-none transition-colors duration-200 ';
+    prevButton.className += currentPage === 1 ? 'bg-neutral-200 dark:bg-neutral-600 text-neutral-400 dark:text-neutral-500 cursor-not-allowed' : 'bg-primary hover:bg-primary-dark text-white';
+    prevButton.disabled = currentPage === 1;
+    prevButton.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderDataEntriesLog();
+      }
+    });
+    dataEntriesPaginationContainer.appendChild(prevButton);
+
+    // Page Info
+    const pageInfo = document.createElement('span');
+    pageInfo.className = 'text-sm text-neutral-700 dark:text-neutral-300';
+    pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    dataEntriesPaginationContainer.appendChild(pageInfo);
+    
+    // Next Button
+    const nextButton = document.createElement('button');
+    nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    nextButton.className = 'px-3 py-1 rounded-md text-sm font-medium focus:outline-none transition-colors duration-200 ';
+    nextButton.className += currentPage === totalPages ? 'bg-neutral-200 dark:bg-neutral-600 text-neutral-400 dark:text-neutral-500 cursor-not-allowed' : 'bg-primary hover:bg-primary-dark text-white';
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderDataEntriesLog();
+      }
+    });
+    dataEntriesPaginationContainer.appendChild(nextButton);
+  }
+
+  async function handleDeleteEntry(event) {
+    if (window.isViewingSharedData) {
+        alert('Deletion is not allowed when viewing shared data.');
+        return;
+    }
+    const button = event.currentTarget;
+    const entryId = button.dataset.id;
+    const entryType = button.dataset.type;
+
+    if (!confirm(`Are you sure you want to delete this ${entryType} entry?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/delete_entry/${entryType}/${entryId}`, {
+        method: 'DELETE',
+        headers: {
+          // Add any necessary headers, like CSRF token if applicable
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete entry');
+      }
+
+      // Remove entry from local data and re-render
+      if (entryType === 'fitness') {
+        window.rawData = window.rawData.filter(entry => entry.id !== parseInt(entryId));
+      } else if (entryType === 'food') {
+        window.foodData = window.foodData.filter(entry => entry.id !== parseInt(entryId));
+      }
+      
+      // Re-filter and update everything
+      updateDashboard(); 
+
+      alert('Entry deleted successfully!');
+
+    } catch (error) {
+      console.error('Error deleting entry:', error);
+      alert(`Error: ${error.message}`);
+    }
+  }
+
   // ---------- Main Dashboard Update Function ----------
   function updateDashboard() {
-    const start = startDateInput.value || getNDaysAgo(6);
-    const end = endDateInput.value || getToday();
+    let start = startDateInput.value;
+    let end = endDateInput.value;
+
+    // Validate dates if viewing shared data
+    if (window.isViewingSharedData) {
+        if (window.effectiveStartDate && start < window.effectiveStartDate) {
+            alert(`You can only view data from ${window.effectiveStartDate} onwards for this shared view.`);
+            startDateInput.value = window.effectiveStartDate;
+            start = window.effectiveStartDate;
+        }
+        if (window.effectiveEndDate && end > window.effectiveEndDate) {
+            alert(`You can only view data up to ${window.effectiveEndDate} for this shared view.`);
+            endDateInput.value = window.effectiveEndDate;
+            end = window.effectiveEndDate;
+        }
+        // Also ensure start is not after end, and if so, reset appropriately
+        if (start > end) {
+            alert('Start date cannot be after end date. Adjusting start date.');
+            startDateInput.value = end; // Or set to effectiveStartDate if available
+            start = end;
+        }
+    }
+    
+    // If dates are still not set (e.g. initial load not shared), use defaults
+    if (!start) start = getNDaysAgo(6);
+    if (!end) end = getToday();
 
     // Filter records within the selected date range
     const filteredFitness = window.rawData.filter(row => row.date >= start && row.date <= end);
@@ -127,26 +345,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalIntake = intake.reduce((sum, c) => sum + c, 0);
     const calorieGap = totalIntake - totalCalories;
 
+    // Update combined data for the log
+    combinedData = combineAndSortData(filteredFitness, filteredFood);
+    currentPage = 1; // Reset to first page on filter change
+    renderDataEntriesLog();
+
     // ---------- Update Summary Card ----------
     const summaryContentDiv = document.getElementById('summary-content');
     if (summaryContentDiv) {
       summaryContentDiv.innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="p-4 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
-            <p class="text-lg font-semibold text-primary-dark dark:text-primary-light">Total Calories Burned</p>
-            <p class="text-2xl font-bold mt-2">${totalCalories.toLocaleString()} kcal</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <!-- Total Calories Burned Card -->
+          <div class="flex flex-col items-center justify-center p-6 bg-sky-100 dark:bg-sky-700 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
+            <p class="text-sm font-medium text-sky-600 dark:text-sky-300 uppercase tracking-wider">Calories Burned</p>
+            <p class="text-3xl font-bold text-sky-800 dark:text-sky-100 mt-1">${totalCalories.toLocaleString()} kcal</p>
           </div>
-          <div class="p-4 bg-neutral-100 dark:bg-neutral-800/50 rounded-lg">
-            <p class="text-lg font-semibold">Total Workout Time</p>
-            <p class="text-2xl font-bold mt-2">${totalTime.toLocaleString()} mins</p>
+
+          <!-- Total Workout Time Card -->
+          <div class="flex flex-col items-center justify-center p-6 bg-emerald-100 dark:bg-emerald-700 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
+            <p class="text-sm font-medium text-emerald-600 dark:text-emerald-300 uppercase tracking-wider">Workout Time</p>
+            <p class="text-3xl font-bold text-emerald-800 dark:text-emerald-100 mt-1">${totalTime.toLocaleString()} mins</p>
           </div>
-          <div class="p-4 bg-neutral-100 dark:bg-neutral-800/50 rounded-lg">
-            <p class="text-lg font-semibold">Calorie Balance</p>
-            <p class="text-2xl font-bold mt-2 ${calorieGap <= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">${calorieGap.toLocaleString()} kcal</p>
+
+          <div class="flex flex-col items-center justify-center p-6 ${calorieGap <= 0 ? 'bg-teal-100 dark:bg-teal-700' : 'bg-rose-100 dark:bg-rose-700'} rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
+            <p class="text-sm font-medium ${calorieGap <= 0 ? 'text-teal-600 dark:text-teal-300' : 'text-rose-600 dark:text-rose-300'} uppercase tracking-wider">Calorie Balance</p>
+            <p class="text-3xl font-bold ${calorieGap <= 0 ? 'text-teal-800 dark:text-teal-100' : 'text-rose-800 dark:text-rose-100'} mt-1">${calorieGap.toLocaleString()} kcal</p>
           </div>
-        </div>
-        <div class="mt-4">
-          <p class="text-neutral-700 dark:text-neutral-300">Top Activities: ${Object.keys(typeCounts).slice(0, 3).join(', ')}</p>
         </div>
       `;
     }
@@ -155,9 +379,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Destroy previous charts if they exist
     durationChart?.destroy();
+    caloriesBurnedChart?.destroy(); 
+    caloriesEfficiencyChart?.destroy(); // Destroy new chart instance
     intensityChart?.destroy();
     performanceChart?.destroy();
-    pieChart?.destroy();
     emotionChart?.destroy();
     goalChart?.destroy();
     calorieBalanceChart?.destroy();
@@ -198,7 +423,85 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
-    
+
+    // Line Chart: Calories Burned Trend
+    if (ctxCaloriesBurned) {
+      caloriesBurnedChart = new Chart(ctxCaloriesBurned, {
+        type: 'line',
+        data: {
+          labels: allDates,
+          datasets: [{
+            label: 'Calories Burned',
+            data: calories, // Use the 'calories' array
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Calories'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Date'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Line Chart: Calorie Burn Efficiency (Calories per Minute)
+    if (ctxCaloriesEfficiency) {
+      const efficiencyData = allDates.map(date => {
+        const duration = groupedDuration[date] || 0;
+        const calories = groupedBurned[date] || 0;
+        return duration > 0 ? calories / duration : 0; // Calculate calories per minute
+      });
+
+      caloriesEfficiencyChart = new Chart(ctxCaloriesEfficiency, {
+        type: 'line',
+        data: {
+          labels: allDates,
+          datasets: [{
+            label: 'Calories Burned per Minute',
+            data: efficiencyData,
+            borderColor: 'rgb(153, 102, 255)',
+            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Calories/Minute'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Date'
+              }
+            }
+          }
+        }
+      });
+    }
+
     // Intensity Chart (Activity Intensity Analysis)
     if (ctxIntensity) {
       // Calculate intensity (calories/minute) for each activity type
@@ -228,10 +531,13 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Sort by intensity
       intensityData.sort((a, b) => b.intensity - a.intensity);
+
+      // Slice to get top 10 records
+      const top10IntensityData = intensityData.slice(0, 10);
       
       // Create chart data
-      const labels = intensityData.map(item => item.type);
-      const data = intensityData.map(item => item.intensity);
+      const labels = top10IntensityData.map(item => item.type);
+      const data = top10IntensityData.map(item => item.intensity);
       const backgroundColors = [
         'rgba(255, 99, 132, 0.7)',
         'rgba(54, 162, 235, 0.7)',
@@ -270,7 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
               callbacks: {
                 afterLabel: function(context) {
                   const index = context.dataIndex;
-                  const item = intensityData[index];
+                  const item = top10IntensityData[index]; // Use top10IntensityData here
                   return [
                     `Total Calories: ${item.totalCalories.toFixed(0)}`,
                     `Sessions: ${item.count}`
@@ -329,6 +635,7 @@ document.addEventListener('DOMContentLoaded', () => {
         type: 'radar',
         data: radarData,
         options: {
+          maintainAspectRatio: false, // Ensure chart fills container
           elements: {
             line: {
               borderWidth: 3
@@ -344,38 +651,6 @@ document.addEventListener('DOMContentLoaded', () => {
               ticks: {
                 display: false
               }
-            }
-          }
-        }
-      });
-    }
-
-    // Pie Chart: Activity distribution
-    if (ctxPie) {
-      const activityLabels = Object.keys(typeCounts);
-      const activityData = Object.values(typeCounts);
-      
-      pieChart = new Chart(ctxPie, {
-        type: 'pie',
-        data: {
-          labels: activityLabels,
-          datasets: [{
-            data: activityData,
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.8)',
-              'rgba(54, 162, 235, 0.8)',
-              'rgba(255, 206, 86, 0.8)',
-              'rgba(75, 192, 192, 0.8)',
-              'rgba(153, 102, 255, 0.8)',
-              'rgba(255, 159, 64, 0.8)'
-            ]
-          }]
-        },
-        options: { 
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'right',
             }
           }
         }
@@ -407,6 +682,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false, // Added to respect container height
           scales: {
             y: {
               beginAtZero: true,
@@ -458,9 +734,10 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false, // Added to respect container height
           plugins: {
             legend: {
-              position: 'bottom'
+              position: 'top'
             }
           }
         }
@@ -498,9 +775,10 @@ document.addEventListener('DOMContentLoaded', () => {
           },
           options: { 
             responsive: true,
+            maintainAspectRatio: false, // Ensure chart fills container
             plugins: {
               legend: {
-                position: 'bottom'
+                position: 'top'
               }
             }
           }
@@ -515,8 +793,20 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ---------- Initial Render with Defaults ----------
-  if (!startDateInput.value) startDateInput.value = getNDaysAgo(6);
-  if (!endDateInput.value) endDateInput.value = getToday();
+  if (!startDateInput.value) {
+    if (window.isViewingSharedData && window.effectiveStartDate) {
+        startDateInput.value = window.effectiveStartDate;
+    } else {
+        startDateInput.value = getNDaysAgo(6);
+    }
+  }
+  if (!endDateInput.value) {
+    if (window.isViewingSharedData && window.effectiveEndDate) {
+        endDateInput.value = window.effectiveEndDate;
+    } else {
+        endDateInput.value = getToday();
+    }
+  }
 
   // Apply button listener
   applyButton.addEventListener('click', updateDashboard);
@@ -526,30 +816,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Fetch and display fitness ranking data
   const rankingTableBody = document.getElementById('rankingTableBody');
-  if (rankingTableBody) {
-    try {
-      fetchRankingData();
-    } catch (error) {
-      console.error("Error fetching ranking data:", error);
+  const rankingTimePeriodSelect = document.getElementById('rankingTimePeriod'); // Get time period select
+  const rankingSortBySelect = document.getElementById('rankingSortBy'); // Get sort by select
+
+  if (rankingTableBody && !window.isViewingSharedData) { // Only init if not viewing shared data
+    // Function to handle changes in ranking filters
+    function handleRankingFilterChange() {
+      const timeRange = rankingTimePeriodSelect ? rankingTimePeriodSelect.value : 'week';
+      const sortBy = rankingSortBySelect ? rankingSortBySelect.value : 'calories';
+      fetchRankingData(timeRange, sortBy);
     }
 
-    // Add event listener for ranking time period change
-    const rankingTimePeriodSelect = document.getElementById('rankingTimePeriod');
-    if (rankingTimePeriodSelect) {
-      rankingTimePeriodSelect.addEventListener('change', () => {
-        fetchRankingData(rankingTimePeriodSelect.value);
-      });
+    try {
+      // Initial fetch using default or selected values from HTML
+      handleRankingFilterChange(); 
+    } catch (error) {
+      console.error("Error fetching initial ranking data:", error);
     }
-    
-    // Add event listener for ranking sort option change
-    const rankingSortBySelect = document.getElementById('rankingSortBy');
+
+    // Add event listeners for ranking filter changes
+    if (rankingTimePeriodSelect) {
+      rankingTimePeriodSelect.addEventListener('change', handleRankingFilterChange);
+    }
     if (rankingSortBySelect) {
-      rankingSortBySelect.addEventListener('change', () => {
-        fetchRankingData(
-          rankingTimePeriodSelect?.value || 'week',
-          rankingSortBySelect.value
-        );
-      });
+      rankingSortBySelect.addEventListener('change', handleRankingFilterChange);
     }
   }
 
@@ -588,7 +878,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function displayRankingData(rankingData) {
     if (!rankingTableBody) return;
 
-    if (!rankingData || rankingData.length === 0) {
+    const limitedData = rankingData.slice(0, 10); // Limit to top 10
+
+    if (!limitedData || limitedData.length === 0) {
       rankingTableBody.innerHTML = `
         <tr>
           <td colspan="5" class="px-6 py-4 text-center text-neutral-500 dark:text-neutral-400">
@@ -603,7 +895,7 @@ document.addEventListener('DOMContentLoaded', () => {
     rankingTableBody.innerHTML = '';
 
     // Add rows for each user in the ranking
-    rankingData.forEach(entry => {
+    limitedData.forEach(entry => {
       const row = document.createElement('tr');
       
       // Highlight the current user
@@ -660,39 +952,6 @@ document.addEventListener('DOMContentLoaded', () => {
       default: return '';
     }
   }
-
-  // Add event listener for export button
-  const exportRankingButton = document.getElementById('exportRanking');
-  if (exportRankingButton) {
-    exportRankingButton.addEventListener('click', () => {
-      if (!window.currentRankingData || !window.currentRankingData.ranking) {
-        alert('No ranking data available to export');
-        return;
-      }
-      
-      const rankingData = window.currentRankingData.ranking;
-      const timeRange = window.currentRankingData.time_range;
-      const sortBy = window.currentRankingData.sort_by;
-      
-      // Create CSV content
-      let csvContent = 'Rank,Username,Calories Burned,Duration (mins),Activity Count\n';
-      
-      rankingData.forEach(entry => {
-        csvContent += `${entry.rank},"${entry.username}",${entry.total_calories_burned},${entry.total_duration},${entry.activity_count}\n`;
-      });
-      
-      // Create a download link
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute('download', `fitness_ranking_${timeRange}_${sortBy}_${new Date().toISOString().slice(0,10)}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    });
-  }
   
   // Helper function: Calculate consistency (percentage of days with activity)
   function calculateConsistency(fitnessData, allDates) {
@@ -738,14 +997,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Goal Progress Tracker functions
   function initGoalProgressChart(filteredFitness) {
-    const ctxGoal = document.getElementById('goalProgressChart')?.getContext('2d');
-    if (!ctxGoal) return;
-    
-    // Check if we have valid data
-    if (!filteredFitness || !Array.isArray(filteredFitness) || filteredFitness.length === 0) {
-      console.warn("No fitness data available for goal progress chart");
-      return;
-    }
+    if (!ctxGoal) return; // Ensure canvas context exists
     
     // Calculate weekly sessions
     function calculateWeeklySessions(fitnessData) {

@@ -262,32 +262,6 @@
                 {% endif %}
             </ul>
         </nav>
-        
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="container mx-auto px-4 py-2" aria-live="polite">
-                    {% for category, message in messages %}
-                        <div class="p-3 my-2 rounded-lg text-white animate-fadeIn flex items-center justify-between
-                                  {% if category == 'danger' %}bg-red-600{% elif category == 'success' %}bg-green-600{% else %}bg-blue-600{% endif %}">
-                            <div>
-                                {% if category == 'danger' %}
-                                    <i class="fas fa-exclamation-circle mr-2" aria-hidden="true"></i>
-                                {% elif category == 'success' %}
-                                    <i class="fas fa-check-circle mr-2" aria-hidden="true"></i>
-                                {% else %}
-                                    <i class="fas fa-info-circle mr-2" aria-hidden="true"></i>
-                                {% endif %}
-                                {{ message }}
-                            </div>
-                            <button class="close-alert focus:outline-none focus:ring-1 focus:ring-white" aria-label="Close alert">
-                                <i class="fas fa-times" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
     </header>
 
     <!-- Main Content Area -->
@@ -430,19 +404,6 @@
                             return !$(this).val();
                         }).first()).offset().top - 100
                     }, 500);
-                }
-            });
-            
-            // Input fields validation on blur
-            $(document).on('blur', 'input, textarea, select', function() {
-                if ($(this).attr('required') && !$(this).val()) {
-                    $(this).addClass('border-red-500').removeClass('border-gray-300');
-                    if (!$(this).next('.error-message').length) {
-                        $('<p class="text-red-500 text-xs mt-1 error-message">This field is required</p>').insertAfter($(this));
-                    }
-                } else {
-                    $(this).removeClass('border-red-500').addClass('border-gray-300');
-                    $(this).next('.error-message').remove();
                 }
             });
             

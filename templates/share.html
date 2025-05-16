@@ -60,10 +60,11 @@
             {% set share_categories = [
               {'id': 'basic_profile', 'label': 'Basic Profile', 'details': '(Gender, Age, Height, Weight)'},
               {'id': 'activity_summary', 'label': 'Activity Summary', 'details': '(Type, Duration, Calories)'},
-              {'id': 'activity', 'label': 'Activity Log', 'details': '(Includes Date/Time)'},
+              {'id': 'activity_log', 'label': 'Activity Log', 'details': '(Includes Date/Time)'},
               {'id': 'meal_log', 'label': 'Meal Log', 'details': '(Food, Quantity, Calories, Type, Date/Time)'},
               {'id': 'daily_nutrition', 'label': 'Daily Nutrition Summary', 'details': '(Total Calories)'},
-              {'id': 'mood_entries', 'label': 'Mood Entries', 'details': '(Emotion, Date/Time)'}
+              {'id': 'mood_entries', 'label': 'Mood Entries', 'details': '(Emotion, Date/Time)'},
+              {'id': 'fitness_ranking', 'label': 'Fitness Ranking', 'details': '(Share your ranking on the leaderboard)'}
             ] %}
 
             {# Loop through categories to create checkbox inputs and labels #}
@@ -245,33 +246,35 @@
         #}
         {% if shared_with_you %}
           {% for share in shared_with_you %}
-          <div class="bg-white dark:bg-neutral-700 rounded-xl shadow-md border border-neutral-100 dark:border-neutral-600 overflow-hidden transition hover:shadow-lg">
-            <!-- Share Item Header: Sharer info and shared date -->
-            <div class="flex items-center justify-between p-4 border-b border-neutral-100 dark:border-neutral-600">
-              <div class="flex items-center gap-3">
-                <!-- Avatar Placeholder -->
-                <div class="flex-shrink-0 h-9 w-9 rounded-full bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center text-white shadow-sm">
-                  <span class="font-semibold text-base">{{ share.sharer_name[0]|upper }}</span>
+          <a href="{{ url_for('view_shared_data', share_id=share.share_id) }}" class="block">
+            <div class="bg-white dark:bg-neutral-700 rounded-xl shadow-md border border-neutral-100 dark:border-neutral-600 overflow-hidden transition hover:shadow-lg">
+              <!-- Share Item Header: Sharer info and shared date -->
+              <div class="flex items-center justify-between p-4 border-b border-neutral-100 dark:border-neutral-600">
+                <div class="flex items-center gap-3">
+                  <!-- Avatar Placeholder -->
+                  <div class="flex-shrink-0 h-9 w-9 rounded-full bg-gradient-to-br from-green-500 to-emerald-400 flex items-center justify-center text-white shadow-sm">
+                    <span class="font-semibold text-base">{{ share.sharer_name[0]|upper }}</span>
+                  </div>
+                  <h3 class="text-base font-semibold text-primary dark:text-primary-light">{{ share.sharer_name }}</h3>
                 </div>
-                <h3 class="text-base font-semibold text-primary dark:text-primary-light">{{ share.sharer_name }}</h3>
+                <span class="text-xs text-neutral-500 dark:text-neutral-400">Shared: {{ share.shared_at }}</span>
               </div>
-              <span class="text-xs text-neutral-500 dark:text-neutral-400">Shared: {{ share.shared_at }}</span>
-            </div>
-            <!-- Shared Data Details: Categories and time range -->
-            <div class="p-4 bg-neutral-50 dark:bg-neutral-800/30">
-              <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-2">Shared data:</p>
-              <div class="flex flex-wrap gap-2">
-                {% for item in share.data_categories %}
-                <span class="inline-block border border-primary/70 dark:border-primary-light/70 text-primary-dark dark:text-primary-light text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary/5 dark:bg-primary-light/10">
-                  {{ item }}
-                </span>
-                {% endfor %}
-                <span class="inline-block border border-secondary/70 dark:border-secondary-light/70 text-secondary-dark dark:text-secondary-light text-xs font-medium px-2.5 py-0.5 rounded-full bg-secondary/5 dark:bg-secondary-light/10">
-                  Time: {{ share.time_range }}
-                </span>
+              <!-- Shared Data Details: Categories and time range -->
+              <div class="p-4 bg-neutral-50 dark:bg-neutral-800/30">
+                <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-2">Shared data:</p>
+                <div class="flex flex-wrap gap-2">
+                  {% for item in share.data_categories %}
+                  <span class="inline-block border border-primary/70 dark:border-primary-light/70 text-primary-dark dark:text-primary-light text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary/5 dark:bg-primary-light/10">
+                    {{ item }}
+                  </span>
+                  {% endfor %}
+                  <span class="inline-block border border-secondary/70 dark:border-secondary-light/70 text-secondary-dark dark:text-secondary-light text-xs font-medium px-2.5 py-0.5 rounded-full bg-secondary/5 dark:bg-secondary-light/10">
+                    Time: {{ share.time_range }}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          </a>
           {% endfor %}
         {% else %}
           <!-- Message displayed when no data has been shared with the user -->
