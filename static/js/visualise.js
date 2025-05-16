@@ -463,6 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false, // Added to respect container height
           scales: {
             y: {
               beginAtZero: true,
@@ -514,6 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false, // Added to respect container height
           plugins: {
             legend: {
               position: 'bottom'
